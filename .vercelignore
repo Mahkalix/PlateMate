@@ -1,0 +1,11 @@
+.git
+.vercel
+.agents
+.codex
+AzuriteConfig
+__azurite*
+README.md
+.env*
+.DS_Store
+
+BRIEF.md

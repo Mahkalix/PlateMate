@@ -1,0 +1,67 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+
+@font-face {
+  font-family: 'BBB ReadMe';
+  src: url('assets/fonts/BBBReadMe-BlackItalic.woff2') format('woff2');
+  font-style: italic;
+  font-weight: 900;
+  font-display: swap;
+}
+
+:root {
+  --wine: #803037;
+  --yellow: #f5d000;
+  --cream: #faf7ef;
+  --ink: #392825;
+  --muted: #766862;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--cream); color: var(--ink); font: 15px/1.6 'DM Sans', sans-serif; }
+a { color: inherit; text-decoration: none; }
+a:focus-visible { outline: 3px solid var(--wine); outline-offset: 5px; }
+.page { width: min(100% - 48px, 540px); margin: 0 auto; }
+.header { display: flex; align-items: center; justify-content: space-between; padding: 25px 0 22px; }
+.logo { position: relative; display: block; width: 91px; height: 63px; overflow: hidden; }
+.logo img { position: absolute; width: 146.97%; height: 178.46%; max-width: none; left: -22.82%; top: -26.97%; filter: brightness(0) saturate(100%) invert(24%) sepia(23%) saturate(1912%) hue-rotate(306deg) brightness(95%) contrast(88%); }
+.city { color: var(--wine); font-size: 12px; font-weight: 600; border: 1px solid #80303740; border-radius: 30px; padding: 4px 13px; }
+.cover { height: 195px; border-radius: 12px; overflow: hidden; }
+.cover img { width: 100%; height: 100%; object-fit: cover; object-position: center 46%; display: block; }
+.intro { padding: 28px 8px 0; text-align: center; }
+h1 { font: italic 900 clamp(38px, 7vw, 48px)/1.12 'BBB ReadMe', Georgia, serif; color: var(--wine); letter-spacing: -.5px; margin: 0 0 20px; }
+.intro p { max-width: 445px; margin: 0 auto 12px; }
+.intro p:last-child { color: var(--muted); font-size: 14px; max-width: 365px; }
+.communities { margin: 26px 0 32px; }
+h2 { font-size: 11px; text-transform: uppercase; letter-spacing: 1.6px; font-weight: 600; color: var(--muted); margin: 0 0 12px 2px; }
+.group { display: flex; align-items: center; gap: 20px; padding: 18px 23px; border-radius: 12px; border: 1px solid transparent; transition: transform .18s, box-shadow .18s; }
+.group[href]:hover { transform: translateY(-2px); box-shadow: 0 4px 12px #39282512; }
+.group-copy { flex: 1; min-width: 0; }
+.group-copy strong, .group-copy > span { display: block; }
+.group-copy strong { font-size: 17px; line-height: 1.3; margin-bottom: 4px; font-weight: 700; }
+.group-copy > span { font-size: 12px; line-height: 1.5; }
+.group-whatsapp { background: #176b40; color: #fff; border-color: #176b40; }
+.group-whatsapp:hover { background: #125a35; }
+.group-whatsapp .group-copy > span { color: #e1f3e7; }
+.whatsapp-logo { width: 36px; height: 36px; flex-shrink: 0; filter: brightness(0) invert(1); }
+.arrow { font-size: 23px; font-weight: 400; }
+.groups-note { text-align: center; font-size: 11px; color: var(--muted); margin: 17px 0 0; }
+.signoff { text-align: center; font-size: 12px; color: var(--muted); margin: 31px 15px 28px; }
+footer { display: flex; justify-content: center; gap: 15px; border-top: 1px solid #e4dcd1; padding: 18px 0 25px; color: var(--muted); font-size: 10px; }
+@media (max-width: 480px) {
+  .page { width: calc(100% - 36px); }
+  .header { padding: 18px 0; }
+  .logo { width: 80px; height: 55px; }
+  .cover { height: 158px; }
+  .intro { padding: 25px 2px 0; }
+  .intro p { font-size: 14px; }
+  .intro p:last-child { font-size: 13px; }
+  .group { padding: 17px 18px; gap: 14px; }
+  .group-copy strong { font-size: 15px; }
+  .group-whatsapp { gap: 12px; padding-inline: 15px; }
+  .whatsapp-logo { width: 30px; height: 30px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .group { transition: none; }
+}
+
+.community-values { max-width: 390px; margin: -12px auto 28px; text-align: center; color: var(--muted); font-size: 12px; line-height: 1.6; }
