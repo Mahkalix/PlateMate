@@ -4,12 +4,12 @@ PlateMate met les expériences culinaires au centre. Les visiteurs découvrent l
 
 ## Accueil provisoire et ancienne page
 
-La racine `/` affiche une page de maintenance aux couleurs du Figma pendant la construction de l'application. La page statique du groupe WhatsApp reste dans [`/whatsapp/`](whatsapp/) et son lien est accessible depuis l'accueil. Pour les voir localement :
+La racine `/` affiche une page de maintenance aux couleurs du Figma pendant la construction de l'application. La page statique du groupe WhatsApp reste dans [`/whatsapp/`](frontend/public/whatsapp/) et son lien est accessible depuis l'accueil. Les deux sont dans `frontend/public/`, le dossier servi par Vercel. Pour les voir localement :
 
 ```sh
 npm ci --prefix frontend
 npm run build --prefix frontend
-python3 -m http.server 8080
+python3 -m http.server 8080 --directory frontend/public
 # http://localhost:8080/ (maintenance)
 # http://localhost:8080/whatsapp/ (ancien site)
 ```

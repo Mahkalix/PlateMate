@@ -99,43 +99,18 @@ a:focus-visible {
   top: -26px;
 }
 
-.c-header__status {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-  border: 1px solid rgba(250, 244, 212, 0.45);
-  border-radius: 999px;
-  padding: 9px 16px;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.c-header__status-dot {
-  width: 8px;
-  height: 8px;
-  flex: 0 0 auto;
-  border-radius: 50%;
-  background: var(--yellow);
-}
-
 .c-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 15px 30px;
-  min-height: 80px;
+  min-height: 64px;
   padding: 16px max(44px, (100vw - 1440px) / 2 + 44px);
-  background: var(--red);
+  border-top: 1px solid rgba(250, 244, 212, 0.18);
+  background: var(--wine);
+  color: rgba(250, 244, 212, 0.75);
   font-size: 13px;
-}
-
-.c-footer p {
-  margin: 0;
-  font-weight: 800;
 }
 
 .c-footer__links {
@@ -155,7 +130,7 @@ a:focus-visible {
 
 .s-maintenance {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr);
   align-items: stretch;
   width: min(100%, 1600px);
   flex: 1;
@@ -168,21 +143,13 @@ a:focus-visible {
   align-items: flex-start;
   justify-content: center;
   min-width: 0;
-  padding: clamp(55px, 8vw, 140px) 5vw clamp(65px, 9vw, 150px) max(44px, (100vw - 1440px) / 2 + 44px);
-}
-
-.s-maintenance__eyebrow {
-  margin: 0 0 26px;
-  color: var(--yellow);
-  font-size: clamp(12px, 1.25vw, 17px);
-  font-weight: 800;
-  letter-spacing: 0.18em;
+  padding: clamp(55px, 7vw, 110px) 5vw clamp(65px, 8vw, 120px) max(44px, (100vw - 1440px) / 2 + 44px);
 }
 
 h1 {
-  max-width: 780px;
+  max-width: 700px;
   margin: 0;
-  font: italic 900 clamp(52px, 6.5vw, 104px)/0.99 "BBB ReadMe", Georgia, serif;
+  font: italic 900 clamp(48px, 5vw, 76px)/1.03 "BBB ReadMe", Georgia, serif;
   text-transform: uppercase;
   letter-spacing: -0.025em;
 }
@@ -193,22 +160,15 @@ h1 span {
 
 .s-maintenance__lead {
   max-width: 620px;
-  margin: 30px 0 0;
-  font-size: clamp(18px, 1.6vw, 23px);
+  margin: 28px 0 32px;
+  font-size: clamp(17px, 1.4vw, 20px);
   line-height: 1.4;
   font-weight: 600;
 }
 
-.s-maintenance__small-copy {
-  max-width: 570px;
-  margin: 18px 0 30px;
-  font-size: 15px;
-  color: rgba(250, 244, 212, 0.84);
-}
-
 .s-maintenance__image {
   position: relative;
-  min-height: 540px;
+  min-height: 480px;
   overflow: hidden;
   background: #341915;
 }
@@ -216,7 +176,7 @@ h1 span {
 .s-maintenance__image::after {
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, var(--wine) 0, rgba(98, 0, 9, 0.07) 18%, transparent 55%), linear-gradient(0deg, rgba(41, 4, 8, 0.25), transparent 50%);
+  background: linear-gradient(90deg, rgba(98, 0, 9, 0.18), transparent 35%);
   content: "";
   pointer-events: none;
 }
@@ -229,23 +189,6 @@ h1 span {
   height: 100%;
   object-fit: cover;
   object-position: 54% center;
-}
-
-.s-maintenance__stamp {
-  position: absolute;
-  z-index: 1;
-  right: clamp(24px, 4vw, 72px);
-  bottom: clamp(24px, 4vw, 72px);
-  display: grid;
-  place-items: center;
-  width: clamp(120px, 13vw, 185px);
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: var(--red);
-  color: var(--cream);
-  font: italic 900 clamp(17px, 1.8vw, 25px)/1.03 "BBB ReadMe", Georgia, serif;
-  text-align: center;
-  transform: rotate(-11deg);
 }
 
 @media (max-width: 950px) {
@@ -283,26 +226,15 @@ h1 span {
     left: -31px;
     top: -22px;
   }
-  .c-header__status {
-    padding: 7px 10px;
-    font-size: 10px;
-    letter-spacing: 0.03em;
-  }
   .s-maintenance__copy {
     padding: 38px 24px 54px;
   }
-  .s-maintenance__eyebrow {
-    margin-bottom: 18px;
-  }
   h1 {
-    font-size: clamp(46px, 12.5vw, 70px);
+    font-size: clamp(42px, 11vw, 64px);
   }
   .s-maintenance__lead {
     margin-top: 24px;
     font-size: 17px;
-  }
-  .s-maintenance__small-copy {
-    font-size: 14px;
   }
   .o-button {
     width: 100%;
@@ -311,12 +243,6 @@ h1 span {
   .s-maintenance__image {
     min-height: 280px;
     max-height: 300px;
-  }
-  .s-maintenance__stamp {
-    width: 112px;
-    font-size: 15px;
-    right: 18px;
-    bottom: 18px;
   }
   .c-footer {
     padding: 22px 24px;

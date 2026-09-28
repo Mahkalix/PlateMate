@@ -9,12 +9,12 @@ Depuis la racine du dépôt :
 ```sh
 npm ci --prefix frontend
 npm run build --prefix frontend
-python3 -m http.server 8080
+python3 -m http.server 8080 --directory frontend/public
 ```
 
 Ouvrir `http://localhost:8080/` ou `http://localhost:8080/whatsapp/`. Pour compiler après chaque modification : `npm run watch --prefix frontend`. Avant une PR : `npm run format:check --prefix frontend` et `npm run check:css --prefix frontend`.
 
-Les sources sont dans `frontend/scss/`. La compilation écrit `maintenance.css` et `whatsapp/styles.css` dans les chemins utilisés par les deux pages. Ces CSS sont versionnés car l'hébergement Vercel sert des fichiers statiques sans étape de build. Le dossier `frontend/` est exclu du site publié.
+Les sources sont dans `frontend/scss/`. La compilation écrit `frontend/public/maintenance.css` et `frontend/public/whatsapp/styles.css` dans les chemins utilisés par les pages. Ces CSS sont versionnés car l'hébergement Vercel sert des fichiers statiques sans étape de build. Vercel publie uniquement `frontend/public/`, indiqué dans `vercel.json` ; la page d'attente est son `index.html` à la route `/`, sans routeur JavaScript.
 
 ## Architecture
 

@@ -3,9 +3,9 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "build": "sass --no-source-map scss/main.scss:../maintenance.css scss/community.scss:../whatsapp/styles.css",
-    "watch": "sass --watch --no-source-map scss/main.scss:../maintenance.css scss/community.scss:../whatsapp/styles.css",
-    "check:css": "npm run build && git -C .. diff --exit-code -- maintenance.css whatsapp/styles.css",
+    "build": "sass --no-source-map scss/main.scss:public/maintenance.css scss/community.scss:public/whatsapp/styles.css",
+    "watch": "sass --watch --no-source-map scss/main.scss:public/maintenance.css scss/community.scss:public/whatsapp/styles.css",
+    "check:css": "npm run build && git -C .. diff --exit-code -- frontend/public/maintenance.css frontend/public/whatsapp/styles.css",
     "format": "prettier --write 'scss/**/*.scss'",
     "format:check": "prettier --check 'scss/**/*.scss'"
   },

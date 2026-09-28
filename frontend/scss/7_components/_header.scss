@@ -23,23 +23,3 @@
   left: -37px;
   top: -26px;
 }
-.c-header__status {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-  border: 1px solid rgb(250 244 212 / 45%);
-  border-radius: 999px;
-  padding: 9px 16px;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-.c-header__status-dot {
-  width: 8px;
-  height: 8px;
-  flex: 0 0 auto;
-  border-radius: 50%;
-  background: var(--yellow);
-}

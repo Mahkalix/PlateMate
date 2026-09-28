@@ -4,14 +4,12 @@
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 15px 30px;
-  min-height: 80px;
+  min-height: 64px;
   padding: 16px max(44px, calc((100vw - 1440px) / 2 + 44px));
-  background: var(--red);
+  border-top: 1px solid rgb(250 244 212 / 18%);
+  background: var(--wine);
+  color: rgb(250 244 212 / 75%);
   font-size: 13px;
-}
-.c-footer p {
-  margin: 0;
-  font-weight: 800;
 }
 .c-footer__links {
   display: flex;

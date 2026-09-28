@@ -4,17 +4,13 @@ on:
   pull_request:
     paths:
       - 'frontend/**'
-      - 'index.html'
-      - 'maintenance.css'
-      - 'whatsapp/**'
+      - 'vercel.json'
       - '.github/workflows/frontend.yml'
   push:
     branches: [main]
     paths:
       - 'frontend/**'
-      - 'index.html'
-      - 'maintenance.css'
-      - 'whatsapp/**'
+      - 'vercel.json'
       - '.github/workflows/frontend.yml'
 
 jobs:
