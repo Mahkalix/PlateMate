@@ -21,5 +21,6 @@ CREATE TABLE IF NOT EXISTS profiles (
   dietary_preferences text[] NOT NULL DEFAULT '{}',
   allergies text[] NOT NULL DEFAULT '{}',
   meeting_context text NOT NULL DEFAULT '',
+  discoverable boolean NOT NULL DEFAULT false,
   updated_at timestamptz NOT NULL DEFAULT now()
 );

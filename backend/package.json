@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "express": "^5.1.0",
+    "express-rate-limit": "^8.0.0",
     "pg": "^8.16.0",
     "zod": "^4.0.0"
   },
