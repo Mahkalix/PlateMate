@@ -4,3 +4,4 @@
 AzuriteConfig
 __azurite*
 .vercel
+frontend/node_modules/

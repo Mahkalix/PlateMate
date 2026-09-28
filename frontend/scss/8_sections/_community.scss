@@ -1,53 +1,34 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap");
-@font-face {
-  font-family: "BBB ReadMe";
-  src: url("/whatsapp/assets/fonts/BBBReadMe-BlackItalic.woff2") format("woff2");
-  font-style: italic;
-  font-weight: 900;
-  font-display: swap;
-}
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
+@use "../1_settings/tokens" as token;
+@use "../2_tools/focus";
 
 :root {
-  --wine: #803037;
-  --yellow: #f5d000;
-  --cream: #faf7ef;
-  --ink: #392825;
-  --muted: #766862;
+  @include token.community-theme;
 }
 
 body {
   margin: 0;
   background: var(--cream);
   color: var(--ink);
-  font: 15px/1.6 "DM Sans", sans-serif;
+  font:
+    15px/1.6 "DM Sans",
+    sans-serif;
 }
-
 a {
   color: inherit;
   text-decoration: none;
-}
-a:focus-visible {
-  outline: 3px solid var(--wine);
-  outline-offset: 5px;
+  @include focus.focus-ring(var(--wine));
 }
 
 .page {
   width: min(100% - 48px, 540px);
   margin: 0 auto;
 }
-
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 25px 0 22px;
 }
-
 .header-links {
   display: flex;
   flex-wrap: wrap;
@@ -56,7 +37,6 @@ a:focus-visible {
   gap: 8px 18px;
   margin-left: 16px;
 }
-
 .header nav a {
   display: inline-block;
   padding: 8px 0;
@@ -64,31 +44,25 @@ a:focus-visible {
   font-weight: 600;
   color: var(--wine);
 }
-
 .header nav a:hover,
 footer a:hover {
   text-decoration: underline;
   text-underline-offset: 4px;
 }
-
 .logo {
   flex-shrink: 0;
 }
-
-.header nav a[aria-current=page] {
+.header nav a[aria-current="page"] {
   text-decoration: underline;
   text-underline-offset: 4px;
 }
-
 footer {
   flex-wrap: wrap;
   align-items: center;
 }
-
 footer a {
   padding: 6px 0;
 }
-
 .instagram-link {
   display: inline-flex;
   align-items: center;
@@ -98,26 +72,21 @@ footer a {
   color: var(--wine);
   border-radius: 50%;
 }
-
 .instagram-link:hover {
-  background: rgba(128, 48, 55, 0.0509803922);
+  background: #8030370d;
 }
-
 .legal {
   padding: 16px 0 36px;
 }
-
 .back-link {
   display: inline-block;
   margin-bottom: 24px;
   color: var(--wine);
   font-size: 13px;
 }
-
 .legal h1 {
   font-size: clamp(32px, 7vw, 42px);
 }
-
 .legal h2 {
   margin: 28px 0 12px;
   color: var(--wine);
@@ -125,35 +94,29 @@ footer a {
   text-transform: none;
   letter-spacing: 0;
 }
-
 .legal p,
 .legal dl {
   font-size: 14px;
 }
-
 .legal a {
   text-decoration: underline;
   text-underline-offset: 3px;
   overflow-wrap: anywhere;
 }
-
 .legal-note {
   padding: 16px;
   border-left: 3px solid var(--yellow);
   background: #f1ece1;
   border-radius: 0 8px 8px 0;
 }
-
 .legal dt {
   margin-top: 12px;
   font-weight: 600;
 }
-
 .legal dd {
   margin: 2px 0 0;
   color: var(--muted);
 }
-
 .logo {
   position: relative;
   display: block;
@@ -161,7 +124,6 @@ footer a {
   height: 63px;
   overflow: hidden;
 }
-
 .logo img {
   position: absolute;
   width: 146.97%;
@@ -169,24 +131,22 @@ footer a {
   max-width: none;
   left: -22.82%;
   top: -26.97%;
-  filter: brightness(0) saturate(100%) invert(24%) sepia(23%) saturate(1912%) hue-rotate(306deg) brightness(95%) contrast(88%);
+  filter: brightness(0) saturate(100%) invert(24%) sepia(23%) saturate(1912%)
+    hue-rotate(306deg) brightness(95%) contrast(88%);
 }
-
 .city {
   color: var(--wine);
   font-size: 12px;
   font-weight: 600;
-  border: 1px solid rgba(128, 48, 55, 0.2509803922);
+  border: 1px solid #80303740;
   border-radius: 30px;
   padding: 4px 13px;
 }
-
 .cover {
   height: 195px;
   border-radius: 12px;
   overflow: hidden;
 }
-
 .cover img {
   width: 100%;
   height: 100%;
@@ -194,34 +154,31 @@ footer a {
   object-position: center 46%;
   display: block;
 }
-
 .intro {
   padding: 28px 8px 0;
   text-align: center;
 }
-
 h1 {
-  font: italic 900 clamp(38px, 7vw, 48px)/1.12 "BBB ReadMe", Georgia, serif;
+  font:
+    italic 900 clamp(38px, 7vw, 48px)/1.12 "BBB ReadMe",
+    Georgia,
+    serif;
   color: var(--wine);
   letter-spacing: -0.5px;
   margin: 0 0 20px;
 }
-
 .intro p {
   max-width: 445px;
   margin: 0 auto 12px;
 }
-
 .intro p:last-child {
   color: var(--muted);
   font-size: 14px;
   max-width: 365px;
 }
-
 .communities {
   margin: 26px 0 32px;
 }
-
 h2 {
   font-size: 11px;
   text-transform: uppercase;
@@ -230,7 +187,6 @@ h2 {
   color: var(--muted);
   margin: 0 0 12px 2px;
 }
-
 .group {
   display: flex;
   align-items: center;
@@ -238,76 +194,65 @@ h2 {
   padding: 18px 23px;
   border-radius: 12px;
   border: 1px solid transparent;
-  transition: transform 0.18s, box-shadow 0.18s;
+  transition:
+    transform 0.18s,
+    box-shadow 0.18s;
 }
-
 .group[href]:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(57, 40, 37, 0.0705882353);
+  box-shadow: 0 4px 12px #39282512;
 }
-
 .group-copy {
   flex: 1;
   min-width: 0;
 }
-
 .group-copy strong,
 .group-copy > span {
   display: block;
 }
-
 .group-copy strong {
   font-size: 17px;
   line-height: 1.3;
   margin-bottom: 4px;
   font-weight: 700;
 }
-
 .group-copy > span {
   font-size: 12px;
   line-height: 1.5;
 }
-
 .group-whatsapp {
   background: #176b40;
   color: #fff;
   border-color: #176b40;
 }
-
 .group-whatsapp:hover {
   background: #125a35;
 }
-
 .group-whatsapp .group-copy > span {
   color: #e1f3e7;
 }
-
 .whatsapp-logo {
   width: 36px;
   height: 36px;
   flex-shrink: 0;
   filter: brightness(0) invert(1);
 }
-
 .arrow {
   font-size: 23px;
   font-weight: 400;
 }
-
 .groups-note {
   text-align: center;
   font-size: 11px;
   color: var(--muted);
   margin: 17px 0 0;
 }
-
 .signoff {
   text-align: center;
   font-size: 12px;
   color: var(--muted);
   margin: 31px 15px 28px;
 }
-
 footer {
   display: flex;
   justify-content: center;
@@ -317,7 +262,6 @@ footer {
   color: var(--muted);
   font-size: 10px;
 }
-
 @media (max-width: 480px) {
   .page {
     width: calc(100% - 36px);
@@ -362,6 +306,7 @@ footer {
     transition: none;
   }
 }
+
 .community-values {
   max-width: 390px;
   margin: -12px auto 28px;
@@ -377,54 +322,49 @@ footer {
   border-top: 1px solid #e4dcd1;
   text-align: center;
 }
-
 .team-page {
   margin-top: 0;
   padding-top: 8px;
   border-top: 0;
 }
-
 .team-page h1 {
   font-size: clamp(32px, 7vw, 42px);
 }
-
 .team h2 {
   margin: 0 0 14px;
   color: var(--wine);
-  font: italic 900 clamp(28px, 6vw, 34px)/1.15 "BBB ReadMe", Georgia, serif;
+  font:
+    italic 900 clamp(28px, 6vw, 34px)/1.15 "BBB ReadMe",
+    Georgia,
+    serif;
   text-transform: none;
   letter-spacing: -0.3px;
 }
-
 .team-intro {
   max-width: 330px;
   margin: 0 auto 24px;
   color: var(--muted);
   font-size: 13px;
 }
-
 .team-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 24px 16px;
 }
-
 .team-member {
   margin: 0;
   min-width: 0;
 }
-
 .team-member img {
   display: block;
   width: 100%;
   height: auto;
-  aspect-ratio: 3/4;
+  aspect-ratio: 3 / 4;
   object-fit: cover;
   object-position: center 55%;
   border-radius: 12px;
   background: #e4dcd1;
 }
-
 .team-member figcaption {
   margin-top: 10px;
   color: var(--wine);
@@ -432,7 +372,6 @@ footer {
   font-weight: 700;
   overflow-wrap: anywhere;
 }
-
 .team-role {
   display: block;
   margin-top: 3px;
@@ -440,7 +379,6 @@ footer {
   font-size: 12px;
   font-weight: 400;
 }
-
 @media (max-width: 480px) {
   .team-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));

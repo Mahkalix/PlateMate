@@ -7,10 +7,14 @@ PlateMate met les expériences culinaires au centre. Les visiteurs découvrent l
 La racine `/` affiche une page de maintenance aux couleurs du Figma pendant la construction de l'application. La page statique du groupe WhatsApp reste dans [`/whatsapp/`](whatsapp/) et son lien est accessible depuis l'accueil. Pour les voir localement :
 
 ```sh
+npm ci --prefix frontend
+npm run build --prefix frontend
 python3 -m http.server 8080
 # http://localhost:8080/ (maintenance)
 # http://localhost:8080/whatsapp/ (ancien site)
 ```
+
+Les sources et commandes SCSS sont décrites dans le [guide frontend](frontend/README.md). Les feuilles compilées sont versionnées pour l'hébergement statique.
 
 Le site statique n'est pas l'application de réservation. Son identité visuelle reprend le Figma PlateMate ; le logo WhatsApp est issu de Simple Icons. Les licences des polices sont conservées avec leurs fichiers.
 
