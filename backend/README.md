@@ -57,9 +57,9 @@ Ouvrir l'URL Checkout imprimée et payer avec [la carte de test Stripe](https://
 
 ## Configuration Auth0
 
-1. Créer une API Auth0 avec l'audience `https://platemate.fr/api`, algorithme **RS256** et un tenant HTTPS. Configurer le frontend Auth0 pour demander un jeton d'accès à cette audience.
-2. Définir `AUTH_MODE=auth0`, `AUTH0_ISSUER_BASE_URL=https://VOTRE_TENANT/` et `AUTH0_AUDIENCE=https://platemate.fr/api` côté API. L'API vérifie la signature via le JWKS Auth0, l'émetteur, l'audience et l'expiration. L'identité durable est le `sub`. Les comptes ne sont jamais rapprochés par e-mail.
-3. Si l'e-mail doit être transmis à Stripe, une Action Auth0 peut ajouter au **jeton d'accès** les claims `https://platemate.fr/email` et `https://platemate.fr/email_verified`. Le serveur n'utilise l'e-mail que si le second claim est `true`. Configurer la vérification d'e-mail, la récupération du mot de passe, MFA et les fournisseurs souhaités dans Auth0. Le secret client Auth0 ne va jamais au navigateur.
+1. API Auth0 créée avec l'audience `https://weareplatemate.com/api`, algorithme **RS256** et un tenant HTTPS. Configurer le frontend Auth0 (Client ID `rwmckSUTScqswy4vZoSxp88Ru0aJ47Hk`) pour demander un jeton d'accès à cette audience.
+2. Définir `AUTH_MODE=auth0`, `AUTH0_ISSUER_BASE_URL=https://dev-s4cqy56nmufsd1nf.us.auth0.com/` et `AUTH0_AUDIENCE=https://weareplatemate.com/api` côté API. L'API vérifie la signature via le JWKS Auth0, l'émetteur, l'audience et l'expiration. L'identité durable est le `sub`. Les comptes ne sont jamais rapprochés par e-mail.
+3. Si l'e-mail doit être transmis à Stripe, une Action Auth0 peut ajouter au **jeton d'accès** les claims `https://weareplatemate.com/email` et `https://weareplatemate.com/email_verified`. Le serveur n'utilise l'e-mail que si le second claim est `true`. Configurer la vérification d'e-mail, la récupération du mot de passe, MFA et les fournisseurs souhaités dans Auth0. Le secret client Auth0 ne va jamais au navigateur.
 
 En mode Auth0, tester `GET /api/auth/me` avec `-H "Authorization: Bearer $TOKEN"`. La page de profil est `PUT /api/profile` (remplacement de tous les champs). `GET /api/profile` inclut les préférences privées ; la fiche expérience expose seulement nom, photo, bio, langues et centres d'intérêt de l'hôte.
 

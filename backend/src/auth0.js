@@ -8,8 +8,8 @@ export function auth0Middleware(pool, { issuerBaseURL, audience }) {
     try {
       const subject = req.auth?.payload.sub;
       if (!subject || subject.endsWith('@clients') || subject.length > 255) return res.status(403).json({ error: 'Compte utilisateur requis' });
-      const email = req.auth.payload['https://platemate.fr/email'];
-      const verified = req.auth.payload['https://platemate.fr/email_verified'] === true;
+      const email = req.auth.payload['https://weareplatemate.com/email'];
+      const verified = req.auth.payload['https://weareplatemate.com/email_verified'] === true;
       const safeEmail = verified && typeof email === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email.toLowerCase() : null;
       const { rows } = await pool.query(`INSERT INTO users(id, auth_subject) VALUES($1,$2)
         ON CONFLICT (auth_subject) DO UPDATE SET auth_subject=EXCLUDED.auth_subject

@@ -14,18 +14,18 @@ test('Auth0 vérifie signature, audience, expiration et lie uniquement le subjec
   const stored=[];
   const pool={ query:async (_sql,args)=>{ stored.push(args[1]);return { rows:[{ id:args[0],disabled_at:null }] }; } };
   const app=express();
-  app.get('/private',...auth0Middleware(pool,{ issuerBaseURL:issuer,audience:'https://platemate.fr/api' }),(req,res)=>res.json(req.user));
+  app.get('/private',...auth0Middleware(pool,{ issuerBaseURL:issuer,audience:'https://weareplatemate.com/api' }),(req,res)=>res.json(req.user));
   app.use((error,_req,res,_next)=>res.status(error.status || 500).json({error:error.message}));
   const server=app.listen(0),base=`http://127.0.0.1:${server.address().port}`;
-  const sign=async (aud,subject='auth0|user123')=>new SignJWT({ 'https://platemate.fr/email':'test@example.com','https://platemate.fr/email_verified':true }).setProtectedHeader({alg:'RS256',kid:'test-key'}).setIssuer(issuer).setAudience(aud).setSubject(subject).setIssuedAt().setExpirationTime('5m').sign(privateKey);
+  const sign=async (aud,subject='auth0|user123')=>new SignJWT({ 'https://weareplatemate.com/email':'test@example.com','https://weareplatemate.com/email_verified':true }).setProtectedHeader({alg:'RS256',kid:'test-key'}).setIssuer(issuer).setAudience(aud).setSubject(subject).setIssuedAt().setExpirationTime('5m').sign(privateKey);
   try {
     assert.equal((await fetch(`${base}/private`)).status,401);
-    const valid=await fetch(`${base}/private`,{headers:{authorization:`Bearer ${await sign('https://platemate.fr/api')}`}});
+    const valid=await fetch(`${base}/private`,{headers:{authorization:`Bearer ${await sign('https://weareplatemate.com/api')}`}});
     assert.equal(valid.status,200);
     assert.equal((await valid.json()).email,'test@example.com');
     assert.deepEqual(stored,['auth0|user123']);
     assert.equal((await fetch(`${base}/private`,{headers:{authorization:`Bearer ${await sign('wrong-audience')}`}})).status,401);
-    assert.equal((await fetch(`${base}/private`,{headers:{authorization:`Bearer ${await sign('https://platemate.fr/api','app@clients')}`}})).status,403);
+    assert.equal((await fetch(`${base}/private`,{headers:{authorization:`Bearer ${await sign('https://weareplatemate.com/api','app@clients')}`}})).status,403);
   } finally {
     await new Promise(resolve=>server.close(resolve));
     await new Promise(resolve=>keyServer.close(resolve));
