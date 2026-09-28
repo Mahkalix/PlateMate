@@ -1,6 +1,8 @@
 # PlateMate Backend
 
-API Node.js 22, Express 5 et PostgreSQL 17 pour les expériences culinaires. Les hôtes publient une table, les invités filtrent par ville, date, cuisine, thème, ambiance, langue, régime et places. Le paiement Stripe n'est proposé qu'après acceptation. Cette version est réservée aux essais : elle refuse les clés `sk_live_` et les webhooks `livemode=true`. L'ancienne page statique est conservée sous `/whatsapp/` dans le dépôt.
+API Node.js 22, Express 5 et PostgreSQL 17 pour les expériences culinaires. Les hôtes publient une table, les invités filtrent par ville, date, cuisine, thème, ambiance, langue, régime et places. Le paiement Stripe n'est proposé qu'après acceptation. Cette version est réservée aux essais : elle refuse les clés `sk_live_` et les webhooks `livemode=true`. La page communautaire est l'accueil `/` et reste disponible sous `/whatsapp/`.
+
+Pour lancer tout l'environnement en conteneurs (frontend, API, worker et base), exécuter `docker compose up --build -d --wait` depuis la racine du dépôt. L'API est sur `http://localhost:3000`, le frontend sur `http://localhost:8080`. Docker Compose migre la base avant l'API et utilise le mode local par défaut. Les variables `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` et `STRIPE_CONNECT_WEBHOOK_SECRET` peuvent être renseignées dans un `.env` à la racine, avec uniquement des clés Stripe de test. La CLI Stripe reste à lancer sur la machine hôte pour relayer les webhooks. `docker compose down` arrête les services sans effacer les volumes.
 
 ## Lancer en local
 

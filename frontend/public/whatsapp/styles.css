@@ -200,6 +200,18 @@ footer a {
   text-align: center;
 }
 
+.intro .construction-note {
+  display: inline-block;
+  margin: 0 0 18px;
+  padding: 5px 12px;
+  border: 1px solid var(--wine);
+  border-radius: 999px;
+  color: var(--wine);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
 h1 {
   font: italic 900 clamp(38px, 7vw, 48px)/1.12 "BBB ReadMe", Georgia, serif;
   color: var(--wine);

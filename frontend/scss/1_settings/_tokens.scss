@@ -1,4 +1,4 @@
-// Couleurs PlateMate : maquette pour l'accueil, palette historique pour la communauté.
+// Couleurs PlateMate : maquette de l'application et page communautaire.
 $wine: #620009;
 $cream: #faf4d4;
 $yellow: #ffcc58;
@@ -11,13 +11,6 @@ $muted: #766862;
 
 $mobile: 560px;
 $tablet: 950px;
-
-@mixin maintenance-theme {
-  --wine: #{$wine};
-  --cream: #{$cream};
-  --yellow: #{$yellow};
-  --red: #{$red};
-}
 
 @mixin community-theme {
   --wine: #{$community-wine};

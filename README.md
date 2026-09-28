@@ -2,23 +2,31 @@
 
 PlateMate met les expériences culinaires au centre. Les visiteurs découvrent le menu et l'hôte (photo, présentation, langues, centres d'intérêt), puis filtrent par cuisine, thème, ambiance, ville, date, régime et nombre de places. Le questionnaire peut alimenter ces filtres ; il n'y a pas de score de compatibilité. Voir le [cadrage produit](docs/product-direction.md).
 
-## Accueil provisoire et ancienne page
+## Démarrer tout l'environnement
 
-La racine `/` affiche une page de maintenance aux couleurs du Figma pendant la construction de l'application. La page statique du groupe WhatsApp reste dans [`/whatsapp/`](frontend/public/whatsapp/) et son lien est accessible depuis l'accueil. Les deux sont dans `frontend/public/`, le dossier servi par Vercel. Pour les voir localement :
+Depuis la racine du dépôt, avec Docker Compose :
 
 ```sh
-npm ci --prefix frontend
-npm run build --prefix frontend
-python3 -m http.server 8080 --directory frontend/public
-# http://localhost:8080/ (maintenance)
-# http://localhost:8080/whatsapp/ (ancien site)
+docker compose up --build -d --wait
+```
+
+Ouvrir [l'accueil](http://localhost:8080/) ou [la page WhatsApp](http://localhost:8080/whatsapp/). L'API répond sur [localhost:3000/api/ready](http://localhost:3000/api/ready). La base PostgreSQL, les migrations, l'API, le worker et le frontend démarrent ensemble. Pour arrêter : `docker compose down`. Les données PostgreSQL et les médias restent dans des volumes Docker. Ce démarrage utilise l'authentification locale et les paiements Stripe en mode test uniquement ; pour renseigner les clés de test, voir le [guide backend](backend/README.md).
+
+## Accueil provisoire
+
+La page communautaire est l'accueil provisoire sur `/`, avec la mention « Site en construction ». Elle reste également accessible sous [`/whatsapp/`](frontend/public/whatsapp/). Les fichiers publiés sont dans `frontend/public/`, le dossier servi par Vercel. Pour les voir localement :
+
+```sh
+cd frontend
+npm run start
+# http://localhost:8080/ et http://localhost:8080/whatsapp/
 ```
 
 Les sources et commandes SCSS sont décrites dans le [guide frontend](frontend/README.md). Les feuilles compilées sont versionnées pour l'hébergement statique.
 
-Le site statique n'est pas l'application de réservation. Son identité visuelle reprend le Figma PlateMate ; le logo WhatsApp est issu de Simple Icons. Les licences des polices sont conservées avec leurs fichiers.
+Le site statique n'est pas l'application de réservation. Le logo WhatsApp est issu de Simple Icons. Les licences des polices sont conservées avec leurs fichiers.
 
-## Backend
+## Backend sans Docker Compose complet
 
 Le [guide backend](backend/README.md) contient les commandes d'installation, les tests PostgreSQL, le parcours Stripe test, Auth0, les routes et les conditions de déploiement.
 

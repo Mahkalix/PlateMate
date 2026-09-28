@@ -5,12 +5,14 @@ on:
     paths:
       - 'frontend/**'
       - 'vercel.json'
+      - 'compose.yaml'
       - '.github/workflows/frontend.yml'
   push:
     branches: [main]
     paths:
       - 'frontend/**'
       - 'vercel.json'
+      - 'compose.yaml'
       - '.github/workflows/frontend.yml'
 
 jobs:
@@ -26,3 +28,5 @@ jobs:
       - run: npm ci --prefix frontend
       - run: npm run format:check --prefix frontend
       - run: npm run check:css --prefix frontend
+      - run: docker compose config --quiet
+      - run: docker build ./frontend

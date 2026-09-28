@@ -3,36 +3,49 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#620009">
-  <meta name="description" content="PlateMate prépare des expériences culinaires à partager. Retrouvez notre communauté en attendant l'ouverture du site.">
-  <title>PlateMate (le site se prépare)</title>
+  <meta name="theme-color" content="#803037">
+  <meta name="description" content="PlateMate est en construction. Rejoignez notre communauté à Grenoble et aux alentours pour partager un repas, une rencontre et une culture.">
+  <title>PlateMate — Un repas, une rencontre, une culture</title>
   <link rel="preload" href="/whatsapp/assets/fonts/BBBReadMe-BlackItalic.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="/maintenance.css">
+  <link rel="stylesheet" href="/whatsapp/styles.css">
 </head>
 <body>
-  <div class="l-site-shell">
-    <header class="c-header">
-      <a class="c-header__brand" href="/" aria-label="PlateMate, accueil">
-        <img src="/whatsapp/assets/platemate-logo.png" alt="PlateMate" width="3000" height="2500">
-      </a>
+  <div class="page">
+    <header class="header">
+      <a class="logo" href="/" aria-label="PlateMate, accueil"><img src="/whatsapp/assets/platemate-logo.png" alt="PlateMate" width="230" height="191"></a>
+      <div class="header-links">
+        <nav aria-label="Navigation principale"><a href="/whatsapp/equipe.html">L’équipe</a></nav>
+        <span class="city">Grenoble & alentours</span>
+      </div>
     </header>
 
-    <main id="contenu" class="s-maintenance">
-      <div class="s-maintenance__copy">
-        <h1>On se retrouve<br><span>bientôt à table.</span></h1>
-        <p class="s-maintenance__lead">PlateMate se prépare. En attendant les premières expériences culinaires, rejoignez notre communauté.</p>
-        <a class="o-button" href="/whatsapp/">Rejoindre la communauté <span aria-hidden="true">↗</span></a>
-      </div>
-      <div class="s-maintenance__image">
-        <img src="/whatsapp/assets/hero-table.png" alt="Des personnes partagent un repas autour d'une table" width="1125" height="750" fetchpriority="high">
-      </div>
-    </main>
+    <main>
+      <div class="cover"><img src="/whatsapp/assets/hero-table.png" alt="Un repas à partager autour d’une grande table" width="1125" height="750" fetchpriority="high"></div>
+      <section class="intro" aria-labelledby="title">
+        <p class="construction-note">Site en construction</p>
+        <h1 id="title">Un repas,<br>une rencontre,<br>une culture.</h1>
+        <p>On teste les repas entre hôtes et invités à Grenoble et aux alentours. Tu nous rejoins ?</p>
+      </section>
 
-    <footer class="c-footer">
-      <div class="c-footer__links">
-        <span>© PlateMate 2026</span>
-        <a href="/whatsapp/mentions-legales.html">Mentions légales</a>
+      <div class="communities">
+        <a class="group group-whatsapp" href="https://chat.whatsapp.com/FZZxZ4uXX8E5D3ac2s2Tc3" target="_blank" rel="noopener noreferrer" aria-label="Rejoindre le groupe WhatsApp PlateMate Grenoble et alentours (nouvel onglet)">
+          <img class="whatsapp-logo" src="/whatsapp/assets/whatsapp.svg" alt="" width="36" height="36">
+          <span class="group-copy"><strong>Rejoindre le groupe WhatsApp</strong></span>
+          <span class="arrow" aria-hidden="true">↗</span>
+        </a>
       </div>
+      <p class="community-values">Une communauté bienveillante où chacun peut se sentir en confiance, avec ses différences.</p>
+    </main>
+    <footer>
+      <span>© PlateMate 2026</span>
+      <a href="/whatsapp/mentions-legales.html">Mentions légales</a>
+      <a class="instagram-link" href="https://www.instagram.com/weareplatemate/" target="_blank" rel="noopener noreferrer" aria-label="PlateMate sur Instagram : @weareplatemate (nouvel onglet)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" focusable="false">
+          <rect x="3" y="3" width="18" height="18" rx="5"/>
+          <circle cx="12" cy="12" r="4"/>
+          <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+        </svg>
+      </a>
     </footer>
   </div>
 </body>
