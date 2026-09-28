@@ -27,6 +27,6 @@ npm run dev
 # puis dans un autre terminal : npm run demo
 ```
 
-L'API gère les profils privés et fiches hôte publiques, les expériences et menus, la publication, les dates et capacités, les demandes acceptées par l'hôte, Stripe Checkout, les annulations/remboursements, la messagerie, les avis et les revenus des hôtes avec Stripe Connect. L'authentification Auth0 est imposée en mode production ; les comptes locaux servent à la démo de développement. Les confirmations de paiement viennent exclusivement des webhooks signés.
+L'API gère les profils privés et fiches hôte publiques, les expériences et menus, la publication, les dates et capacités, les demandes acceptées par l'hôte, Stripe Checkout, les annulations/remboursements, la messagerie, les avis et les revenus des hôtes avec Stripe Connect. Cette version accepte uniquement Stripe en mode test. L'authentification Auth0 est imposée pour un déploiement HTTPS ; les comptes locaux servent à la démo de développement. Les confirmations de paiement viennent exclusivement des webhooks signés.
 
-La [PR #1](https://github.com/Mahkalix/PlateMate/pull/1) reste en brouillon : le frontend principal, la configuration des comptes Auth0/Stripe Connect et les essais réels de bout en bout restent à faire avant d'ouvrir les ventes. Le site `/whatsapp/` conserve son chemin.
+La [PR #1](https://github.com/Mahkalix/PlateMate/pull/1) livre un socle backend à tester pendant la construction du frontend. Les URL Auth0 dépendront des routes du futur frontend ; les parcours Stripe Connect doivent être essayés avec des comptes de test. Le site `/whatsapp/` conserve son chemin. Aucun paiement réel n'est activé.

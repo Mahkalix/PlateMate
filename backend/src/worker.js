@@ -3,6 +3,7 @@ import { migrate } from './migrations.js';
 import Stripe from 'stripe';
 import { processWithdrawal, handlePayoutEvent } from './wallet.js';
 import { requestRefund } from './experiences.js';
+import { assertStripeTestKey } from './stripe-test-mode.js';
 
 export async function settleExperiences(pool) {
   const client=await pool.connect();
@@ -23,6 +24,7 @@ export async function settleExperiences(pool) {
 
 if (process.argv[1] && import.meta.url===new URL(`file://${process.argv[1]}`).href) {
   if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL requis');
+  assertStripeTestKey(process.env.STRIPE_SECRET_KEY);
   const pool=new pg.Pool({ connectionString:process.env.DATABASE_URL });
   try {
     await migrate(pool);

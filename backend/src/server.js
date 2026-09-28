@@ -14,12 +14,13 @@ import { socialRoutes } from './social.js';
 import { walletRoutes } from './wallet.js';
 import { mediaRoutes } from './media.js';
 import { experienceRoutes, stripeWebhook } from './experiences.js';
+import { assertStripeTestKey } from './stripe-test-mode.js';
 
 const scrypt = promisify(scryptCallback);
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const app = express();
 app.disable('x-powered-by');
-if (process.env.STRIPE_SECRET_KEY && !/^sk_(test|live)_/.test(process.env.STRIPE_SECRET_KEY)) throw new Error('Clé Stripe invalide');
+assertStripeTestKey(process.env.STRIPE_SECRET_KEY);
 if (process.env.NODE_ENV === 'production' && process.env.AUTH_MODE !== 'auth0') throw new Error('AUTH_MODE=auth0 requis en production');
 if (process.env.NODE_ENV === 'production' && (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET || !process.env.STRIPE_CONNECT_WEBHOOK_SECRET || !process.env.APP_ORIGIN?.startsWith('https://') || !process.env.API_PUBLIC_URL?.startsWith('https://') || !process.env.MEDIA_DIR)) throw new Error('Stripe, HTTPS et MEDIA_DIR requis en production');
 if (process.env.NODE_ENV === 'production' && !process.env.AUTH0_ISSUER_BASE_URL?.startsWith('https://')) throw new Error('Issuer Auth0 HTTPS requis');

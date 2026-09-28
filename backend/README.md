@@ -1,6 +1,6 @@
 # PlateMate Backend
 
-API Node.js 22, Express 5 et PostgreSQL 17 pour les expériences culinaires. Les hôtes publient une table, les invités filtrent par ville, date, cuisine, thème, ambiance, langue, régime et places. Le paiement Stripe n'est proposé qu'après acceptation. L'ancienne page statique est conservée sous `/whatsapp/` dans le dépôt.
+API Node.js 22, Express 5 et PostgreSQL 17 pour les expériences culinaires. Les hôtes publient une table, les invités filtrent par ville, date, cuisine, thème, ambiance, langue, régime et places. Le paiement Stripe n'est proposé qu'après acceptation. Cette version est réservée aux essais : elle refuse les clés `sk_live_` et les webhooks `livemode=true`. L'ancienne page statique est conservée sous `/whatsapp/` dans le dépôt.
 
 ## Lancer en local
 
@@ -39,7 +39,7 @@ npm run test:integration
 
 ### Stripe en mode test
 
-Créer un compte Stripe Connect de test et renseigner `STRIPE_SECRET_KEY=sk_test_...` dans `.env`. Installer la [CLI Stripe](https://docs.stripe.com/stripe-cli) puis :
+Activer le mode test dans Stripe, utiliser une clé secrète `sk_test_...` et des comptes Connect de test. Renseigner la clé dans `.env`. L'API et le worker refusent les clés live ; les webhooks refusent les événements live. Installer la [CLI Stripe](https://docs.stripe.com/stripe-cli) puis :
 
 ```sh
 stripe login
@@ -53,11 +53,11 @@ Lancer ces commandes dans deux terminaux, renseigner leurs secrets respectifs da
 npm run demo:stripe
 ```
 
-Ouvrir l'URL Checkout imprimée et payer avec [la carte de test Stripe](https://docs.stripe.com/testing) `4242 4242 4242 4242`, une expiration future et un CVC à trois chiffres. Le script attend la confirmation du webhook. L'URL de retour `/reservations/:id` est un point d'intégration frontend ; elle ne confirme jamais à elle seule le paiement.
+Ouvrir l'URL Checkout imprimée et payer avec [la carte de test Stripe](https://docs.stripe.com/testing) `4242 4242 4242 4242`, une expiration future et un CVC à trois chiffres. Le script attend la confirmation du webhook et le revenu apparaît en attente dans le portefeuille test. Sans frontend, le retour navigateur sur `/reservations/:id` peut afficher une page inexistante : vérifier le statut dans le terminal ou via l'API. Cette URL de retour ne confirme jamais à elle seule le paiement.
 
 ## Configuration Auth0
 
-1. API Auth0 créée avec l'audience `https://weareplatemate.com/api`, algorithme **RS256** et un tenant HTTPS. Configurer le frontend Auth0 (Client ID `rwmckSUTScqswy4vZoSxp88Ru0aJ47Hk`) pour demander un jeton d'accès à cette audience.
+1. API Auth0 créée avec l'audience `https://weareplatemate.com/api`, algorithme **RS256** et un tenant de développement HTTPS. Le frontend n'existe pas encore : ses URL de retour, de déconnexion et son origine Auth0 seront fixées selon ses routes réelles. Configurer ensuite le frontend (Client ID `rwmckSUTScqswy4vZoSxp88Ru0aJ47Hk`) pour demander un jeton d'accès à cette audience ; autoriser alors l'application à accéder à l'API Auth0.
 2. Définir `AUTH_MODE=auth0`, `AUTH0_ISSUER_BASE_URL=https://dev-s4cqy56nmufsd1nf.us.auth0.com/` et `AUTH0_AUDIENCE=https://weareplatemate.com/api` côté API. L'API vérifie la signature via le JWKS Auth0, l'émetteur, l'audience et l'expiration. L'identité durable est le `sub`. Les comptes ne sont jamais rapprochés par e-mail.
 3. Si l'e-mail doit être transmis à Stripe, une Action Auth0 peut ajouter au **jeton d'accès** les claims `https://weareplatemate.com/email` et `https://weareplatemate.com/email_verified`. Le serveur n'utilise l'e-mail que si le second claim est `true`. Configurer la vérification d'e-mail, la récupération du mot de passe, MFA et les fournisseurs souhaités dans Auth0. Le secret client Auth0 ne va jamais au navigateur.
 
@@ -94,8 +94,8 @@ npm run worker:dev   # toutes les minutes
 
 Le worker libère les revenus 48 h après la date, ferme les demandes acceptées sans paiement après 24 h, et reprend les retraits en cours. Faire tourner **une instance** supervisée du worker en production. Les migrations utilisent un verrou PostgreSQL et une table de versions ; exécuter `node src/server.js --migrate` avant de démarrer l'API. Le [Dockerfile](Dockerfile) démarre l'API avec un utilisateur non privilégié. Monter un volume persistant sur `/data/media` ou définir `MEDIA_DIR` sur un stockage persistant partagé entre instances. Prévoir sauvegardes PostgreSQL, restauration testée, TLS, proxy HTTPS, secret manager, journalisation et alertes. `API_PUBLIC_URL` doit être l'URL HTTPS publique de l'API ; `APP_ORIGIN` celle du frontend autorisé par CORS.
 
-Variables obligatoires en production : `DATABASE_URL`, `NODE_ENV=production`, `AUTH_MODE=auth0`, `AUTH0_ISSUER_BASE_URL`, `AUTH0_AUDIENCE`, `APP_ORIGIN` HTTPS, `API_PUBLIC_URL` HTTPS, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_CONNECT_WEBHOOK_SECRET`, `MEDIA_DIR`. Des clés `sk_test_` conviennent à la préproduction ; le passage en `sk_live_` nécessite une configuration Stripe Connect validée et un test bout en bout. Ne jamais committer `.env` ni transmettre une clé privée au frontend.
+Variables obligatoires pour déployer l'API dans un environnement de test HTTPS : `DATABASE_URL`, `NODE_ENV=production`, `AUTH_MODE=auth0`, `AUTH0_ISSUER_BASE_URL`, `AUTH0_AUDIENCE`, `APP_ORIGIN` HTTPS, `API_PUBLIC_URL` HTTPS, `STRIPE_SECRET_KEY=sk_test_...`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_CONNECT_WEBHOOK_SECRET`, `MEDIA_DIR`. Le mot `production` dans `NODE_ENV` durcit l'exécution Node, mais n'active pas Stripe live. Ne jamais committer `.env` ni transmettre une clé privée au frontend.
 
 ### Points à valider avant toute vente réelle
 
-Le backend n'a **pas** été testé avec un tenant Auth0 ni un compte Stripe Connect réels. Il faut vérifier l'onboarding KYC, les taxes/factures applicables, les remboursements et litiges tardifs, les notifications, la conformité de la conservation des données et la disponibilité de l'hébergement. La conciliation automatique des transferts Stripe après une interruption prolongée doit encore être éprouvée ; ne lancer aucun retrait réel avant cela. Les paiements en argent réel demandent également une validation des conditions Stripe et des règles commerciales. La PR reste en brouillon jusqu'à ces essais.
+Le backend n'a **pas** été testé de bout en bout avec le tenant Auth0 ni avec un compte Stripe Connect de test du projet. Il faut d'abord vérifier ces parcours avec des données de test pendant la construction du frontend. Les taxes/factures applicables, les remboursements et litiges tardifs, les notifications, la conservation des données et la disponibilité de l'hébergement restent à traiter avant toute ouverture commerciale. La conciliation automatique des transferts Stripe après une interruption prolongée doit encore être éprouvée. Cette version interdit les paiements réels ; leur activation demandera un changement explicite du code et de nouveaux essais.

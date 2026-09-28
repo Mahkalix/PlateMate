@@ -60,7 +60,7 @@ export async function runDemo({ baseUrl = 'http://localhost:3000', checkout = fa
     await setTimeout(2500);
     const bookings = (await call('/bookings', { cookie: guest })).data.bookings;
     const status = bookings.find(item => item.id === booking.id)?.status;
-    if (status === 'paid') { log('Paiement test confirmé par le webhook : paid. Aucun portefeuille crédité.'); return { bookingId: booking.id, status }; }
+    if (status === 'paid') { log('Paiement test confirmé par le webhook : paid. Le revenu hôte est enregistré en attente dans le portefeuille test.'); return { bookingId: booking.id, status }; }
   }
   throw new Error('Délai dépassé : vérifier Stripe CLI, le webhook et le statut dans Stripe. Les données restent dans la base.');
 }

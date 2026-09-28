@@ -3,6 +3,13 @@ import { strict as assert } from 'node:assert';
 import express from 'express';
 import Stripe from 'stripe';
 import { experienceRoutes, stripeWebhook } from '../src/experiences.js';
+import { assertStripeTestKey } from '../src/stripe-test-mode.js';
+
+test('Stripe accepte seulement les clés de test', () => {
+  assert.doesNotThrow(() => assertStripeTestKey('sk_test_example'));
+  assert.throws(() => assertStripeTestKey('sk_live_example'), /sk_test_/);
+  assert.throws(() => assertStripeTestKey('invalid'), /sk_test_/);
+});
 
 async function serve(app, run) {
   const server = app.listen(0);
@@ -47,7 +54,7 @@ test('webhook signé crédite le portefeuille une seule fois après paiement Str
   const stripe = { webhooks:sdk.webhooks,paymentIntents:{ retrieve:async()=>({ id:'pi_test_1',status:'succeeded',amount_received:3200,latest_charge:'ch_test_1' }) } };
   const app = express();
   app.post('/webhook', express.raw({ type:'application/json' }),stripeWebhook(pool,stripe,secret));
-  const payload=JSON.stringify({ id:'evt_test',type:'checkout.session.completed',data:{object:{ id:'cs_test_1',client_reference_id:'booking-id',payment_status:'paid',currency:'eur',amount_total:3200,payment_intent:'pi_test_1' }} });
+  const payload=JSON.stringify({ id:'evt_test',livemode:false,type:'checkout.session.completed',data:{object:{ id:'cs_test_1',client_reference_id:'booking-id',payment_status:'paid',currency:'eur',amount_total:3200,payment_intent:'pi_test_1' }} });
   await serve(app,async url=>{
     const invalid=await fetch(`${url}/webhook`,{method:'POST',headers:{'content-type':'application/json','stripe-signature':'invalid'},body:payload});
     assert.equal(invalid.status,400);
@@ -58,5 +65,10 @@ test('webhook signé crédite le portefeuille une seule fois après paiement Str
     }
     assert.equal(queries.filter(([sql])=>sql.includes('INSERT INTO wallet_entries')).length,1);
     assert.deepEqual(queries.find(([sql])=>sql.includes("SET status='paid'"))[1],['booking-id','cs_test_1','pi_test_1',3200,'ch_test_1']);
+    const livePayload=JSON.stringify({id:'evt_live',livemode:true,type:'checkout.session.completed',data:{object:{id:'cs_live'}}});
+    const liveSignature=sdk.webhooks.generateTestHeaderString({payload:livePayload,secret});
+    const live=await fetch(`${url}/webhook`,{method:'POST',headers:{'content-type':'application/json','stripe-signature':liveSignature},body:livePayload});
+    assert.equal(live.status,400);
+    assert.equal(queries.filter(([sql])=>sql.includes('INSERT INTO stripe_events')).length,2);
   });
 });

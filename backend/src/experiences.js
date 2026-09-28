@@ -311,6 +311,7 @@ export function stripeWebhook(pool, stripe, secret) {
     let event;
     try { event = stripe.webhooks.constructEvent(req.body, req.get('stripe-signature'), secret); }
     catch { return res.status(400).json({ error: 'Signature Stripe invalide' }); }
+    if (event.livemode !== false) return res.status(400).json({ error: 'Événement Stripe de test requis' });
     const client = await pool.connect();
     try {
       await client.query('BEGIN');

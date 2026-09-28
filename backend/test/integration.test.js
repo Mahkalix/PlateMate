@@ -86,13 +86,13 @@ test('parcours PostgreSQL : hôte, expérience, invité, demande et capacité', 
         const signature=sdk.webhooks.generateTestHeaderString({payload,secret});
         return fetch(`http://127.0.0.1:${webhookServer.address().port}/webhook`,{method:'POST',headers:{'content-type':'application/json','stripe-signature':signature},body:payload});
       };
-      const paid={id:`evt_paid_${suffix}`,type:'checkout.session.completed',data:{object:{id:sessionId,client_reference_id:booking.body.id,payment_status:'paid',currency:'eur',amount_total:6400,payment_intent:`pi_integration_${suffix}`}}};
+      const paid={id:`evt_paid_${suffix}`,livemode:false,type:'checkout.session.completed',data:{object:{id:sessionId,client_reference_id:booking.body.id,payment_status:'paid',currency:'eur',amount_total:6400,payment_intent:`pi_integration_${suffix}`}}};
       assert.equal((await send(paid)).status,200);
       assert.equal((await send(paid)).status,200);
       assert.equal((await request('/api/wallet','GET',null,host.cookie)).body.pendingCents,5600);
       assert.equal((await pool.query('SELECT count(*)::integer AS count FROM wallet_entries WHERE booking_id=$1',[booking.body.id])).rows[0].count,1);
       await pool.query("UPDATE bookings SET status='refund_pending' WHERE id=$1",[booking.body.id]);
-      assert.equal((await send({id:`evt_refund_${suffix}`,type:'refund.updated',data:{object:{id:'re_integration',metadata:{bookingId:booking.body.id},status:'succeeded',amount:6400}}})).status,200);
+      assert.equal((await send({id:`evt_refund_${suffix}`,livemode:false,type:'refund.updated',data:{object:{id:'re_integration',metadata:{bookingId:booking.body.id},status:'succeeded',amount:6400}}})).status,200);
       assert.equal((await request('/api/wallet','GET',null,host.cookie)).body.pendingCents,0);
     } finally { await new Promise(resolve=>webhookServer.close(resolve)); }
     const demo = await runDemo({ baseUrl: base, log: () => {} });
