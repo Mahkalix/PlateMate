@@ -269,6 +269,24 @@ export function stripeWebhook(pool, stripe, secret) {
           const updated=await client.query(`UPDATE bookings SET status='refunded',stripe_refund_id=$2 WHERE id=$1 AND status='refund_pending' AND total_cents=$3 RETURNING id`, [bookingId,refund.id,refund.amount]);
           if (updated.rowCount) await client.query("UPDATE wallet_entries SET state='reversed',updated_at=now() WHERE booking_id=$1 AND state IN ('pending','available')", [bookingId]);
         }
+        if (bookingId && refund.status==='failed') await client.query("UPDATE bookings SET status='paid' WHERE id=$1 AND status='refund_pending'",[bookingId]);
+      }
+      if (event.type==='charge.refunded') {
+        const charge=event.data.object;
+        if (charge.amount_refunded===charge.amount) {
+          const updated=await client.query(`UPDATE bookings SET status='refunded' WHERE stripe_charge_id=$1 AND status IN ('paid','completed','refund_pending') RETURNING id`,[charge.id]);
+          if (updated.rowCount) await client.query("UPDATE wallet_entries SET state='reversed',updated_at=now() WHERE booking_id=$1 AND state IN ('pending','available','disputed')",[updated.rows[0].id]);
+        }
+      }
+      if (event.type==='charge.dispute.created') {
+        const charge=event.data.object.charge;
+        const updated=await client.query("UPDATE bookings SET status='disputed' WHERE stripe_charge_id=$1 AND status IN ('paid','completed') RETURNING id",[charge]);
+        if (updated.rowCount) await client.query("UPDATE wallet_entries SET state='disputed',updated_at=now() WHERE booking_id=$1 AND state IN ('pending','available')",[updated.rows[0].id]);
+      }
+      if (event.type==='charge.dispute.closed' && event.data.object.status==='won') {
+        const charge=event.data.object.charge;
+        const updated=await client.query("UPDATE bookings SET status='paid' WHERE stripe_charge_id=$1 AND status='disputed' RETURNING id",[charge]);
+        if (updated.rowCount) await client.query(`UPDATE wallet_entries SET state=CASE WHEN available_at<=now() THEN 'available' ELSE 'pending' END,updated_at=now() WHERE booking_id=$1 AND state='disputed'`,[updated.rows[0].id]);
       }
       if (['payout.paid','payout.failed'].includes(event.type)) await handlePayoutEvent(client,event);
       await client.query('UPDATE stripe_events SET processed_at=now() WHERE id=$1', [event.id]);

@@ -91,6 +91,9 @@ export async function processWithdrawal(pool,stripe,id,hostId) {
     await pool.query("UPDATE wallet_entries SET stripe_transfer_id=$2,updated_at=now() WHERE booking_id=$1 AND state='transfer_pending'", [entry.booking_id,transfer.id]);
   }
   if (!payout.stripe_payout_id) {
+    const balance = await stripe.balance.retrieve({}, { stripeAccount:payout.stripe_account_id });
+    const available = balance.available.filter(item=>item.currency==='eur').reduce((sum,item)=>sum+item.amount,0);
+    if (available < payout.amount_cents) return { id,state:'processing',amountCents:payout.amount_cents,awaitingFunds:true };
     const created = await stripe.payouts.create({ amount:payout.amount_cents,currency:'eur',metadata:{payoutId:id} },
       { stripeAccount:payout.stripe_account_id,idempotencyKey:`payout-${id}-${payout.attempt}` });
     await pool.query('UPDATE wallet_payouts SET stripe_payout_id=$2 WHERE id=$1 AND stripe_payout_id IS NULL', [id,created.id]);

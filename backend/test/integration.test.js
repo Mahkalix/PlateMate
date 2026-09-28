@@ -1,6 +1,9 @@
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
 import pg from 'pg';
+import express from 'express';
+import Stripe from 'stripe';
+import { stripeWebhook } from '../src/experiences.js';
 import { runDemo } from '../scripts/demo.mjs';
 import { migrate } from '../src/migrations.js';
 
@@ -69,6 +72,28 @@ test('parcours PostgreSQL : hôte, expérience, invité, demande et capacité', 
     const second = await request('/api/bookings', 'POST', { dateId: date.body.id, guests: 1 }, guest.cookie);
     assert.equal((await request(`/api/bookings/${second.body.id}/accept`, 'POST', null, host.cookie)).status, 409);
     assert.equal((await request(`/api/bookings/${second.body.id}/cancel`,'POST',null,guest.cookie)).body.status,'cancelled');
+    const sessionId=`cs_integration_${suffix}`;
+    await pool.query("UPDATE bookings SET status='checkout_pending',stripe_session_id=$2 WHERE id=$1",[booking.body.id,sessionId]);
+    const sdk = new Stripe('sk_test_testing');
+    const fakeStripe={ webhooks:sdk.webhooks,paymentIntents:{ retrieve:async()=>({id:`pi_integration_${suffix}`,status:'succeeded',amount_received:6400,latest_charge:`ch_integration_${suffix}`}) } };
+    const secret='whsec_integration';
+    const webhookApp=express().post('/webhook',express.raw({type:'application/json'}),stripeWebhook(pool,fakeStripe,secret));
+    const webhookServer=webhookApp.listen(0);
+    try {
+      const send=async(event)=>{
+        const payload=JSON.stringify(event);
+        const signature=sdk.webhooks.generateTestHeaderString({payload,secret});
+        return fetch(`http://127.0.0.1:${webhookServer.address().port}/webhook`,{method:'POST',headers:{'content-type':'application/json','stripe-signature':signature},body:payload});
+      };
+      const paid={id:`evt_paid_${suffix}`,type:'checkout.session.completed',data:{object:{id:sessionId,client_reference_id:booking.body.id,payment_status:'paid',currency:'eur',amount_total:6400,payment_intent:`pi_integration_${suffix}`}}};
+      assert.equal((await send(paid)).status,200);
+      assert.equal((await send(paid)).status,200);
+      assert.equal((await request('/api/wallet','GET',null,host.cookie)).body.pendingCents,5600);
+      assert.equal((await pool.query('SELECT count(*)::integer AS count FROM wallet_entries WHERE booking_id=$1',[booking.body.id])).rows[0].count,1);
+      await pool.query("UPDATE bookings SET status='refund_pending' WHERE id=$1",[booking.body.id]);
+      assert.equal((await send({id:`evt_refund_${suffix}`,type:'refund.updated',data:{object:{id:'re_integration',metadata:{bookingId:booking.body.id},status:'succeeded',amount:6400}}})).status,200);
+      assert.equal((await request('/api/wallet','GET',null,host.cookie)).body.pendingCents,0);
+    } finally { await new Promise(resolve=>webhookServer.close(resolve)); }
     const demo = await runDemo({ baseUrl: base, log: () => {} });
     assert.ok(demo.experienceId);
     assert.ok(demo.bookingId);

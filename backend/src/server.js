@@ -21,9 +21,11 @@ const app = express();
 app.disable('x-powered-by');
 if (process.env.STRIPE_SECRET_KEY && !/^sk_(test|live)_/.test(process.env.STRIPE_SECRET_KEY)) throw new Error('Clé Stripe invalide');
 if (process.env.NODE_ENV === 'production' && process.env.AUTH_MODE !== 'auth0') throw new Error('AUTH_MODE=auth0 requis en production');
-if (process.env.NODE_ENV === 'production' && (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET || !process.env.APP_ORIGIN?.startsWith('https://'))) throw new Error('Stripe et APP_ORIGIN HTTPS requis en production');
+if (process.env.NODE_ENV === 'production' && (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET || !process.env.STRIPE_CONNECT_WEBHOOK_SECRET || !process.env.APP_ORIGIN?.startsWith('https://') || !process.env.API_PUBLIC_URL?.startsWith('https://') || !process.env.MEDIA_DIR)) throw new Error('Stripe, HTTPS et MEDIA_DIR requis en production');
+if (process.env.NODE_ENV === 'production' && !process.env.AUTH0_ISSUER_BASE_URL?.startsWith('https://')) throw new Error('Issuer Auth0 HTTPS requis');
 const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
 if (stripe && process.env.STRIPE_WEBHOOK_SECRET) app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), stripeWebhook(pool, stripe, process.env.STRIPE_WEBHOOK_SECRET));
+if (stripe && process.env.STRIPE_CONNECT_WEBHOOK_SECRET) app.post('/api/stripe/connect-webhook', express.raw({ type: 'application/json' }), stripeWebhook(pool, stripe, process.env.STRIPE_CONNECT_WEBHOOK_SECRET));
 app.use(helmet());
 app.use(cors({ origin: process.env.APP_ORIGIN || false }));
 app.use(express.json({ limit: '32kb' }));
@@ -75,7 +77,7 @@ const requireUser = authMode === 'auth0' ? auth0 : localRequireUser;
 
 // Cookie sessions require a same-origin write. Stripe webhooks use signatures.
 app.use((req, res, next) => {
-  if (authMode === 'auth0' || req.path === '/api/stripe/webhook' || ['GET', 'HEAD', 'OPTIONS'].includes(req.method)) return next();
+  if (authMode === 'auth0' || req.path === '/api/stripe/webhook' || req.path === '/api/stripe/connect-webhook' || ['GET', 'HEAD', 'OPTIONS'].includes(req.method)) return next();
   const origin = req.get('origin');
   const expectedOrigin = process.env.APP_ORIGIN || `${req.protocol}://${req.get('host')}`;
   if ((process.env.NODE_ENV === 'production' && !origin) || (origin && origin !== expectedOrigin)) return res.status(403).json({ error: 'Origine refusée' });

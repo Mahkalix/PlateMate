@@ -43,10 +43,11 @@ Créer un compte Stripe Connect de test et renseigner `STRIPE_SECRET_KEY=sk_test
 
 ```sh
 stripe login
-stripe listen --forward-to localhost:3000/api/stripe/webhook --forward-connect-to localhost:3000/api/stripe/webhook
+stripe listen --forward-to localhost:3000/api/stripe/webhook
+stripe listen --forward-connect-to localhost:3000/api/stripe/connect-webhook
 ```
 
-Renseigner le `whsec_...` correspondant à la destination réellement configurée dans `STRIPE_WEBHOOK_SECRET`, puis redémarrer le serveur. Pour un endpoint Connect séparé avec un autre secret de signature, il faut déployer une route distincte ou configurer Stripe pour que les deux types d'événements atteignent le même endpoint et secret. Les événements requis : `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `checkout.session.expired`, `checkout.session.async_payment_failed`, `refund.created`, `refund.updated`, `payout.paid`, `payout.failed` (y compris événements des comptes connectés).
+Lancer ces commandes dans deux terminaux, renseigner leurs secrets respectifs dans `STRIPE_WEBHOOK_SECRET` et `STRIPE_CONNECT_WEBHOOK_SECRET`, puis redémarrer le serveur. La deuxième route sert aux événements des comptes Connect. Les événements requis : `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `checkout.session.expired`, `checkout.session.async_payment_failed`, `refund.created`, `refund.updated`, `charge.refunded`, `charge.dispute.created`, `charge.dispute.closed`, `payout.paid`, `payout.failed`.
 
 ```sh
 npm run demo:stripe
@@ -92,7 +93,7 @@ npm run worker:dev   # toutes les minutes
 
 Le worker libère les revenus 48 h après la date, ferme les demandes acceptées sans paiement après 24 h, et reprend les retraits en cours. Faire tourner **une instance** supervisée du worker en production. Les migrations utilisent un verrou PostgreSQL et une table de versions ; exécuter `node src/server.js --migrate` avant de démarrer l'API. Le [Dockerfile](Dockerfile) démarre l'API avec un utilisateur non privilégié. Monter un volume persistant sur `/data/media` ou définir `MEDIA_DIR` sur un stockage persistant partagé entre instances. Prévoir sauvegardes PostgreSQL, restauration testée, TLS, proxy HTTPS, secret manager, journalisation et alertes. `API_PUBLIC_URL` doit être l'URL HTTPS publique de l'API ; `APP_ORIGIN` celle du frontend autorisé par CORS.
 
-Variables obligatoires en production : `DATABASE_URL`, `NODE_ENV=production`, `AUTH_MODE=auth0`, `AUTH0_ISSUER_BASE_URL`, `AUTH0_AUDIENCE`, `APP_ORIGIN` HTTPS, `API_PUBLIC_URL` HTTPS, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `MEDIA_DIR`. Des clés `sk_test_` conviennent à la préproduction ; le passage en `sk_live_` nécessite une configuration Stripe Connect validée et un test bout en bout. Ne jamais committer `.env` ni transmettre une clé privée au frontend.
+Variables obligatoires en production : `DATABASE_URL`, `NODE_ENV=production`, `AUTH_MODE=auth0`, `AUTH0_ISSUER_BASE_URL`, `AUTH0_AUDIENCE`, `APP_ORIGIN` HTTPS, `API_PUBLIC_URL` HTTPS, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_CONNECT_WEBHOOK_SECRET`, `MEDIA_DIR`. Des clés `sk_test_` conviennent à la préproduction ; le passage en `sk_live_` nécessite une configuration Stripe Connect validée et un test bout en bout. Ne jamais committer `.env` ni transmettre une clé privée au frontend.
 
 ### Points à valider avant toute vente réelle
 
