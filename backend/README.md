@@ -73,7 +73,7 @@ En mode Auth0, tester `GET /api/auth/me` avec `-H "Authorization: Bearer $TOKEN"
 | `POST /api/experiences/:id/menu`, `/dates`, `/publish`, `/unpublish` | Hôte | Préparer, publier et retirer de la recherche |
 | `PUT/DELETE /api/experiences/:id/menu/:itemId`, `/dates/:dateId` | Hôte | Modifier ou supprimer avant qu'une demande ne porte sur l'expérience ou la date |
 | `POST /api/media` (multipart `photo`) ; `GET /api/media/:filename` | Connecté ; public | Image limitée à 3 Mo et 20 mégapixels, réencodée en WebP sans métadonnées |
-| `POST /api/bookings`, `GET /api/bookings` | Invité ; participants | Demande avec `dateId,guests` et prix calculé côté serveur ; `Idempotency-Key` optionnel |
+| `POST /api/bookings`, `GET /api/bookings`, `GET /api/bookings/:id` | Invité ; participants | Demande avec `dateId,guests` et prix calculé côté serveur ; `Idempotency-Key` optionnel ; fiche même si l'expérience est retirée de la recherche |
 | `POST /api/bookings/:id/accept`, `/decline` | Hôte | Accepter sous verrou de date et réservation, ou refuser |
 | `POST /api/bookings/:id/checkout` | Invité | Checkout de 30 min, après acceptation et au moins 35 min avant la table |
 | `POST /api/bookings/:id/cancel` | Invité ou hôte | Demande/acceptation annulée ; après paiement, remboursement intégral possible avant la table (invité : au moins 24 h avant) |

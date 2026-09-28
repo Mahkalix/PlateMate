@@ -160,13 +160,20 @@ export function experienceRoutes(pool, requireUser, stripe) {
     try {
       const data = parse(bookingInput, req.body, res);
       if (!data) return;
+      const key = req.get('idempotency-key');
+      if (key && !/^[A-Za-z0-9_-]{8,128}$/.test(key)) return res.status(400).json({ error:'Clé de répétition invalide' });
+      if (key) {
+        const previous=await pool.query('SELECT id,date_id,guests,status,total_cents AS "totalCents" FROM bookings WHERE guest_id=$1 AND idempotency_key=$2',[req.user.id,key]);
+        if (previous.rows[0]) {
+          if (previous.rows[0].date_id!==data.dateId || previous.rows[0].guests!==data.guests) return res.status(409).json({error:'Clé déjà utilisée pour une autre demande'});
+          return res.json({id:previous.rows[0].id,status:previous.rows[0].status,quote:{totalCents:previous.rows[0].totalCents}});
+        }
+      }
       const { rows } = await pool.query(`SELECT d.id, e.host_id, e.menu_price_cents, e.service_fee_cents FROM experience_dates d
         JOIN experiences e ON e.id = d.experience_id WHERE d.id = $1 AND d.starts_at > now() AND e.published`, [data.dateId]);
       if (!rows[0]) return res.status(404).json({ error: 'Date indisponible' });
       if (rows[0].host_id === req.user.id) return res.status(403).json({ error: 'Un hôte ne peut pas réserver sa table' });
       const price = quote(rows[0].menu_price_cents, rows[0].service_fee_cents, data.guests);
-      const key = req.get('idempotency-key');
-      if (key && !/^[A-Za-z0-9_-]{8,128}$/.test(key)) return res.status(400).json({ error:'Clé de répétition invalide' });
       const id = randomUUID();
       const inserted = await pool.query(`INSERT INTO bookings(id, date_id, guest_id, guests, menu_price_cents, service_fee_cents, total_cents,idempotency_key)
         VALUES ($1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT DO NOTHING RETURNING id`, [id, data.dateId, req.user.id, data.guests, rows[0].menu_price_cents, rows[0].service_fee_cents, price.totalCents,key || null]);
@@ -185,6 +192,18 @@ export function experienceRoutes(pool, requireUser, stripe) {
         WHERE b.guest_id = $1 OR e.host_id = $1 ORDER BY b.created_at DESC LIMIT 100`, [req.user.id]);
       res.json({ bookings: rows });
     } catch (error) { next(error); }
+  });
+  router.get('/bookings/:id',requireUser,async(req,res,next)=>{
+    const id=parse(uuidParam,req.params.id,res);if(!id)return;
+    try {
+      const {rows}=await pool.query(`SELECT b.id,b.guests,b.menu_price_cents AS "menuPriceCents",b.service_fee_cents AS "serviceFeeCents",b.total_cents AS "totalCents",
+        b.status,b.created_at AS "createdAt",d.starts_at AS "startsAt",e.id AS "experienceId",e.title,e.city,e.cuisine,e.theme,
+        e.host_id AS "hostId",p.display_name AS "hostName",p.photo_url AS "hostPhotoUrl",b.guest_id AS "guestId"
+        FROM bookings b JOIN experience_dates d ON d.id=b.date_id JOIN experiences e ON e.id=d.experience_id
+        JOIN profiles p ON p.user_id=e.host_id WHERE b.id=$1 AND (b.guest_id=$2 OR e.host_id=$2)`,[id,req.user.id]);
+      if(!rows[0])return res.status(404).json({error:'Réservation introuvable'});
+      res.json({booking:rows[0]});
+    }catch(error){next(error);}
   });
   router.post('/bookings/:id/accept', requireUser, async (req, res, next) => {
     const id = parse(uuidParam, req.params.id, res);
