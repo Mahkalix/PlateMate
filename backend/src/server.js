@@ -1,17 +1,22 @@
 import express from 'express';
 import pg from 'pg';
 import { rateLimit } from 'express-rate-limit';
+import Stripe from 'stripe';
 import { randomBytes, randomUUID, scrypt as scryptCallback, timingSafeEqual, createHash } from 'node:crypto';
 import { promisify } from 'node:util';
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { credentials, profile } from './validation.js';
 import { compatibility } from './matching.js';
+import { experienceRoutes, stripeWebhook } from './experiences.js';
 
 const scrypt = promisify(scryptCallback);
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const app = express();
 app.disable('x-powered-by');
+if (process.env.STRIPE_SECRET_KEY && !process.env.STRIPE_SECRET_KEY.startsWith('sk_test_')) throw new Error('Seule une clé Stripe de test est acceptée');
+const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
+if (stripe && process.env.STRIPE_WEBHOOK_SECRET) app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), stripeWebhook(pool, stripe, process.env.STRIPE_WEBHOOK_SECRET));
 app.use(express.json({ limit: '16kb' }));
 const cookieName = 'platemate_session';
 const sessionMs = 7 * 24 * 60 * 60 * 1000;
@@ -94,7 +99,7 @@ app.post('/api/auth/logout', requireUser, async (req, res, next) => {
 });
 app.get('/api/profile', requireUser, async (req, res, next) => {
   try {
-    const { rows } = await pool.query('SELECT display_name AS "displayName", city, bio, languages, dietary_preferences AS "dietaryPreferences", allergies, meeting_context AS "meetingContext", discoverable FROM profiles WHERE user_id = $1', [req.user.id]);
+    const { rows } = await pool.query('SELECT display_name AS "displayName", city, bio, languages, dietary_preferences AS "dietaryPreferences", allergies, preferred_cuisines AS "preferredCuisines", experience_goals AS "experienceGoals", preferred_atmospheres AS "preferredAtmospheres", meeting_context AS "meetingContext", discoverable FROM profiles WHERE user_id = $1', [req.user.id]);
     res.json({ profile: rows[0] ?? null });
   } catch (error) { next(error); }
 });
@@ -102,10 +107,10 @@ app.put('/api/profile', requireUser, async (req, res, next) => {
   try {
     const data = validate(profile, req, res);
     if (!data) return;
-    const { rows } = await pool.query(`INSERT INTO profiles(user_id, display_name, city, bio, languages, dietary_preferences, allergies, meeting_context, discoverable)
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
-      ON CONFLICT (user_id) DO UPDATE SET display_name = EXCLUDED.display_name, city = EXCLUDED.city, bio = EXCLUDED.bio, languages = EXCLUDED.languages, dietary_preferences = EXCLUDED.dietary_preferences, allergies = EXCLUDED.allergies, meeting_context = EXCLUDED.meeting_context, discoverable = EXCLUDED.discoverable, updated_at = now()
-      RETURNING user_id`, [req.user.id, data.displayName, data.city, data.bio, data.languages, data.dietaryPreferences, data.allergies, data.meetingContext, data.discoverable]);
+    const { rows } = await pool.query(`INSERT INTO profiles(user_id, display_name, city, bio, languages, dietary_preferences, allergies, preferred_cuisines, experience_goals, preferred_atmospheres, meeting_context, discoverable)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
+      ON CONFLICT (user_id) DO UPDATE SET display_name = EXCLUDED.display_name, city = EXCLUDED.city, bio = EXCLUDED.bio, languages = EXCLUDED.languages, dietary_preferences = EXCLUDED.dietary_preferences, allergies = EXCLUDED.allergies, preferred_cuisines = EXCLUDED.preferred_cuisines, experience_goals = EXCLUDED.experience_goals, preferred_atmospheres = EXCLUDED.preferred_atmospheres, meeting_context = EXCLUDED.meeting_context, discoverable = EXCLUDED.discoverable, updated_at = now()
+      RETURNING user_id`, [req.user.id, data.displayName, data.city, data.bio, data.languages, data.dietaryPreferences, data.allergies, data.preferredCuisines, data.experienceGoals, data.preferredAtmospheres, data.meetingContext, data.discoverable]);
     res.json({ saved: Boolean(rows[0]) });
   } catch (error) { next(error); }
 });
@@ -115,10 +120,15 @@ app.get('/api/discover', requireUser, async (req, res, next) => {
     if (!own[0]) return res.status(409).json({ error: 'Complète ton profil avant de découvrir les autres' });
     const { rows } = await pool.query(`SELECT user_id AS id, display_name AS "displayName", city, bio, languages, dietary_preferences AS "dietaryPreferences", meeting_context AS "meetingContext"
       FROM profiles WHERE discoverable = true AND user_id <> $1 ORDER BY updated_at DESC LIMIT 100`, [req.user.id]);
-    const profiles = rows.map(candidate => ({ ...candidate, ...compatibility(own[0], candidate) })).sort((a, b) => b.score - a.score);
+    const profiles = rows.map(candidate => {
+      const { dietaryPreferences, ...publicProfile } = candidate;
+      const { score, sharedLanguages } = compatibility(own[0], candidate);
+      return { ...publicProfile, score, sharedLanguages };
+    }).sort((a, b) => b.score - a.score);
     res.json({ profiles });
   } catch (error) { next(error); }
 });
+app.use('/api', experienceRoutes(pool, requireUser, stripe));
 app.use((error, _req, res, _next) => {
   console.error(error);
   res.status(500).json({ error: 'Erreur interne' });
@@ -128,7 +138,7 @@ if (fileURLToPath(import.meta.url) === process.argv[1]) {
   if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL est requis');
   if (process.env.NODE_ENV === 'production' && !process.env.APP_ORIGIN) throw new Error('APP_ORIGIN est requis en production');
   if (process.argv.includes('--migrate')) {
-    for (const migration of ['001_initial.sql', '002_discoverable.sql']) {
+    for (const migration of ['001_initial.sql', '002_discoverable.sql', '003_experiences_bookings.sql', '004_profile_preferences.sql']) {
       const sql = await readFile(new URL(`../sql/${migration}`, import.meta.url), 'utf8');
       await pool.query(sql);
     }

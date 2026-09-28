@@ -13,6 +13,9 @@ export const profile = z.object({
   languages: list.default([]),
   dietaryPreferences: list.default([]),
   allergies: list.default([]),
+  preferredCuisines: list.default([]),
+  experienceGoals: list.default([]),
+  preferredAtmospheres: list.default([]),
   meetingContext: z.string().trim().max(300).default(''),
   discoverable: z.boolean().default(false)
 }).strict();
