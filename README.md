@@ -1,19 +1,33 @@
 # PlateMate
 
-Page de liens WhatsApp pour organiser des repas à Grenoble : un header simple, une photo, une courte présentation et un seul groupe WhatsApp. HTML, CSS et JavaScript, sans backend ni compilation.
+PlateMate met les expériences culinaires au centre. Les visiteurs découvrent le menu et l'hôte (photo, présentation, langues, centres d'intérêt), puis filtrent par cuisine, thème, ambiance, ville, date, régime et nombre de places. Le questionnaire peut alimenter ces filtres ; il n'y a pas de score de compatibilité. Voir le [cadrage produit](docs/product-direction.md).
 
-## Aperçu local
+## Accueil provisoire et ancienne page
 
-Ouvrir `index.html`, ou lancer `python3 -m http.server 8080` puis consulter http://localhost:8080.
+La racine `/` affiche une page de maintenance aux couleurs du Figma pendant la construction de l'application. La page statique du groupe WhatsApp reste dans [`/whatsapp/`](whatsapp/) et son lien est accessible depuis l'accueil. Pour les voir localement :
 
-## Groupe WhatsApp
+```sh
+python3 -m http.server 8080
+# http://localhost:8080/ (maintenance)
+# http://localhost:8080/whatsapp/ (ancien site)
+```
 
-Un seul groupe réunit hôtes et invités. Le lien d’invitation est directement dans `index.html`, sur le bouton « Rejoindre le groupe WhatsApp ». Il fonctionne sans JavaScript.
+Le site statique n'est pas l'application de réservation. Son identité visuelle reprend le Figma PlateMate ; le logo WhatsApp est issu de Simple Icons. Les licences des polices sont conservées avec leurs fichiers.
 
-Le logo WhatsApp est conservé dans `assets/whatsapp.svg` (source : Simple Icons, https://github.com/simple-icons/simple-icons).
+## Backend
 
-## Identité visuelle
+Le [guide backend](backend/README.md) contient les commandes d'installation, les tests PostgreSQL, le parcours Stripe test, Auth0, les routes et les conditions de déploiement.
 
-Logo exporté du hero Figma `232:540`, photo fournie par le porteur du projet. Jaune `#F5D000`, bordeaux `#803037`. BBB ReadMe Black Italic hébergée dans `assets/fonts`, issue de https://gitlab.com/bye-bye-binary/bbb-readme (notice conservée). DM Sans via Google Fonts.
+```sh
+cd backend
+npm ci
+cp .env.example .env
+docker compose up -d --wait db
+npm run migrate
+npm run dev
+# puis dans un autre terminal : npm run demo
+```
 
-Le site peut être publié sur un hébergement statique. Aucun service Azure ou Azurite n’est utilisé.
+L'API gère les profils privés et fiches hôte publiques, les expériences et menus, la publication, les dates et capacités, les demandes acceptées par l'hôte, Stripe Checkout, les annulations/remboursements, la messagerie, les avis et les revenus des hôtes avec Stripe Connect. Cette version accepte uniquement Stripe en mode test. L'authentification Auth0 est imposée pour un déploiement HTTPS ; les comptes locaux servent à la démo de développement. Les confirmations de paiement viennent exclusivement des webhooks signés.
+
+La [PR #1](https://github.com/Mahkalix/PlateMate/pull/1) livre un socle backend à tester pendant la construction du frontend. Les URL Auth0 dépendront des routes du futur frontend ; les parcours Stripe Connect doivent être essayés avec des comptes de test. Le site `/whatsapp/` conserve son chemin. Aucun paiement réel n'est activé.

@@ -1,0 +1,1 @@
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS refund_attempt integer NOT NULL DEFAULT 0;
