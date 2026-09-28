@@ -18,6 +18,16 @@ export function experienceRoutes(pool, requireUser, stripe) {
       res.json({ experiences: rows });
     } catch (error) { next(error); }
   });
+  router.get('/my/experiences/:id',requireUser,async(req,res,next)=>{
+    const id=parse(uuidParam,req.params.id,res);if(!id)return;
+    try {
+      const {rows}=await pool.query(`SELECT id,title,description,city,cuisine,theme,atmosphere,photo_url AS "photoUrl",dietary_options AS "dietaryOptions",menu_price_cents AS "menuPriceCents",service_fee_cents AS "serviceFeeCents",published FROM experiences WHERE id=$1 AND host_id=$2`,[id,req.user.id]);
+      if(!rows[0])return res.status(404).json({error:'Expérience introuvable'});
+      const dates=(await pool.query('SELECT id,starts_at AS "startsAt",capacity FROM experience_dates WHERE experience_id=$1 ORDER BY starts_at',[id])).rows;
+      const menu=(await pool.query('SELECT id,title,description,position FROM menu_items WHERE experience_id=$1 ORDER BY position',[id])).rows;
+      res.json({experience:rows[0],dates,menu});
+    }catch(error){next(error);}
+  });
   router.get(['/experiences', '/discover'], async (req, res, next) => {
     try {
       const filters = parse(experienceFilters, req.query, res);
@@ -59,7 +69,7 @@ export function experienceRoutes(pool, requireUser, stripe) {
     if (!id || !data) return;
     try {
       const { rows } = await pool.query(`UPDATE experiences e SET title=$3,description=$4,city=$5,cuisine=$6,theme=$7,atmosphere=$8,photo_url=$9,dietary_options=$10,menu_price_cents=$11
-        WHERE e.id=$1 AND e.host_id=$2 AND NOT EXISTS(SELECT 1 FROM bookings b JOIN experience_dates d ON d.id=b.date_id WHERE d.experience_id=e.id AND b.status IN ('accepted','checkout_pending','paid','completed','refund_pending','disputed')) RETURNING e.id`,
+        WHERE e.id=$1 AND e.host_id=$2 AND NOT EXISTS(SELECT 1 FROM bookings b JOIN experience_dates d ON d.id=b.date_id WHERE d.experience_id=e.id AND b.status IN ('requested','accepted','checkout_pending','paid','completed','refund_pending','disputed')) RETURNING e.id`,
       [id,req.user.id,data.title,data.description,data.city,data.cuisine,data.theme,data.atmosphere,data.photoUrl,data.dietaryOptions,data.menuPriceCents]);
       if (!rows[0]) return res.status(409).json({ error:'Modification indisponible après réservation confirmée' });
       res.json({ id });
@@ -109,6 +119,42 @@ export function experienceRoutes(pool, requireUser, stripe) {
       if (!rows[0]) return res.status(404).json({ error: 'Expérience introuvable' });
       res.status(201).json({ id: itemId });
     } catch (error) { next(error); }
+  });
+  router.put('/experiences/:id/menu/:itemId', requireUser, async (req,res,next) => {
+    const id=parse(uuidParam,req.params.id,res),itemId=parse(uuidParam,req.params.itemId,res),data=parse(menuItemInput,req.body,res);
+    if(!id||!itemId||!data)return;
+    try {
+      const {rows}=await pool.query(`UPDATE menu_items m SET title=$4,description=$5,position=$6 FROM experiences e
+        WHERE m.id=$1 AND m.experience_id=$2 AND e.id=$2 AND e.host_id=$3
+        AND NOT EXISTS(SELECT 1 FROM bookings b JOIN experience_dates d ON d.id=b.date_id WHERE d.experience_id=e.id AND b.status IN ('requested','accepted','checkout_pending','paid','completed','refund_pending','disputed')) RETURNING m.id`,
+      [itemId,id,req.user.id,data.title,data.description,data.position]);
+      if(!rows[0])return res.status(409).json({error:'Menu verrouillé après réservation confirmée'});res.json({id:itemId});
+    }catch(error){next(error);}
+  });
+  router.delete('/experiences/:id/menu/:itemId',requireUser,async(req,res,next)=>{
+    const id=parse(uuidParam,req.params.id,res),itemId=parse(uuidParam,req.params.itemId,res);if(!id||!itemId)return;
+    try { const {rowCount}=await pool.query(`DELETE FROM menu_items m USING experiences e WHERE m.id=$1 AND m.experience_id=$2 AND e.id=$2 AND e.host_id=$3
+      AND NOT EXISTS(SELECT 1 FROM bookings b JOIN experience_dates d ON d.id=b.date_id WHERE d.experience_id=e.id AND b.status IN ('requested','accepted','checkout_pending','paid','completed','refund_pending','disputed'))`,[itemId,id,req.user.id]);
+      if(!rowCount)return res.status(409).json({error:'Plat indisponible'});res.status(204).end();
+    }catch(error){next(error);}
+  });
+  router.put('/experiences/:id/dates/:dateId',requireUser,async(req,res,next)=>{
+    const id=parse(uuidParam,req.params.id,res),dateId=parse(uuidParam,req.params.dateId,res),data=parse(dateInput,req.body,res);
+    if(!id||!dateId||!data)return;
+    if(Date.parse(data.startsAt)<=Date.now())return res.status(400).json({error:'La date doit être future'});
+    try {const {rows}=await pool.query(`UPDATE experience_dates d SET starts_at=$4,capacity=$5 FROM experiences e
+      WHERE d.id=$1 AND d.experience_id=$2 AND e.id=$2 AND e.host_id=$3
+      AND NOT EXISTS(SELECT 1 FROM bookings b WHERE b.date_id=d.id AND b.status IN ('requested','accepted','checkout_pending','paid','completed','refund_pending','disputed')) RETURNING d.id`,
+      [dateId,id,req.user.id,data.startsAt,data.capacity]);
+      if(!rows[0])return res.status(409).json({error:'Date verrouillée après réservation confirmée'});res.json({id:dateId});
+    }catch(error){next(error);}
+  });
+  router.delete('/experiences/:id/dates/:dateId',requireUser,async(req,res,next)=>{
+    const id=parse(uuidParam,req.params.id,res),dateId=parse(uuidParam,req.params.dateId,res);if(!id||!dateId)return;
+    try {const {rowCount}=await pool.query(`DELETE FROM experience_dates d USING experiences e WHERE d.id=$1 AND d.experience_id=$2 AND e.id=$2 AND e.host_id=$3
+      AND NOT EXISTS(SELECT 1 FROM bookings b WHERE b.date_id=d.id)`,[dateId,id,req.user.id]);
+      if(!rowCount)return res.status(409).json({error:'Date déjà réservée ou introuvable'});res.status(204).end();
+    }catch(error){next(error);}
   });
   router.post('/bookings', requireUser, async (req, res, next) => {
     try {
@@ -218,9 +264,9 @@ export function experienceRoutes(pool, requireUser, stripe) {
         }
         if (Date.parse(booking.starts_at) <= Date.now()) { await client.query('ROLLBACK'); return res.status(409).json({ error:'Expérience déjà commencée' }); }
         if (!stripe) { await client.query('ROLLBACK'); return res.status(503).json({ error:'Stripe indisponible' }); }
-        await client.query("UPDATE bookings SET status='refund_pending',refund_reason='cancelled',cancelled_at=now() WHERE id=$1", [id]);
+        await client.query("UPDATE bookings SET status='refund_pending',refund_reason='cancelled',cancelled_at=now(),refund_attempt=refund_attempt+1 WHERE id=$1", [id]);
         await client.query('COMMIT');
-        await stripe.refunds.create({ payment_intent:booking.stripe_payment_intent_id, reason:'requested_by_customer', metadata:{bookingId:id} }, { idempotencyKey:`cancel-refund-${id}` });
+        await requestRefund(stripe,{...booking,refund_attempt:booking.refund_attempt+1});
         return res.status(202).json({ id,status:'refund_pending' });
       }
       await client.query("UPDATE bookings SET status='cancelled',cancelled_at=now() WHERE id=$1", [id]);
@@ -230,6 +276,15 @@ export function experienceRoutes(pool, requireUser, stripe) {
     finally { client.release(); }
   });
   return router;
+}
+
+export async function requestRefund(stripe, booking) {
+  if (!booking.stripe_payment_intent_id) throw new Error('Paiement Stripe absent');
+  const previous = await stripe.refunds.list({ payment_intent:booking.stripe_payment_intent_id,limit:100 });
+  const attempt=booking.refund_attempt || 1;
+  const found = previous.data.find(refund=>refund.metadata?.bookingId===booking.id && refund.metadata?.refundAttempt===String(attempt));
+  if (found) return found;
+  return stripe.refunds.create({ payment_intent:booking.stripe_payment_intent_id, reason:'requested_by_customer', metadata:{bookingId:booking.id,refundAttempt:String(attempt)} }, { idempotencyKey:`cancel-refund-${booking.id}-${attempt}` });
 }
 
 export function stripeWebhook(pool, stripe, secret) {

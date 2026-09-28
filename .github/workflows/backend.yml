@@ -34,5 +34,6 @@ jobs:
           cache-dependency-path: backend/package-lock.json
       - run: npm ci
       - run: npm test
-      - run: node --check src/server.js
-      - run: node --check src/experiences.js
+      - run: for source in src/*.js; do node --check "$source"; done
+      - run: docker build -f backend/Dockerfile backend
+        working-directory: .

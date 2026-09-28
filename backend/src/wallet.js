@@ -86,15 +86,29 @@ export async function processWithdrawal(pool,stripe,id,hostId) {
   for (const entry of entries) {
     if (entry.stripe_transfer_id) continue;
     if (!entry.stripe_charge_id) throw new Error('Charge Stripe absente');
-    const transfer = await stripe.transfers.create({ amount:entry.amount_cents,currency:'eur',destination:payout.stripe_account_id,
-      source_transaction:entry.stripe_charge_id,metadata:{bookingId:entry.booking_id,payoutId:id} }, { idempotencyKey:`transfer-${entry.booking_id}` });
+    const previous = await stripe.transfers.list({transfer_group:entry.booking_id,limit:100});
+    let transfer = previous.data.find(item=>item.destination===payout.stripe_account_id && item.amount===entry.amount_cents && item.source_transaction===entry.stripe_charge_id);
+    if (!transfer) transfer = await stripe.transfers.create({ amount:entry.amount_cents,currency:'eur',destination:payout.stripe_account_id,
+      source_transaction:entry.stripe_charge_id,transfer_group:entry.booking_id,metadata:{bookingId:entry.booking_id,payoutId:id} }, { idempotencyKey:`transfer-${entry.booking_id}` });
     await pool.query("UPDATE wallet_entries SET stripe_transfer_id=$2,updated_at=now() WHERE booking_id=$1 AND state='transfer_pending'", [entry.booking_id,transfer.id]);
   }
   if (!payout.stripe_payout_id) {
+    let existing;
+    let cursor;
+    do {
+      const page=await stripe.payouts.list({limit:100,created:{gte:Math.floor(new Date(payout.created_at).getTime()/1000)-60},...(cursor?{starting_after:cursor}:{})},{stripeAccount:payout.stripe_account_id});
+      existing=page.data.find(item=>item.metadata?.payoutId===id && item.metadata?.payoutAttempt===String(payout.attempt));
+      if (existing || !page.has_more) break;
+      cursor=page.data.at(-1)?.id;
+    } while (cursor);
+    if (existing) {
+      await pool.query('UPDATE wallet_payouts SET stripe_payout_id=$2 WHERE id=$1 AND stripe_payout_id IS NULL',[id,existing.id]);
+      return {id,state:'processing',amountCents:payout.amount_cents};
+    }
     const balance = await stripe.balance.retrieve({}, { stripeAccount:payout.stripe_account_id });
     const available = balance.available.filter(item=>item.currency==='eur').reduce((sum,item)=>sum+item.amount,0);
     if (available < payout.amount_cents) return { id,state:'processing',amountCents:payout.amount_cents,awaitingFunds:true };
-    const created = await stripe.payouts.create({ amount:payout.amount_cents,currency:'eur',metadata:{payoutId:id} },
+    const created = await stripe.payouts.create({ amount:payout.amount_cents,currency:'eur',metadata:{payoutId:id,payoutAttempt:String(payout.attempt)} },
       { stripeAccount:payout.stripe_account_id,idempotencyKey:`payout-${id}-${payout.attempt}` });
     await pool.query('UPDATE wallet_payouts SET stripe_payout_id=$2 WHERE id=$1 AND stripe_payout_id IS NULL', [id,created.id]);
   }

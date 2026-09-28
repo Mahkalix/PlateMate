@@ -60,6 +60,7 @@ test('parcours PostgreSQL : hôte, expérience, invité, demande et capacité', 
     const booking = await request('/api/bookings', 'POST', { dateId: date.body.id, guests: 2 }, guest.cookie);
     assert.equal(booking.status, 201);
     assert.equal(booking.body.quote.totalCents, 6400);
+    assert.equal((await request(`/api/experiences/${experience.body.id}/dates/${date.body.id}`,'PUT',{startsAt:'2030-12-02T19:00:00+01:00',capacity:3},host.cookie)).status,409);
     assert.equal((await request(`/api/bookings/${booking.body.id}/messages`,'POST',{body:'Bonjour, à bientôt !'},guest.cookie)).status,201);
     assert.equal((await request(`/api/bookings/${booking.body.id}/messages`,'GET',null,host.cookie)).body.messages.length,1);
     assert.equal((await request(`/api/bookings/${booking.body.id}/review`,'POST',{rating:5},guest.cookie)).status,409);

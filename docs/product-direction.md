@@ -14,28 +14,20 @@ Les filtres se cumulent. Un résultat doit satisfaire tous les régimes sélecti
 
 L'existence d'un portefeuille est confirmée. La première version retenue pour le cadrage permet aux hôtes de consulter leurs gains, l'historique des mouvements et les retraits vers leur compte bancaire. Le réemploi du solde pour réserver un autre repas reste une décision ouverte, sans présumer de la réponse.
 
-### États à implémenter
+### États du backend
 
-| État affiché | Sens métier | Conditions à développer |
+| État affiché | Sens métier | Règle implémentée ou à valider |
 | --- | --- | --- |
 | Gains en attente | Part de l'hôte d'un paiement confirmé, pas encore retirable | Paiement rapproché d'une réservation et commission exclue |
-| Solde disponible | Gains libérés après le repas et les contrôles applicables | Proposition de fonctionnement, délai et preuve de réalisation à définir |
+| Solde disponible | Gains libérés après le repas et les contrôles applicables | Libération 48 h après la date du repas ; preuve de réalisation et délai commercial à valider |
 | Retrait en cours | Montant affecté à un retrait | Compte bénéficiaire vérifié et identifiant de l'opération fournisseur |
 | Retiré | Retrait effectivement confirmé | Événement fournisseur vérifié, pas un clic sur « retirer » |
-| Montant bloqué | Gains indisponibles pour une réservation contestée | Traitement du litige et des remboursements à définir |
+| Montant bloqué | Gains indisponibles pour une réservation contestée | Blocage au webhook de litige ; procédures de résolution à compléter |
 
-### Travail technique restant
+### État de la réalisation et décisions encore ouvertes
 
-- Intégrer les comptes hôtes et leur onboarding Stripe Connect en mode test.
-- Choisir et tester le flux d'encaissement, de transfert et de retrait correspondant à la libération après repas. Le Checkout test actuel sur le compte plateforme n'implémente pas ce flux.
-- Enregistrer les mouvements de gains, frais, remboursements et retraits dans un historique traçable, relié aux événements fournisseur, avec idempotence.
-- Calculer les soldes à partir de ces mouvements ; aucun endpoint ne doit permettre de créditer arbitrairement un solde disponible.
-- Tester les doublons de webhook, le paiement refusé, le remboursement, le litige, le retrait refusé et la reprise après incident.
+La PR contient l'onboarding Stripe Connect Express, un historique par réservation, des gains en attente puis disponibles après 48 h, les transferts, les retraits et la reprise des opérations Stripe recherchées par identifiant. Les remboursements et litiges empêchent la libération des gains encore sur la plateforme. Ces flux n'ont été testés qu'avec des doublures Stripe et PostgreSQL ; il faudra les exécuter avec un compte Connect test et vérifier les cas tardifs après retrait bancaire.
 
-Un paiement de réservation ne signifie pas qu'un solde est immédiatement retirable. Aucun portefeuille opérationnel ni retrait réel n'est annoncé à ce stade. Les clés de test et la configuration Connect seront nécessaires pour vérifier ces parcours chez Stripe.
+Le solde n'est pas réutilisable pour payer un autre repas. Il n'existe pas d'endpoint permettant de créditer librement le portefeuille. Le tarif de service retenu dans le prototype est de 4 € par invité ; la politique retenue par défaut est le remboursement intégral jusqu'à 24 h avant le repas pour l'invité, et avant le début du repas pour l'hôte. Ces deux règles exigent une validation commerciale et juridique.
 
-## État de livraison
-
-- Implémenté dans la PR : filtre des expériences, informations de l'hôte, profils privés, menu, dates, réservation et Checkout test après acceptation.
-- À construire : interfaces, questionnaire relié aux filtres, upload photo, portefeuille/Connect, avis, messagerie, OAuth et règles d'annulation/remboursement.
-- Tarification provisoire du prototype : 4 € de service par invité. Ce choix issu du ticket Figma n'est pas une décision commerciale confirmée.
+Le frontend principal, les notifications, la modération, les badges vérifiés, la vérification de présence après le repas et les procédures de litige et de suppression/export des données restent à créer avant la mise en vente. Les clés Auth0 et Stripe, les comptes connectés et l'hébergement sont externes au dépôt.

@@ -15,6 +15,7 @@ test('Auth0 vérifie signature, audience, expiration et lie uniquement le subjec
   const pool={ query:async (_sql,args)=>{ stored.push(args[1]);return { rows:[{ id:args[0],disabled_at:null }] }; } };
   const app=express();
   app.get('/private',...auth0Middleware(pool,{ issuerBaseURL:issuer,audience:'https://platemate.fr/api' }),(req,res)=>res.json(req.user));
+  app.use((error,_req,res,_next)=>res.status(error.status || 500).json({error:error.message}));
   const server=app.listen(0),base=`http://127.0.0.1:${server.address().port}`;
   const sign=async (aud,subject='auth0|user123')=>new SignJWT({ 'https://platemate.fr/email':'test@example.com','https://platemate.fr/email_verified':true }).setProtectedHeader({alg:'RS256',kid:'test-key'}).setIssuer(issuer).setAudience(aud).setSubject(subject).setIssuedAt().setExpirationTime('5m').sign(privateKey);
   try {

@@ -69,8 +69,9 @@ En mode Auth0, tester `GET /api/auth/me` avec `-H "Authorization: Bearer $TOKEN"
 | --- | --- | --- |
 | `GET /api/experiences` ou `/api/discover` | Public | Filtres `city,cuisine,theme,atmosphere,language,diet,date,guests,sort,limit,offset` ; aucune note de compatibilité |
 | `GET /api/experiences/:id`, `GET /api/hosts/:id/reviews` | Public | Menu, places et profil public, puis avis |
-| `GET /api/my/experiences`, `POST /api/experiences`, `PUT /api/experiences/:id` | Hôte | Créer et modifier avant les réservations confirmées |
+| `GET /api/my/experiences`, `GET /api/my/experiences/:id`, `POST /api/experiences`, `PUT /api/experiences/:id` | Hôte | Créer, consulter et modifier avant les demandes |
 | `POST /api/experiences/:id/menu`, `/dates`, `/publish`, `/unpublish` | Hôte | Préparer, publier et retirer de la recherche |
+| `PUT/DELETE /api/experiences/:id/menu/:itemId`, `/dates/:dateId` | Hôte | Modifier ou supprimer avant qu'une demande ne porte sur l'expérience ou la date |
 | `POST /api/media` (multipart `photo`) ; `GET /api/media/:filename` | Connecté ; public | Image limitée à 3 Mo et 20 mégapixels, réencodée en WebP sans métadonnées |
 | `POST /api/bookings`, `GET /api/bookings` | Invité ; participants | Demande avec `dateId,guests` et prix calculé côté serveur ; `Idempotency-Key` optionnel |
 | `POST /api/bookings/:id/accept`, `/decline` | Hôte | Accepter sous verrou de date et réservation, ou refuser |
