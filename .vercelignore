@@ -8,3 +8,6 @@ README.md
 .env*
 .DS_Store
 backend/
+BRIEF.md
+docs/
+.github/
