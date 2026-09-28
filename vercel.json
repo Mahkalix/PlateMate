@@ -3,12 +3,5 @@
   "framework": null,
   "buildCommand": null,
   "outputDirectory": ".",
-  "cleanUrls": true,
-  "redirects": [
-    {
-      "source": "/",
-      "destination": "/whatsapp/",
-      "permanent": false
-    }
-  ]
+  "cleanUrls": true
 }

@@ -2,13 +2,14 @@
 
 PlateMate met les expériences culinaires au centre. Les visiteurs découvrent le menu et l'hôte (photo, présentation, langues, centres d'intérêt), puis filtrent par cuisine, thème, ambiance, ville, date, régime et nombre de places. Le questionnaire peut alimenter ces filtres ; il n'y a pas de score de compatibilité. Voir le [cadrage produit](docs/product-direction.md).
 
-## Ancienne page
+## Accueil provisoire et ancienne page
 
-La page statique du groupe WhatsApp reste dans [`/whatsapp/`](whatsapp/). Sur l'hébergement statique actuel, `/` redirige temporairement vers `/whatsapp/`. Pour la voir localement :
+La racine `/` affiche une page de maintenance aux couleurs du Figma pendant la construction de l'application. La page statique du groupe WhatsApp reste dans [`/whatsapp/`](whatsapp/) et son lien est accessible depuis l'accueil. Pour les voir localement :
 
 ```sh
 python3 -m http.server 8080
-# http://localhost:8080/whatsapp/
+# http://localhost:8080/ (maintenance)
+# http://localhost:8080/whatsapp/ (ancien site)
 ```
 
 Le site statique n'est pas l'application de réservation. Son identité visuelle reprend le Figma PlateMate ; le logo WhatsApp est issu de Simple Icons. Les licences des polices sont conservées avec leurs fichiers.
