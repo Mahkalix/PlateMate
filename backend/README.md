@@ -1,283 +1,99 @@
-# PlateMate : lancer et tester le backend
+# PlateMate Backend
 
-Le backend est une API Node.js/Express reliée à PostgreSQL. Il fournit les comptes, profils, expériences culinaires, filtres, menus, disponibilités, réservations et Stripe Checkout en mode test.
+API Node.js 22, Express 5 et PostgreSQL 17 pour les expériences culinaires. Les hôtes publient une table, les invités filtrent par ville, date, cuisine, thème, ambiance, langue, régime et places. Le paiement Stripe n'est proposé qu'après acceptation. L'ancienne page statique est conservée sous `/whatsapp/` dans le dépôt.
 
-L'ancienne page WhatsApp est conservée sous `/whatsapp/`. L'API n'a pas encore d'interface graphique : ouvrir `/` sur son port ne montre pas l'application. Les commandes de ce guide fonctionnent dans un terminal macOS, Linux ou WSL. Sur Windows, Git Bash convient aux commandes `cp` et `curl`.
+## Lancer en local
 
-## 1. Prérequis
-
-- Git.
-- Node.js 22 ou 24 et npm.
-- Docker avec Docker Compose et le moteur Docker démarré (Docker Desktop sur macOS/Windows).
-- Un compte et la CLI Stripe uniquement pour le test de paiement externe.
-
-Vérification :
-
-```sh
-node --version
-npm --version
-docker compose version
-```
-
-## 2. Récupérer la branche de travail
-
-Les changements sont dans la [PR #1](https://github.com/Mahkalix/PlateMate/pull/1), branche `feat/backend-foundations`.
-
-Si le dépôt n'est pas encore sur ton ordinateur :
-
-```sh
-git clone --branch feat/backend-foundations https://github.com/Mahkalix/PlateMate.git
-cd PlateMate/backend
-```
-
-Si le dépôt existe déjà, depuis sa racine (conserver/committer tes modifications locales avant de changer de branche) :
-
-```sh
-git fetch origin
-git switch feat/backend-foundations
-git pull --ff-only
-cd backend
-```
-
-Toutes les commandes suivantes sont à lancer depuis `backend/`, sauf indication contraire.
-
-## 3. Installer et configurer
+Depuis `backend/` :
 
 ```sh
 npm ci
 cp .env.example .env
-```
-
-Si tu as déjà un `.env`, conserve-le et complète-le. Configuration locale minimale :
-
-```dotenv
-DATABASE_URL=postgres://platemate:platemate@localhost:5432/platemate
-PORT=3000
-NODE_ENV=development
-APP_ORIGIN=http://localhost:3000
-```
-
-Les identifiants PostgreSQL ci-dessus concernent uniquement la base locale créée par Compose. Les `.env` et `.env.test` sont ignorés par Git. Les exemples ne contiennent aucune clé privée.
-
-## 4. Lancer PostgreSQL et créer les tables
-
-```sh
 docker compose up -d --wait db
 npm run migrate
-```
-
-`migrate` lit `.env` et applique les migrations `001` à `005`. La commande peut être relancée après une mise à jour. Les migrations créent ou complètent les tables sans effacer les données existantes.
-
-Pour vérifier la base :
-
-```sh
-docker compose ps
-docker compose exec db psql -U platemate -d platemate -c '\dt'
-```
-
-## 5. Démarrer l'API
-
-Dans un premier terminal :
-
-```sh
 npm run dev
 ```
 
-Cette commande charge `.env` et redémarre le serveur lors des changements de code. Résultat attendu : `PlateMate API :3000`.
-
-Dans un deuxième terminal :
+Dans un second terminal :
 
 ```sh
-curl http://localhost:3000/api/health
-```
-
-Résultat attendu : `{"status":"ok"}`. Ce contrôle vérifie le serveur HTTP ; le parcours de démonstration ci-dessous vérifie aussi l'accès à la base.
-
-`npm start` est destiné à un environnement où les variables sont déjà fournies par l'hébergeur. Il ne charge pas `.env` automatiquement.
-
-## 6. Tester un parcours complet sans Stripe
-
-Laisse l'API démarrée. Dans le deuxième terminal :
-
-```sh
+curl http://localhost:3000/api/ready
 npm run demo
 ```
 
-Le script utilise l'API pour :
+La démo crée deux comptes de test, un menu, une date, publie l'expérience, la filtre, demande deux places puis les fait accepter. Elle ne déclenche aucun paiement. `/api/health` vérifie HTTP ; `/api/ready` vérifie également PostgreSQL. Les données de démo restent en base. Arrêter avec `Ctrl+C`, puis `docker compose stop` si nécessaire.
 
-1. Créer deux comptes temporaires distincts, hôte et invité, avec des mots de passe aléatoires.
-2. Enregistrer leurs profils privés.
-3. Créer une expérience marocaine, végan, thème Découverte, ambiance Calme.
-4. Ajouter un plat et une date dans sept jours, capacité de quatre personnes.
-5. Rechercher les expériences avec des filtres.
-6. Créer une demande pour deux personnes et la faire accepter par l'hôte.
-7. Vérifier le total de 64 € (2 × 28 € de menu + 2 × 4 € de frais) et les deux places restantes.
+`AUTH_MODE=local` utilise des sessions par cookie et des mots de passe locaux uniquement pour le développement. En production, `AUTH_MODE=auth0` est obligatoire et ces routes d'inscription, connexion et déconnexion renvoient 404. Le frontend gère la connexion et la déconnexion avec Auth0 Universal Login et transmet le jeton d'accès API dans `Authorization: Bearer ...`. Une session locale ne donne aucun accès au mode Auth0.
 
-Le terminal affiche les identifiants utiles et le résultat. Aucun paiement n'est lancé avec cette commande. Les comptes et les réservations de démonstration restent dans la base ; le script ne supprime rien et n'affiche pas leurs secrets. Chaque exécution crée de nouveaux comptes. La limite de connexion/inscription reste active (20 requêtes par 15 minutes).
-
-Si le serveur écoute sur un autre port :
-
-```sh
-API_BASE_URL=http://localhost:3001 npm run demo
-```
-
-Adapter aussi `PORT` et `APP_ORIGIN` dans `.env`, puis redémarrer l'API.
-
-## 7. Tests automatisés
-
-### Tests sans base
+## Tester
 
 ```sh
 npm test
-```
-
-Sans `TEST_DATABASE_URL`, le test PostgreSQL est marqué `SKIP`. Les autres tests vérifient notamment les entrées, les photos HTTPS, les filtres, le prix, le refus du checkout avant acceptation et la signature du webhook. Ils n'appellent pas Stripe.
-
-### Test avec une vraie base PostgreSQL dédiée
-
-```sh
-docker compose --profile test up -d --wait db-test
+# Intégration avec une base isolée sur le port 5433
 cp .env.test.example .env.test
+docker compose --profile test up -d --wait db-test
 npm run test:integration
 ```
 
-La base de test utilise le port **5433**, distinct de la base de développement sur **5432**. Le test applique les migrations, démarre sa propre API sur un port temporaire et vérifie :
+`npm test` lance les tests unitaires et les tests PostgreSQL quand `TEST_DATABASE_URL` est fourni (dans GitHub Actions, le service PostgreSQL est configuré). Le test Auth0 signe de vrais JWT avec une clé locale et vérifie l'audience et le sujet. La suite webhook vérifie la signature Stripe et la répétition d'événement sans accès externe. Pour contrôler les migrations répétées, le test d'intégration les exécute deux fois.
 
-- création des comptes et des profils ;
-- création d'une expérience et de sa date ;
-- combinaison des filtres et exclusion des résultats incompatibles ;
-- informations de l'hôte sans préférences privées ni score ;
-- réservation, acceptation, capacité restante et refus d'une confirmation sans places ;
-- exécution du script `demo` lui-même.
+### Stripe en mode test
 
-Le test ajoute des données à la base de test. Il ne nécessite pas que `npm run dev` tourne. Les appels externes Stripe sont désactivés dans ce test.
-
-La même suite est configurée dans [GitHub Actions](../.github/workflows/backend.yml) avec un service PostgreSQL.
-
-## 8. Tester Stripe Checkout et le webhook
-
-Ce parcours nécessite tes identifiants **Stripe test**. Aucun identifiant n'est inclus dans le dépôt.
-
-### A. Configurer Stripe
-
-1. Dans le Dashboard Stripe, utiliser un environnement de test et récupérer sa clé secrète `sk_test_...`.
-2. Installer la [CLI Stripe](https://docs.stripe.com/stripe-cli) et l'authentifier avec le même environnement Stripe.
-3. Dans un terminal dédié, lancer :
+Créer un compte Stripe Connect de test et renseigner `STRIPE_SECRET_KEY=sk_test_...` dans `.env`. Installer la [CLI Stripe](https://docs.stripe.com/stripe-cli) puis :
 
 ```sh
 stripe login
-stripe listen --forward-to localhost:3000/api/stripe/webhook
+stripe listen --forward-to localhost:3000/api/stripe/webhook --forward-connect-to localhost:3000/api/stripe/webhook
 ```
 
-Laisse cette commande ouverte. Elle affiche un secret de signature `whsec_...`. Complète ton `.env` :
-
-```dotenv
-STRIPE_SECRET_KEY=sk_test_TA_CLE_DE_TEST
-STRIPE_WEBHOOK_SECRET=whsec_LE_SECRET_AFFICHE_PAR_STRIPE_LISTEN
-```
-
-Ces valeurs sont des exemples à remplacer. Redémarre `npm run dev` après modification de `.env`. Une clé de paiement réel est refusée par l'application.
-
-### B. Effectuer le paiement test
-
-Dans un troisième terminal :
+Renseigner le `whsec_...` correspondant à la destination réellement configurée dans `STRIPE_WEBHOOK_SECRET`, puis redémarrer le serveur. Pour un endpoint Connect séparé avec un autre secret de signature, il faut déployer une route distincte ou configurer Stripe pour que les deux types d'événements atteignent le même endpoint et secret. Les événements requis : `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `checkout.session.expired`, `checkout.session.async_payment_failed`, `refund.created`, `refund.updated`, `payout.paid`, `payout.failed` (y compris événements des comptes connectés).
 
 ```sh
 npm run demo:stripe
 ```
 
-Le script refait le parcours hôte/invité, accepte la réservation puis affiche un lien Stripe Checkout. Ouvre ce lien et utilise une carte de test :
+Ouvrir l'URL Checkout imprimée et payer avec [la carte de test Stripe](https://docs.stripe.com/testing) `4242 4242 4242 4242`, une expiration future et un CVC à trois chiffres. Le script attend la confirmation du webhook. L'URL de retour `/reservations/:id` est un point d'intégration frontend ; elle ne confirme jamais à elle seule le paiement.
 
-- numéro : `4242 4242 4242 4242` ;
-- expiration : une date future ;
-- CVC : trois chiffres.
+## Configuration Auth0
 
-Les détails des cartes et cas de refus sont dans la [documentation de test Stripe](https://docs.stripe.com/testing). Utilise uniquement des valeurs de test.
+1. Créer une API Auth0 avec l'audience `https://platemate.fr/api`, algorithme **RS256** et un tenant HTTPS. Configurer le frontend Auth0 pour demander un jeton d'accès à cette audience.
+2. Définir `AUTH_MODE=auth0`, `AUTH0_ISSUER_BASE_URL=https://VOTRE_TENANT/` et `AUTH0_AUDIENCE=https://platemate.fr/api` côté API. L'API vérifie la signature via le JWKS Auth0, l'émetteur, l'audience et l'expiration. L'identité durable est le `sub`. Les comptes ne sont jamais rapprochés par e-mail.
+3. Si l'e-mail doit être transmis à Stripe, une Action Auth0 peut ajouter au **jeton d'accès** les claims `https://platemate.fr/email` et `https://platemate.fr/email_verified`. Le serveur n'utilise l'e-mail que si le second claim est `true`. Configurer la vérification d'e-mail, la récupération du mot de passe, MFA et les fournisseurs souhaités dans Auth0. Le secret client Auth0 ne va jamais au navigateur.
 
-Le script attend jusqu'à dix minutes que le statut devienne `paid`. Le terminal Stripe CLI doit montrer le webhook reçu avec un statut HTTP `200`. Le succès affiché par le script prouve que l'API a traité la confirmation Stripe pour cette réservation.
+En mode Auth0, tester `GET /api/auth/me` avec `-H "Authorization: Bearer $TOKEN"`. La page de profil est `PUT /api/profile` (remplacement de tous les champs). `GET /api/profile` inclut les préférences privées ; la fiche expérience expose seulement nom, photo, bio, langues et centres d'intérêt de l'hôte.
 
-Après le paiement, Stripe redirige vers `/reservations/:id?checkout=success`. Cet écran frontend n'existe pas encore : une page introuvable à cette adresse n'annule pas le paiement test. Lis le résultat du script et le Dashboard Stripe. Le paramètre `checkout=success` n'est jamais utilisé comme preuve de paiement.
+## API métier
 
-Pour tester un refus, utiliser une carte de refus indiquée dans la documentation Stripe ; la réservation ne doit pas devenir `paid`. Tu peux ensuite essayer une carte valide dans le même Checkout. Un événement artificiel créé avec `stripe trigger` ne remplace pas le paiement d'une réservation existante : l'API vérifie aussi l'identifiant et le montant de la session.
-
-## 9. Appels API utiles
-
-### Recherche publique
-
-```sh
-curl --get http://localhost:3000/api/experiences \
-  --data-urlencode 'city=Grenoble' \
-  --data-urlencode 'diet=vegan' \
-  --data-urlencode 'theme=Découverte' \
-  --data-urlencode 'guests=2'
-```
-
-Filtres disponibles : `city`, `cuisine`, `theme`, `atmosphere`, `language`, `diet`, `date` (`YYYY-MM-DD` en Europe/Paris), `guests`. Tri : `sort=date`, `price_asc` ou `price_desc`. Pagination : `limit` et `offset`. Omettre les filtres vides. Plusieurs régimes, par exemple `diet=vegan,sans-gluten`, doivent tous être déclarés pour le repas. `/api/discover` est un alias de cette recherche.
-
-### Compte et session avec curl
-
-Pour un compte manuel, employer une adresse différente à chaque inscription. Exemple avec un mot de passe de démonstration (à remplacer pour un vrai compte) :
-
-```sh
-curl -i -c /tmp/platemate-demo.cookies http://localhost:3000/api/auth/register \
-  -H 'Content-Type: application/json' \
-  -d '{"email":"mon-test@example.com","password":"demo-local-change-me"}'
-
-curl -b /tmp/platemate-demo.cookies http://localhost:3000/api/auth/me
-
-curl -X PUT -b /tmp/platemate-demo.cookies http://localhost:3000/api/profile \
-  -H 'Content-Type: application/json' \
-  -d '{"displayName":"Maxence","city":"Grenoble","languages":["Français"],"dietaryPreferences":["vegan"]}'
-
-curl -b /tmp/platemate-demo.cookies http://localhost:3000/api/profile
-
-curl -i -X POST -b /tmp/platemate-demo.cookies http://localhost:3000/api/auth/logout
-```
-
-Le fichier de cookies permet de réutiliser la session dans curl. Ne le partager pas. Pour se reconnecter, appeler `POST /api/auth/login` avec le même JSON et l'option `-c`. `PUT /api/profile` remplace le profil complet : renvoyer tous les champs à conserver, les champs optionnels omis reprenant leur valeur par défaut.
-
-### Endpoints métier
-
-| Méthode et chemin | Accès | Utilité |
+| Route | Accès | Effet |
 | --- | --- | --- |
-| `GET /api/experiences` | Public | Expériences filtrées disposant de places |
-| `GET /api/experiences/:id` | Public | Hôte, menu et dates |
-| `POST /api/experiences` | Connecté avec profil | Créer une expérience (titre, ville, cuisine, `menuPriceCents`, thème, ambiance, `dietaryOptions`, `photoUrl`) |
-| `POST /api/experiences/:id/menu` | Hôte propriétaire | Ajouter `{ title, description, position }` |
-| `POST /api/experiences/:id/dates` | Hôte propriétaire | Ajouter `{ startsAt, capacity }` avec date ISO et fuseau |
-| `POST /api/bookings` | Invité connecté | Demander `{ dateId, guests }` |
-| `GET /api/bookings` | Connecté | Ses réservations comme invité ou hôte |
-| `POST /api/bookings/:id/accept` | Hôte propriétaire | Accepter si des places restent |
-| `POST /api/bookings/:id/decline` | Hôte propriétaire | Refuser une demande encore en attente |
-| `POST /api/bookings/:id/checkout` | Invité concerné | Créer le Checkout après acceptation |
-| `POST /api/stripe/webhook` | Signature Stripe requise | Recevoir la confirmation de paiement |
+| `GET /api/experiences` ou `/api/discover` | Public | Filtres `city,cuisine,theme,atmosphere,language,diet,date,guests,sort,limit,offset` ; aucune note de compatibilité |
+| `GET /api/experiences/:id`, `GET /api/hosts/:id/reviews` | Public | Menu, places et profil public, puis avis |
+| `GET /api/my/experiences`, `POST /api/experiences`, `PUT /api/experiences/:id` | Hôte | Créer et modifier avant les réservations confirmées |
+| `POST /api/experiences/:id/menu`, `/dates`, `/publish`, `/unpublish` | Hôte | Préparer, publier et retirer de la recherche |
+| `POST /api/media` (multipart `photo`) ; `GET /api/media/:filename` | Connecté ; public | Image limitée à 3 Mo et 20 mégapixels, réencodée en WebP sans métadonnées |
+| `POST /api/bookings`, `GET /api/bookings` | Invité ; participants | Demande avec `dateId,guests` et prix calculé côté serveur ; `Idempotency-Key` optionnel |
+| `POST /api/bookings/:id/accept`, `/decline` | Hôte | Accepter sous verrou de date et réservation, ou refuser |
+| `POST /api/bookings/:id/checkout` | Invité | Checkout de 30 min, après acceptation et au moins 35 min avant la table |
+| `POST /api/bookings/:id/cancel` | Invité ou hôte | Demande/acceptation annulée ; après paiement, remboursement intégral possible avant la table (invité : au moins 24 h avant) |
+| `GET/POST /api/bookings/:id/messages` | Participants | Historique et message privé de réservation |
+| `POST /api/bookings/:id/review` | Invité | Un avis pour une table payée et passée |
+| `GET /api/wallet` | Hôte | Solde en attente, disponible, en retrait, historique en EUR |
+| `POST /api/connect/onboarding`, `GET /api/connect/status` | Hôte | Stripe Connect Express et lien d'onboarding ; l'URL de retour ne valide pas la vérification |
+| `POST /api/wallet/withdrawals`, `/wallet/withdrawals/:id/retry` | Hôte | Retrait du solde disponible vers le compte bancaire Stripe Connect |
 
-## 10. Dépannage
+Le portefeuille représente les **revenus des hôtes**, pas un crédit réutilisable pour payer des repas. Le menu revient à l'hôte ; les 4 € de frais de service par convive reviennent à la plateforme et couvrent ses coûts. Le montant de 4 € et les règles d'annulation sont des hypothèses produit à valider avant le lancement. Le revenu devient disponible 48 h après le repas, sous réserve du paiement et de l'absence de litige. Stripe conserve les fonds (PlateMate n'est pas un établissement de monnaie électronique). Le retrait crée des transferts vers le compte Connect et un paiement bancaire manuel, suivi par les webhooks Stripe. Un retrait en échec peut être retenté avec son identifiant.
 
-| Symptôme | Action |
-| --- | --- |
-| `.env` introuvable ou `DATABASE_URL est requis` | Vérifier le dossier courant, créer `.env`, utiliser `npm run dev` |
-| `ECONNREFUSED` vers PostgreSQL | Démarrer Docker puis `docker compose up -d --wait db` |
-| Table/colonne inexistante | Exécuter `npm run migrate` après le pull |
-| Port 5432 occupé | Changer le port publié dans Compose et celui de `DATABASE_URL` ensemble |
-| Port 3000 occupé | Changer `PORT`, `APP_ORIGIN`, `API_BASE_URL` et la cible Stripe CLI ensemble |
-| HTTP 401 | Se connecter et conserver le cookie de session |
-| HTTP 403 origine refusée | Utiliser la même origine que `APP_ORIGIN`, y compris protocole et port |
-| HTTP 409 | Lire l'erreur : compte existant, places insuffisantes ou transition de réservation interdite |
-| HTTP 429 | La limite d'authentification est atteinte ; attendre la fin de la fenêtre de 15 minutes |
-| Recherche vide | Vérifier les filtres, les régimes déclarés, une date future et les places disponibles |
-| HTTP 503 Stripe test non configuré | Ajouter une clé `sk_test_...` à `.env`, puis redémarrer |
-| Webhook 400 / réservation non payée | Vérifier le `whsec_` du terminal Stripe CLI actif, le compte Stripe utilisé et la cible locale |
-| Test PostgreSQL marqué `SKIP` | Utiliser `npm run test:integration` avec `.env.test` et `db-test` démarré |
-
-Pour arrêter l'API : `Ctrl+C`. Pour arrêter les bases en conservant les données de développement :
+## Worker et déploiement
 
 ```sh
-docker compose --profile test stop
+npm run worker       # un passage
+npm run worker:dev   # toutes les minutes
 ```
 
-## 11. Ce qui reste à construire
+Le worker libère les revenus 48 h après la date, ferme les demandes acceptées sans paiement après 24 h, et reprend les retraits en cours. Faire tourner **une instance** supervisée du worker en production. Les migrations utilisent un verrou PostgreSQL et une table de versions ; exécuter `node src/server.js --migrate` avant de démarrer l'API. Le [Dockerfile](Dockerfile) démarre l'API avec un utilisateur non privilégié. Monter un volume persistant sur `/data/media` ou définir `MEDIA_DIR` sur un stockage persistant partagé entre instances. Prévoir sauvegardes PostgreSQL, restauration testée, TLS, proxy HTTPS, secret manager, journalisation et alertes. `API_PUBLIC_URL` doit être l'URL HTTPS publique de l'API ; `APP_ORIGIN` celle du frontend autorisé par CORS.
 
-L'interface principale, OAuth, l'upload photo, les avis, la messagerie, le portefeuille et Stripe Connect ne sont pas encore livrés. Le portefeuille demandé (gains, historique, solde, retraits) est cadré dans [la direction produit](../docs/product-direction.md). Le paiement test actuel ne simule ni crédit de portefeuille, ni retrait, ni reversement bancaire réel.
+Variables obligatoires en production : `DATABASE_URL`, `NODE_ENV=production`, `AUTH_MODE=auth0`, `AUTH0_ISSUER_BASE_URL`, `AUTH0_AUDIENCE`, `APP_ORIGIN` HTTPS, `API_PUBLIC_URL` HTTPS, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `MEDIA_DIR`. Des clés `sk_test_` conviennent à la préproduction ; le passage en `sk_live_` nécessite une configuration Stripe Connect validée et un test bout en bout. Ne jamais committer `.env` ni transmettre une clé privée au frontend.
 
-Le prototype ne traite pas encore les annulations/remboursements et les réservations acceptées mais non payées peuvent continuer à retenir leurs places. Les règles de libération des places et des gains devront être implémentées avant une utilisation réelle. Le montant de service de 4 € par invité reste une hypothèse de prototype.
+### Points à valider avant toute vente réelle
+
+Le backend n'a **pas** été testé avec un tenant Auth0 ni un compte Stripe Connect réels. Il faut vérifier l'onboarding KYC, les taxes/factures applicables, les remboursements et litiges tardifs, les notifications, la conformité de la conservation des données et la disponibilité de l'hébergement. La conciliation automatique des transferts Stripe après une interruption prolongée doit encore être éprouvée ; ne lancer aucun retrait réel avant cela. Les paiements en argent réel demandent également une validation des conditions Stripe et des règles commerciales. La PR reste en brouillon jusqu'à ces essais.

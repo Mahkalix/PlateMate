@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
-import { readFile } from 'node:fs/promises';
 import pg from 'pg';
 import { runDemo } from '../scripts/demo.mjs';
+import { migrate } from '../src/migrations.js';
 
 test('parcours PostgreSQL : hôte, expérience, invité, demande et capacité', { skip: !process.env.TEST_DATABASE_URL }, async () => {
   process.env.DATABASE_URL = process.env.TEST_DATABASE_URL;
@@ -11,9 +11,8 @@ test('parcours PostgreSQL : hôte, expérience, invité, demande et capacité', 
   delete process.env.STRIPE_WEBHOOK_SECRET;
   delete process.env.APP_ORIGIN;
   const pool = new pg.Pool({ connectionString: process.env.TEST_DATABASE_URL });
-  for (const migration of ['001_initial.sql', '002_discoverable.sql', '003_experiences_bookings.sql', '004_profile_preferences.sql', '005_experience_filters.sql']) {
-    await pool.query(await readFile(new URL(`../sql/${migration}`, import.meta.url), 'utf8'));
-  }
+  await migrate(pool);
+  await migrate(pool);
   const { app } = await import('../src/server.js');
   const server = app.listen(0);
   const base = `http://127.0.0.1:${server.address().port}`;
@@ -36,6 +35,9 @@ test('parcours PostgreSQL : hôte, expérience, invité, demande et capacité', 
     assert.equal(experience.status, 201);
     const date = await request(`/api/experiences/${experience.body.id}/dates`, 'POST', { startsAt: '2030-12-01T19:00:00+01:00', capacity: 2 }, host.cookie);
     assert.equal(date.status, 201);
+    assert.equal((await request(`/api/experiences/${experience.body.id}/publish`, 'POST',null,host.cookie)).status,409);
+    assert.equal((await request(`/api/experiences/${experience.body.id}/menu`,'POST',{title:'Couscous',position:0},host.cookie)).status,201);
+    assert.equal((await request(`/api/experiences/${experience.body.id}/publish`, 'POST',null,host.cookie)).status,200);
     const filters = new URLSearchParams({ city: 'grenoble', cuisine: 'Marocaine', theme: 'Découverte', atmosphere: 'calme', language: 'français', diet: 'vegan,sans-gluten', guests: '2', date: '2030-12-01' });
     const search = await request(`/api/experiences?${filters}`);
     assert.equal(search.status, 200);
@@ -55,6 +57,10 @@ test('parcours PostgreSQL : hôte, expérience, invité, demande et capacité', 
     const booking = await request('/api/bookings', 'POST', { dateId: date.body.id, guests: 2 }, guest.cookie);
     assert.equal(booking.status, 201);
     assert.equal(booking.body.quote.totalCents, 6400);
+    assert.equal((await request(`/api/bookings/${booking.body.id}/messages`,'POST',{body:'Bonjour, à bientôt !'},guest.cookie)).status,201);
+    assert.equal((await request(`/api/bookings/${booking.body.id}/messages`,'GET',null,host.cookie)).body.messages.length,1);
+    assert.equal((await request(`/api/bookings/${booking.body.id}/review`,'POST',{rating:5},guest.cookie)).status,409);
+    assert.equal((await request('/api/wallet','GET',null,host.cookie)).body.availableCents,0);
     assert.equal((await request(`/api/bookings/${booking.body.id}/checkout`, 'POST', null, guest.cookie)).status, 503);
     assert.equal((await request(`/api/bookings/${booking.body.id}/accept`, 'POST', null, host.cookie)).status, 200);
     const detail = await request(`/api/experiences/${experience.body.id}`);
@@ -62,6 +68,7 @@ test('parcours PostgreSQL : hôte, expérience, invité, demande et capacité', 
     assert.equal((await request(`/api/experiences?${filters}`)).body.experiences.length, 0, 'Une table complète est exclue');
     const second = await request('/api/bookings', 'POST', { dateId: date.body.id, guests: 1 }, guest.cookie);
     assert.equal((await request(`/api/bookings/${second.body.id}/accept`, 'POST', null, host.cookie)).status, 409);
+    assert.equal((await request(`/api/bookings/${second.body.id}/cancel`,'POST',null,guest.cookie)).body.status,'cancelled');
     const demo = await runDemo({ baseUrl: base, log: () => {} });
     assert.ok(demo.experienceId);
     assert.ok(demo.bookingId);

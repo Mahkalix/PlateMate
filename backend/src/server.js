@@ -4,19 +4,29 @@ import { rateLimit } from 'express-rate-limit';
 import Stripe from 'stripe';
 import { randomBytes, randomUUID, scrypt as scryptCallback, timingSafeEqual, createHash } from 'node:crypto';
 import { promisify } from 'node:util';
-import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { credentials, profile } from './validation.js';
+import { auth0Middleware } from './auth0.js';
+import { migrate } from './migrations.js';
+import helmet from 'helmet';
+import cors from 'cors';
+import { socialRoutes } from './social.js';
+import { walletRoutes } from './wallet.js';
+import { mediaRoutes } from './media.js';
 import { experienceRoutes, stripeWebhook } from './experiences.js';
 
 const scrypt = promisify(scryptCallback);
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const app = express();
 app.disable('x-powered-by');
-if (process.env.STRIPE_SECRET_KEY && !process.env.STRIPE_SECRET_KEY.startsWith('sk_test_')) throw new Error('Seule une clé Stripe de test est acceptée');
+if (process.env.STRIPE_SECRET_KEY && !/^sk_(test|live)_/.test(process.env.STRIPE_SECRET_KEY)) throw new Error('Clé Stripe invalide');
+if (process.env.NODE_ENV === 'production' && process.env.AUTH_MODE !== 'auth0') throw new Error('AUTH_MODE=auth0 requis en production');
+if (process.env.NODE_ENV === 'production' && (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET || !process.env.APP_ORIGIN?.startsWith('https://'))) throw new Error('Stripe et APP_ORIGIN HTTPS requis en production');
 const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
 if (stripe && process.env.STRIPE_WEBHOOK_SECRET) app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), stripeWebhook(pool, stripe, process.env.STRIPE_WEBHOOK_SECRET));
-app.use(express.json({ limit: '16kb' }));
+app.use(helmet());
+app.use(cors({ origin: process.env.APP_ORIGIN || false }));
+app.use(express.json({ limit: '32kb' }));
 const cookieName = 'platemate_session';
 const sessionMs = 7 * 24 * 60 * 60 * 1000;
 const authLimit = rateLimit({ windowMs: 15 * 60 * 1000, limit: 20, standardHeaders: 'draft-8', legacyHeaders: false });
@@ -38,7 +48,7 @@ function readToken(req) {
   const value = req.headers.cookie?.split(';').map(item => item.trim()).find(item => item.startsWith(`${cookieName}=`));
   return value?.slice(cookieName.length + 1);
 }
-async function requireUser(req, res, next) {
+async function localRequireUser(req, res, next) {
   try {
     const token = readToken(req);
     if (!token || !/^[a-f0-9]{64}$/.test(token)) return res.status(401).json({ error: 'Authentification requise' });
@@ -59,16 +69,22 @@ function validate(schema, req, res) {
   return result.data;
 }
 
-// The site and API share an origin. Cross-origin writes cannot use the session cookie.
+const authMode = process.env.AUTH_MODE === 'auth0' ? 'auth0' : 'local';
+const auth0 = authMode === 'auth0' ? auth0Middleware(pool, { issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL, audience: process.env.AUTH0_AUDIENCE }) : null;
+const requireUser = authMode === 'auth0' ? auth0 : localRequireUser;
+
+// Cookie sessions require a same-origin write. Stripe webhooks use signatures.
 app.use((req, res, next) => {
-  if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) return next();
+  if (authMode === 'auth0' || req.path === '/api/stripe/webhook' || ['GET', 'HEAD', 'OPTIONS'].includes(req.method)) return next();
   const origin = req.get('origin');
   const expectedOrigin = process.env.APP_ORIGIN || `${req.protocol}://${req.get('host')}`;
   if ((process.env.NODE_ENV === 'production' && !origin) || (origin && origin !== expectedOrigin)) return res.status(403).json({ error: 'Origine refusée' });
   next();
 });
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
-app.post('/api/auth/register', authLimit, async (req, res, next) => {
+app.get('/api/ready', async (_req, res) => { try { await pool.query('SELECT 1'); res.json({ status: 'ready' }); } catch { res.status(503).json({ status: 'unavailable' }); } });
+const localOnly = (_req, res, next) => authMode === 'local' ? next() : res.status(404).json({ error: 'Authentification gérée par Auth0' });
+app.post('/api/auth/register', localOnly, authLimit, async (req, res, next) => {
   try {
     const data = validate(credentials, req, res);
     if (!data) return;
@@ -78,7 +94,7 @@ app.post('/api/auth/register', authLimit, async (req, res, next) => {
     res.status(201).json({ user: rows[0] });
   } catch (error) { next(error); }
 });
-app.post('/api/auth/login', authLimit, async (req, res, next) => {
+app.post('/api/auth/login', localOnly, authLimit, async (req, res, next) => {
   try {
     const data = validate(credentials, req, res);
     if (!data) return;
@@ -89,7 +105,7 @@ app.post('/api/auth/login', authLimit, async (req, res, next) => {
   } catch (error) { next(error); }
 });
 app.get('/api/auth/me', requireUser, (req, res) => res.json({ user: req.user }));
-app.post('/api/auth/logout', requireUser, async (req, res, next) => {
+app.post('/api/auth/logout', localOnly, requireUser, async (req, res, next) => {
   try {
     await pool.query('DELETE FROM sessions WHERE token_hash = $1', [tokenHash(readToken(req))]);
     res.clearCookie(cookieName, cookieOptions);
@@ -114,7 +130,14 @@ app.put('/api/profile', requireUser, async (req, res, next) => {
   } catch (error) { next(error); }
 });
 app.use('/api', experienceRoutes(pool, requireUser, stripe));
+app.use('/api', socialRoutes(pool, requireUser));
+app.use('/api', walletRoutes(pool, requireUser, stripe));
+app.use('/api', mediaRoutes(requireUser));
 app.use((error, _req, res, _next) => {
+  if (error.status === 401 || error.statusCode === 401) return res.status(401).json({ error: 'Authentification requise' });
+  if (error.code === 'LIMIT_FILE_SIZE') return res.status(413).json({ error:'Image trop volumineuse' });
+  if (error.status && error.status < 500) return res.status(error.status).json({ error:error.message });
+  if (error.code === '23505') return res.status(409).json({ error: 'Ce contenu existe déjà' });
   console.error(error);
   res.status(500).json({ error: 'Erreur interne' });
 });
@@ -123,13 +146,11 @@ if (fileURLToPath(import.meta.url) === process.argv[1]) {
   if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL est requis');
   if (process.env.NODE_ENV === 'production' && !process.env.APP_ORIGIN) throw new Error('APP_ORIGIN est requis en production');
   if (process.argv.includes('--migrate')) {
-    for (const migration of ['001_initial.sql', '002_discoverable.sql', '003_experiences_bookings.sql', '004_profile_preferences.sql', '005_experience_filters.sql']) {
-      const sql = await readFile(new URL(`../sql/${migration}`, import.meta.url), 'utf8');
-      await pool.query(sql);
-    }
-    await pool.end();
+    try { await migrate(pool); } finally { await pool.end(); }
   } else {
-    app.listen(Number(process.env.PORT || 3000), () => console.log(`PlateMate API :${process.env.PORT || 3000}`));
+    const server = app.listen(Number(process.env.PORT || 3000), () => console.log(`PlateMate API :${process.env.PORT || 3000}`));
+    process.on('SIGTERM', () => server.close(() => pool.end()));
+    process.on('SIGINT', () => server.close(() => pool.end()));
   }
 }
 export { app };

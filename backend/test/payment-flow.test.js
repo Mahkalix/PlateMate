@@ -31,22 +31,32 @@ test('checkout refusé avant acceptation de la réservation', async () => {
   });
 });
 
-test('webhook signé marque payée uniquement la réservation et le montant correspondant', async () => {
+test('webhook signé crédite le portefeuille une seule fois après paiement Stripe confirmé', async () => {
   const secret = 'whsec_testing';
-  const stripe = new Stripe('sk_test_testing');
+  const sdk = new Stripe('sk_test_testing');
   const queries = [];
-  const pool = { query: async (...args) => { queries.push(args); return { rowCount: 1 }; } };
+  let processed = false;
+  const client = { query:async (sql,args) => {
+    queries.push([sql,args]);
+    if (sql.includes('INSERT INTO stripe_events')) return { rows:[{ processed_at:processed ? new Date() : null }] };
+    if (sql.includes("SET status='paid'")) return { rows:[{ id:'booking-id' }],rowCount:1 };
+    if (sql.includes('processed_at=now()')) processed=true;
+    return { rows:[],rowCount:0 };
+  },release() {} };
+  const pool = { connect:async()=>client };
+  const stripe = { webhooks:sdk.webhooks,paymentIntents:{ retrieve:async()=>({ id:'pi_test_1',status:'succeeded',amount_received:3200,latest_charge:'ch_test_1' }) } };
   const app = express();
-  app.post('/webhook', express.raw({ type: 'application/json' }), stripeWebhook(pool, stripe, secret));
-  const payload = JSON.stringify({ id: 'evt_test', type: 'checkout.session.completed', data: { object: { id: 'cs_test_1', client_reference_id: 'booking-id', payment_status: 'paid', currency: 'eur', amount_total: 3200, payment_intent: 'pi_test_1' } } });
-  await serve(app, async url => {
-    const invalid = await fetch(`${url}/webhook`, { method: 'POST', headers: { 'content-type': 'application/json', 'stripe-signature': 'invalid' }, body: payload });
-    assert.equal(invalid.status, 400);
-    const signature = stripe.webhooks.generateTestHeaderString({ payload, secret });
-    const valid = await fetch(`${url}/webhook`, { method: 'POST', headers: { 'content-type': 'application/json', 'stripe-signature': signature }, body: payload });
-    assert.equal(valid.status, 200);
-    assert.equal(queries.length, 1);
-    assert.deepEqual(queries[0][1], ['booking-id', 'cs_test_1', 'pi_test_1', 3200]);
-    assert.match(queries[0][0], /status = 'checkout_pending' AND total_cents = \$4/);
+  app.post('/webhook', express.raw({ type:'application/json' }),stripeWebhook(pool,stripe,secret));
+  const payload=JSON.stringify({ id:'evt_test',type:'checkout.session.completed',data:{object:{ id:'cs_test_1',client_reference_id:'booking-id',payment_status:'paid',currency:'eur',amount_total:3200,payment_intent:'pi_test_1' }} });
+  await serve(app,async url=>{
+    const invalid=await fetch(`${url}/webhook`,{method:'POST',headers:{'content-type':'application/json','stripe-signature':'invalid'},body:payload});
+    assert.equal(invalid.status,400);
+    const signature=sdk.webhooks.generateTestHeaderString({payload,secret});
+    for (let i=0;i<2;i++) {
+      const valid=await fetch(`${url}/webhook`,{method:'POST',headers:{'content-type':'application/json','stripe-signature':signature},body:payload});
+      assert.equal(valid.status,200);
+    }
+    assert.equal(queries.filter(([sql])=>sql.includes('INSERT INTO wallet_entries')).length,1);
+    assert.deepEqual(queries.find(([sql])=>sql.includes("SET status='paid'"))[1],['booking-id','cs_test_1','pi_test_1',3200,'ch_test_1']);
   });
 });

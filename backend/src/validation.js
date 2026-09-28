@@ -6,7 +6,10 @@ export const credentials = z.object({
 }).strict();
 
 const list = z.array(z.string().trim().min(1).max(60)).max(20);
-export const photoUrl = z.url({ protocol: /^https$/ }).max(2048).nullable().default(null);
+export const photoUrl = z.url().max(2048).refine(value => {
+  const url = new URL(value);
+  return url.protocol === 'https:' || (process.env.NODE_ENV !== 'production' && url.protocol === 'http:' && ['localhost','127.0.0.1'].includes(url.hostname));
+}).nullable().default(null);
 export const profile = z.object({
   displayName: z.string().trim().min(1).max(80),
   city: z.string().trim().min(1).max(100),

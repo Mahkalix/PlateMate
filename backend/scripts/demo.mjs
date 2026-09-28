@@ -39,6 +39,7 @@ export async function runDemo({ baseUrl = 'http://localhost:3000', checkout = fa
   const date = (await call(`/experiences/${experience.id}/dates`, { method: 'POST', cookie: host, body: {
     startsAt: new Date(Date.now() + 7 * 86400000).toISOString(), capacity: 4
   } })).data;
+  await call(`/experiences/${experience.id}/publish`, { method: 'POST', cookie: host });
   const results = (await call('/experiences?city=Grenoble&diet=vegan&guests=2')).data;
   log(`Recherche filtrée : ${results.experiences.length} résultat(s) sur cette page.`);
   const booking = (await call('/bookings', { method: 'POST', cookie: guest, body: { dateId: date.id, guests: 2 } })).data;
