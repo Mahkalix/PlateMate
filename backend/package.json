@@ -4,8 +4,12 @@
   "type": "module",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "node --watch src/server.js",
-    "test": "node --test"
+    "dev": "node --env-file=.env --watch src/server.js",
+    "migrate": "node --env-file=.env src/server.js --migrate",
+    "test": "node --test",
+    "test:integration": "node --env-file=.env.test --test test/integration.test.js",
+    "demo": "node scripts/demo.mjs",
+    "demo:stripe": "node scripts/demo.mjs --checkout"
   },
   "dependencies": {
     "express": "^5.1.0",

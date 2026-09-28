@@ -1,6 +1,7 @@
 import express from 'express';
 import { randomUUID } from 'node:crypto';
 import { experienceInput, dateInput, menuItemInput, bookingInput, quote, uuidParam } from './booking-validation.js';
+import { experienceFilters, buildExperienceSearch } from './experience-search.js';
 
 function parse(schema, value, res) {
   const result = schema.safeParse(value);
@@ -10,22 +11,20 @@ function parse(schema, value, res) {
 
 export function experienceRoutes(pool, requireUser, stripe) {
   const router = express.Router();
-  router.get('/experiences', async (req, res, next) => {
+  router.get(['/experiences', '/discover'], async (req, res, next) => {
     try {
-      const city = typeof req.query.city === 'string' ? req.query.city.trim().slice(0, 100) : '';
-      const cuisine = typeof req.query.cuisine === 'string' ? req.query.cuisine.trim().slice(0, 80) : '';
-      const { rows } = await pool.query(`SELECT e.id, e.title, e.city, e.cuisine, e.atmosphere, e.menu_price_cents AS "menuPriceCents", e.service_fee_cents AS "serviceFeeCents", p.display_name AS "hostName"
-        FROM experiences e JOIN profiles p ON p.user_id = e.host_id
-        WHERE e.published AND ($1 = '' OR e.city ILIKE $1) AND ($2 = '' OR e.cuisine ILIKE $2)
-        ORDER BY e.created_at DESC LIMIT 100`, [city, cuisine]);
-      res.json({ experiences: rows });
+      const filters = parse(experienceFilters, req.query, res);
+      if (!filters) return;
+      const { rows } = await pool.query(buildExperienceSearch(filters));
+      res.json({ experiences: rows.slice(0, filters.limit), filters,
+        pagination: { limit: filters.limit, offset: filters.offset, hasMore: rows.length > filters.limit } });
     } catch (error) { next(error); }
   });
   router.get('/experiences/:id', async (req, res, next) => {
     try {
       const id = parse(uuidParam, req.params.id, res);
       if (!id) return;
-      const { rows } = await pool.query(`SELECT e.id, e.title, e.description, e.city, e.cuisine, e.atmosphere, e.dietary_options AS "dietaryOptions", e.menu_price_cents AS "menuPriceCents", e.service_fee_cents AS "serviceFeeCents", p.display_name AS "hostName", p.bio AS "hostBio", p.languages AS "hostLanguages"
+      const { rows } = await pool.query(`SELECT e.id, e.title, e.description, e.city, e.cuisine, e.theme, e.atmosphere, e.photo_url AS "photoUrl", e.dietary_options AS "dietaryOptions", e.menu_price_cents AS "menuPriceCents", e.service_fee_cents AS "serviceFeeCents", e.host_id AS "hostId", p.display_name AS "hostName", p.photo_url AS "hostPhotoUrl", p.bio AS "hostBio", p.languages AS "hostLanguages", p.interests AS "hostInterests"
         FROM experiences e JOIN profiles p ON p.user_id = e.host_id WHERE e.id = $1 AND e.published`, [id]);
       if (!rows[0]) return res.status(404).json({ error: 'Expérience introuvable' });
       const dates = await pool.query(`SELECT d.id, d.starts_at AS "startsAt", d.capacity - COALESCE(SUM(b.guests) FILTER (WHERE b.status IN ('accepted','checkout_pending','paid')), 0)::integer AS "placesRemaining"
@@ -42,8 +41,8 @@ export function experienceRoutes(pool, requireUser, stripe) {
       const { rows: profiles } = await pool.query('SELECT 1 FROM profiles WHERE user_id = $1', [req.user.id]);
       if (!profiles[0]) return res.status(409).json({ error: 'Crée un profil avant de devenir hôte' });
       const id = randomUUID();
-      await pool.query(`INSERT INTO experiences(id, host_id, title, description, city, cuisine, atmosphere, dietary_options, menu_price_cents, service_fee_cents, published)
-        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,true)`, [id, req.user.id, data.title, data.description, data.city, data.cuisine, data.atmosphere, data.dietaryOptions, data.menuPriceCents, 400]);
+      await pool.query(`INSERT INTO experiences(id, host_id, title, description, city, cuisine, atmosphere, dietary_options, menu_price_cents, service_fee_cents, theme, photo_url, published)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,true)`, [id, req.user.id, data.title, data.description, data.city, data.cuisine, data.atmosphere, data.dietaryOptions, data.menuPriceCents, 400, data.theme, data.photoUrl]);
       res.status(201).json({ id });
     } catch (error) { next(error); }
   });
