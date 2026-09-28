@@ -1,0 +1,38 @@
+name: Backend
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: platemate
+          POSTGRES_PASSWORD: platemate
+          POSTGRES_DB: platemate
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U platemate -d platemate"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgres://platemate:platemate@localhost:5432/platemate
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: node --check src/server.js
+      - run: node --check src/experiences.js

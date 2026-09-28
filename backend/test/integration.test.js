@@ -1,0 +1,42 @@
+import { test } from 'node:test';
+import { strict as assert } from 'node:assert';
+import { readFile } from 'node:fs/promises';
+import pg from 'pg';
+
+test('parcours PostgreSQL : hôte, expérience, invité, demande et capacité', { skip: !process.env.TEST_DATABASE_URL }, async () => {
+  process.env.DATABASE_URL = process.env.TEST_DATABASE_URL;
+  const pool = new pg.Pool({ connectionString: process.env.TEST_DATABASE_URL });
+  for (const migration of ['001_initial.sql', '002_discoverable.sql', '003_experiences_bookings.sql', '004_profile_preferences.sql']) {
+    await pool.query(await readFile(new URL(`../sql/${migration}`, import.meta.url), 'utf8'));
+  }
+  const { app } = await import('../src/server.js');
+  const server = app.listen(0);
+  const base = `http://127.0.0.1:${server.address().port}`;
+  const request = async (path, method = 'GET', body, cookie) => {
+    const response = await fetch(base + path, { method, headers: { ...(body ? { 'content-type': 'application/json' } : {}), ...(cookie ? { cookie } : {}) }, body: body ? JSON.stringify(body) : undefined });
+    return { status: response.status, body: await response.json(), cookie: response.headers.get('set-cookie')?.split(';')[0] };
+  };
+  try {
+    const suffix = Date.now().toString(36);
+    const host = await request('/api/auth/register', 'POST', { email: `host-${suffix}@example.com`, password: 'a-long-password' });
+    assert.equal(host.status, 201);
+    assert.equal((await request('/api/profile', 'PUT', { displayName: 'Hôte', city: 'Grenoble', discoverable: true }, host.cookie)).status, 200);
+    const experience = await request('/api/experiences', 'POST', { title: 'Repas partagé', city: 'Grenoble', cuisine: 'Marocaine', menuPriceCents: 2800 }, host.cookie);
+    assert.equal(experience.status, 201);
+    const date = await request(`/api/experiences/${experience.body.id}/dates`, 'POST', { startsAt: '2030-12-01T19:00:00+01:00', capacity: 2 }, host.cookie);
+    assert.equal(date.status, 201);
+    const guest = await request('/api/auth/register', 'POST', { email: `guest-${suffix}@example.com`, password: 'another-long-password' });
+    const booking = await request('/api/bookings', 'POST', { dateId: date.body.id, guests: 2 }, guest.cookie);
+    assert.equal(booking.status, 201);
+    assert.equal(booking.body.quote.totalCents, 6400);
+    assert.equal((await request(`/api/bookings/${booking.body.id}/checkout`, 'POST', null, guest.cookie)).status, 503);
+    assert.equal((await request(`/api/bookings/${booking.body.id}/accept`, 'POST', null, host.cookie)).status, 200);
+    const detail = await request(`/api/experiences/${experience.body.id}`);
+    assert.equal(detail.body.dates[0].placesRemaining, 0);
+    const second = await request('/api/bookings', 'POST', { dateId: date.body.id, guests: 1 }, guest.cookie);
+    assert.equal((await request(`/api/bookings/${second.body.id}/accept`, 'POST', null, host.cookie)).status, 409);
+  } finally {
+    await new Promise(resolve => server.close(resolve));
+    await pool.end();
+  }
+});
