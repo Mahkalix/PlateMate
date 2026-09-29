@@ -2,16 +2,22 @@
 
 API Node.js 22, Express 5 et PostgreSQL 17. Le [catalogue fonctionnel](FONCTIONNALITES.md) décrit les parcours existants et prévus. Cette version est réservée aux essais : elle refuse les clés Stripe `sk_live_` et les webhooks `livemode=true`.
 
-Pour lancer tout l'environnement en conteneurs (frontend, API, worker et base), exécuter `docker compose up --build -d --wait` depuis la racine du dépôt. L'API est sur `http://localhost:3000`, le frontend sur `http://localhost:8080`. Docker Compose migre la base avant l'API et utilise le mode local par défaut. Les variables `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` et `STRIPE_CONNECT_WEBHOOK_SECRET` peuvent être renseignées dans un `.env` à la racine, avec uniquement des clés Stripe de test. La CLI Stripe reste à lancer sur la machine hôte pour relayer les webhooks. `docker compose down` arrête les services sans effacer les volumes.
+Pour lancer tout l'environnement en conteneurs (frontend, API, worker et base), suivre le [guide Docker à la racine](../README.md#démarrer-avec-docker). L'API est sur `http://localhost:3000`, le frontend sur `http://localhost:8080`. Compose migre la base avant l'API et utilise le mode local par défaut. Les variables Stripe test se placent dans un `.env` à la racine. La CLI Stripe tourne sur la machine hôte pour relayer les webhooks. `docker compose down` arrête les services sans effacer les volumes.
 
 ## Lancer en local
 
-Depuis `backend/` :
+Depuis la **racine du dépôt**, démarrer seulement la base ; elle expose `localhost:5432` pour les commandes Node locales :
 
 ```sh
+docker compose up -d --wait db
+```
+
+Puis depuis `backend/` :
+
+```sh
+cd backend
 npm ci
 cp .env.example .env
-docker compose up -d --wait db
 npm run migrate
 npm run dev
 ```
@@ -23,7 +29,7 @@ curl http://localhost:3000/api/ready
 npm run demo
 ```
 
-La démo crée deux comptes de test, un menu, une date, publie l'expérience, la filtre, demande deux places puis les fait accepter. Elle ne déclenche aucun paiement. `/api/health` vérifie HTTP ; `/api/ready` vérifie également PostgreSQL. Les données de démo restent en base. Arrêter avec `Ctrl+C`, puis `docker compose stop` si nécessaire.
+La démo crée deux comptes de test, un menu, une date, publie l'expérience, la filtre, demande deux places puis les fait accepter. Elle ne déclenche aucun paiement. `/api/health` vérifie HTTP ; `/api/ready` vérifie également PostgreSQL. Les données de démo restent en base. Arrêter le serveur avec `Ctrl+C`, puis `docker compose stop db` depuis la racine si nécessaire.
 
 `AUTH_MODE=local` utilise des sessions par cookie et des mots de passe locaux uniquement pour le développement. En production, `AUTH_MODE=auth0` est obligatoire et ces routes d'inscription, connexion et déconnexion renvoient 404. Le frontend gère la connexion et la déconnexion avec Auth0 Universal Login et transmet le jeton d'accès API dans `Authorization: Bearer ...`. Une session locale ne donne aucun accès au mode Auth0.
 
@@ -31,9 +37,15 @@ La démo crée deux comptes de test, un menu, une date, publie l'expérience, la
 
 ```sh
 npm test
-# Intégration avec une base isolée sur le port 5433
-cp .env.test.example .env.test
+```
+
+Pour les tests d'intégration, démarrer la base isolée **depuis la racine** :
+
+```sh
+cd .. # si le terminal est encore dans backend/
 docker compose --profile test up -d --wait db-test
+cd backend
+cp .env.test.example .env.test
 npm run test:integration
 ```
 
