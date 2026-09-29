@@ -5,11 +5,13 @@
   --pm-red: #{token.$red};
   --pm-cream: #{token.$cream};
   --pm-yellow: #{token.$yellow};
-  --pm-teal: #236a74;
-  --pm-ink: #130b0b;
+  --pm-teal: #{token.$teal};
+  --pm-ink: #{token.$app-ink};
+  --pm-background: #{token.$app-background};
+  --pm-mint: #{token.$mint};
   --pm-sky: #d5edf0;
   min-height: 100vh;
-  background: #faf8f4;
+  background: var(--pm-background);
   color: var(--pm-ink);
   font:
     16px/1.5 "DM Sans",

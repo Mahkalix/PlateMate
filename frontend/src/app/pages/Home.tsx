@@ -125,11 +125,25 @@ export function Home() {
           </div>
         </div>
         <div className="pm-container">
-          <div
-            className="pm-gallery__photo"
-            role="img"
-            aria-label="Table conviviale PlateMate"
-          />
+          <div className="pm-gallery__photo">
+            <img
+              src="/figma/gallery-friends.jpg"
+              alt="Amis réunis autour d’un repas"
+            />
+            <img
+              src="/figma/gallery-dinner.jpg"
+              alt="Repas partagé autour d’une table"
+            />
+            <img src="/figma/gallery-dessert.jpg" alt="Plat dressé à table" />
+            <img
+              src="/figma/gallery-sharing.jpg"
+              alt="Convives partageant des plats"
+            />
+            <img
+              src="/figma/gallery-table.jpg"
+              alt="Grande tablée conviviale"
+            />
+          </div>
           <div className="pm-gallery__share">
             <strong>◎ &nbsp; Partagez vos moments</strong>
             <p>

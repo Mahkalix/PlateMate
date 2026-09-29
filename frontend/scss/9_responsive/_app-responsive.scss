@@ -87,7 +87,11 @@
     }
   }
   .pm-gallery__photo {
-    min-height: 290px;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 170px);
+    img:first-child {
+      grid-row: span 2;
+    }
   }
   .pm-gallery__share {
     flex-direction: column;

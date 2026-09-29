@@ -5,7 +5,7 @@
   color: white;
   background:
     linear-gradient(90deg, rgb(11 5 4 / 78%), rgb(11 5 4 / 26%)),
-    url("/whatsapp/assets/hero-table.png") center 47% / cover;
+    url("/figma/home-hero.jpg") center 47% / cover;
   &__content {
     width: min(100% - 64px, 1280px);
     margin: 0 auto;
@@ -155,7 +155,7 @@
   }
 }
 .pm-gallery {
-  background: #faf8f4;
+  background: var(--pm-background);
   padding-bottom: 85px;
   &__title {
     background: var(--pm-yellow);
@@ -167,9 +167,20 @@
     }
   }
   &__photo {
-    min-height: 510px;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-rows: repeat(2, 250px);
+    gap: 12px;
+    overflow: hidden;
     border-radius: 14px;
-    background: url("/whatsapp/assets/hero-table.png") center / cover;
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    img:first-child {
+      grid-row: span 2;
+    }
   }
   &__share {
     display: flex;
@@ -201,7 +212,7 @@
     text-transform: uppercase;
   }
   &__photo {
-    background: url("/whatsapp/assets/hero-table.png") center / cover;
+    background: url("/figma/host-recruitment.jpg") center / cover;
   }
 }
 .pm-empty {
@@ -515,7 +526,7 @@
     }
   }
   &__photo {
-    background: url("/whatsapp/assets/hero-table.png") center / cover;
+    background: url("/figma/gallery-table.jpg") center / cover;
   }
   &__closing {
     text-align: center;
@@ -581,7 +592,7 @@
     color: white;
     background:
       linear-gradient(#0008, #0008),
-      url("/whatsapp/assets/hero-table.png") center / cover;
+      url("/figma/gallery-dinner.jpg") center / cover;
     h1 {
       max-width: 1200px;
       padding: 40px;

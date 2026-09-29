@@ -14,7 +14,7 @@ export function AppShell() {
     <div className="app">
       <header className="pm-header">
         <Link to="/" className="pm-logo" aria-label="PlateMate, accueil">
-          <img src="/whatsapp/assets/platemate-logo.png" alt="" />
+          <img src="/figma/logo-cream.png" alt="" />
         </Link>
         <button
           className="pm-menu-toggle"
@@ -54,7 +54,7 @@ export function AppShell() {
             className="pm-logo pm-logo--light"
             aria-label="PlateMate, accueil"
           >
-            <img src="/whatsapp/assets/platemate-logo.png" alt="" />
+            <img src="/figma/logo-cream.png" alt="" />
           </Link>
           <div className="pm-footer__social">
             <a
