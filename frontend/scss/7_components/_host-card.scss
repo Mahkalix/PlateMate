@@ -1,0 +1,183 @@
+.pm-host-card {
+  position: relative;
+  box-sizing: border-box;
+  width: 280px;
+  height: 432px;
+  flex: 0 0 280px;
+  overflow: hidden;
+  border: 2px solid var(--pm-red);
+  border-radius: 20px;
+  background: #fff;
+  color: var(--pm-ink);
+  text-align: center;
+
+  &__photo {
+    position: absolute;
+    top: 9px;
+    left: 10px;
+    width: 257px;
+    height: 245px;
+    overflow: hidden;
+    border-radius: 11px;
+    background: var(--pm-cream);
+
+    > img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__empty {
+    display: grid;
+    height: 100%;
+    place-items: center;
+    padding: 16px;
+    font-size: 1.4rem;
+    font-weight: 800;
+  }
+
+  &__portrait-frame {
+    position: absolute;
+    z-index: 1;
+    top: 7px;
+    left: 7px;
+    box-sizing: border-box;
+    width: 90px;
+    height: 116px;
+    padding: 2px 2px 11px;
+    transform: rotate(1.77deg);
+    background: #fff;
+
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    &::before {
+      position: absolute;
+      z-index: 1;
+      top: -12px;
+      left: -14px;
+      width: 55px;
+      height: 13px;
+      transform: rotate(-42deg);
+      background: var(--pm-yellow);
+      opacity: 0.8;
+      content: "";
+    }
+  }
+
+  &__identity {
+    position: absolute;
+    top: 264px;
+    left: 10px;
+    width: 257px;
+    text-transform: uppercase;
+  }
+
+  &__host {
+    margin: 0 0 3px;
+    color: var(--pm-teal);
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 18px;
+    letter-spacing: -0.6px;
+  }
+
+  h3 {
+    overflow: hidden;
+    margin: 0;
+    font-family: "BBB ReadMe", Georgia, serif;
+    font-size: 20px;
+    font-weight: 900;
+    line-height: 20px;
+    letter-spacing: -0.4px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__interests {
+    position: absolute;
+    top: 322px;
+    left: 10px;
+    width: 257px;
+
+    p {
+      margin: 0 0 5px;
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 14px;
+      letter-spacing: -0.28px;
+    }
+  }
+
+  &__tags {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+}
+
+.pm-interest-tag {
+  display: block;
+  max-width: 105px;
+  overflow: hidden;
+  border-radius: 100px;
+  background: rgba(0, 158, 179, 0.2);
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pm-card-action {
+  position: absolute;
+  bottom: 13px;
+  left: 10px;
+  display: flex;
+  width: 257px;
+  height: 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 999px;
+  color: var(--pm-red) !important;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+
+  &__arrow {
+    display: block;
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.pm-host-card--showcase .pm-host-card__portrait-frame {
+  top: 5px;
+  left: 5px;
+  width: 101px;
+  height: 128px;
+  padding: 0;
+  transform: none;
+  background: transparent;
+
+  img {
+    object-fit: contain;
+  }
+
+  &::before {
+    content: none;
+  }
+}
