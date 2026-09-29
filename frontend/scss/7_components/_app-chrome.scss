@@ -16,6 +16,26 @@
     letter-spacing: 0.06em;
   }
 }
+.app:has(.pm-hero) {
+  .pm-header {
+    position: absolute;
+    z-index: 5;
+    inset: 0 0 auto;
+    min-height: 104px;
+    background: transparent;
+    color: #fff;
+
+    .pm-nav a:hover,
+    .pm-nav a.is-active {
+      color: var(--pm-yellow);
+    }
+  }
+
+  .pm-header__login {
+    background: var(--pm-red);
+    color: #fff !important;
+  }
+}
 .pm-logo {
   display: block;
   flex: 0 0 auto;

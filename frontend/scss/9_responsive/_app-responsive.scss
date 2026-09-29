@@ -49,6 +49,11 @@
       display: flex;
     }
   }
+  .app:has(.pm-hero) .pm-nav.is-open {
+    padding: 16px;
+    border-radius: 12px;
+    background: var(--pm-ink);
+  }
   .pm-hero {
     min-height: 590px;
     &__content {
@@ -85,6 +90,9 @@
     h2 {
       font-size: 2.2rem;
     }
+  }
+  .pm-step:not(:last-child)::after {
+    display: none;
   }
   .pm-gallery__photo {
     grid-template-columns: repeat(2, 1fr);

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, NavLink, Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import { Button } from "./Button";
 
 const nav = [
@@ -10,11 +10,15 @@ const nav = [
 ];
 export function AppShell() {
   const [open, setOpen] = useState(false);
+  const isHome = useLocation().pathname === "/";
   return (
     <div className="app">
       <header className="pm-header">
         <Link to="/" className="pm-logo" aria-label="PlateMate, accueil">
-          <img src="/figma/logo-red.png" alt="" />
+          <img
+            src={isHome ? "/figma/logo-cream.png" : "/figma/logo-red.png"}
+            alt=""
+          />
         </Link>
         <button
           className="pm-menu-toggle"
