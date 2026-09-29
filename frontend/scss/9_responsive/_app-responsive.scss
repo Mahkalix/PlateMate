@@ -1,4 +1,27 @@
 @media (max-width: 980px) {
+  .pm-featured {
+    height: auto;
+    padding-block: 45px 55px;
+  }
+  .pm-featured__cards {
+    width: 100%;
+    height: auto;
+    gap: 16px;
+    overflow-x: auto;
+    margin-left: 0;
+    padding: 8px 0 20px;
+    scroll-snap-type: x mandatory;
+
+    .pm-host-card:nth-child(n) {
+      margin-left: 0;
+      transform: none;
+      scroll-snap-align: start;
+    }
+  }
+  .pm-featured__note {
+    position: static;
+    margin-top: 4px;
+  }
   .pm-header {
     flex-wrap: wrap;
     .pm-logo {
@@ -97,8 +120,9 @@
   .pm-gallery__photo {
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(3, 170px);
-    img:first-child {
-      grid-row: span 2;
+    img:nth-child(n) {
+      grid-column: auto;
+      grid-row: auto;
     }
   }
   .pm-gallery__share {

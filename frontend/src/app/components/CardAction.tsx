@@ -4,14 +4,20 @@ import { Link } from "react-router-dom";
 export function CardAction({
   to,
   children,
+  ariaLabel,
 }: {
   to: string;
   children: ReactNode;
+  ariaLabel?: string;
 }) {
   return (
-    <Link className="pm-card-action" to={to}>
+    <Link className="pm-card-action" to={to} aria-label={ariaLabel}>
       <span>{children}</span>
-      <span className="pm-card-action__arrow" aria-hidden="true" />
+      <img
+        className="pm-card-action__arrow"
+        src="/figma/cards/arrow-right.svg"
+        alt=""
+      />
     </Link>
   );
 }

@@ -2,13 +2,26 @@ import type { Experience } from "../lib/api";
 import { CardAction } from "./CardAction";
 import { InterestTag } from "./InterestTag";
 
-export function HostCard({ experience }: { experience: Experience }) {
+export function HostCard({
+  experience,
+  preview = false,
+}: {
+  experience: Experience;
+  preview?: boolean;
+}) {
   const interests = experience.hostInterests?.slice(0, 3) ?? [];
 
   return (
     <article
-      className="pm-host-card"
-      aria-label={experience.title + ", avec " + experience.hostName}
+      className={
+        preview ? "pm-host-card pm-host-card--showcase" : "pm-host-card"
+      }
+      aria-label={
+        (preview ? "Aperçu de la maquette : " : "") +
+        experience.title +
+        ", avec " +
+        experience.hostName
+      }
     >
       <div className="pm-host-card__photo">
         {experience.photoUrl ? (
@@ -47,7 +60,10 @@ export function HostCard({ experience }: { experience: Experience }) {
           </ul>
         )}
       </div>
-      <CardAction to={"/experiences/" + experience.id}>
+      <CardAction
+        to={preview ? "/explorer" : "/experiences/" + experience.id}
+        ariaLabel={preview ? "Explorer les expériences disponibles" : undefined}
+      >
         Voir l’expérience
       </CardAction>
     </article>

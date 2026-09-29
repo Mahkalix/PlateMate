@@ -78,6 +78,8 @@
   font-weight: 800;
 }
 .pm-footer {
+  box-sizing: border-box;
+  min-height: 277px;
   background: var(--pm-ink);
   color: var(--pm-cream);
   padding: 48px max(32px, calc((100vw - 1280px) / 2)) 28px;

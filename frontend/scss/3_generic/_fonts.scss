@@ -2,6 +2,14 @@
 
 @font-face {
   font-family: "BBB ReadMe";
+  src: url("/whatsapp/assets/fonts/BBBReadMe-Black.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "BBB ReadMe";
   src: url("/whatsapp/assets/fonts/BBBReadMe-BlackItalic.woff2") format("woff2");
   font-style: italic;
   font-weight: 900;

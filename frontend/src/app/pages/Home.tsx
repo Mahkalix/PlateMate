@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "../components/Button";
 import { HostCard } from "../components/HostCard";
+import { showcaseCards } from "../data/showcase";
 import { getExperiences, type Experience } from "../lib/api";
 
 const steps = [
@@ -20,6 +21,10 @@ const steps = [
 ];
 export function Home() {
   const [experiences, setExperiences] = useState<Experience[]>([]);
+  const hasIllustratedCatalogue =
+    experiences.length >= 5 &&
+    experiences.slice(0, 5).every((item) => item.photoUrl && item.hostPhotoUrl);
+  const featuredCards = hasIllustratedCatalogue ? experiences : showcaseCards;
   useEffect(() => {
     const controller = new AbortController();
     getExperiences({ limit: 5 }, controller.signal)
@@ -72,17 +77,26 @@ export function Home() {
           </div>
           <Link to="/explorer">Découvrir →</Link>
         </div>
-        {experiences.length ? (
-          <div className="pm-featured__cards">
-            {experiences.map((item) => (
-              <HostCard experience={item} key={item.id} />
-            ))}
-          </div>
-        ) : (
-          <p className="pm-empty">
-            Les premières tables arrivent bientôt.{" "}
-            <Link to="/whatsapp/">Rejoins la communauté</Link> pour suivre le
-            lancement.
+        <div
+          className="pm-featured__cards"
+          aria-label={
+            hasIllustratedCatalogue
+              ? "Expériences à la une"
+              : "Aperçu des cartes de la maquette"
+          }
+        >
+          {featuredCards.map((item) => (
+            <HostCard
+              experience={item}
+              key={item.id}
+              preview={!hasIllustratedCatalogue}
+            />
+          ))}
+        </div>
+        {!hasIllustratedCatalogue && (
+          <p className="pm-featured__note">
+            Aperçu de la maquette. Les expériences réellement disponibles sont
+            dans <Link to="/explorer">Explorer</Link>.
           </p>
         )}
       </section>
@@ -126,6 +140,10 @@ export function Home() {
         </div>
         <div className="pm-container">
           <div className="pm-gallery__photo">
+            <img
+              src="/figma/home-hero.jpg"
+              alt="Plats partagés autour d’une table"
+            />
             <img
               src="/figma/gallery-friends.jpg"
               alt="Amis réunis autour d’un repas"

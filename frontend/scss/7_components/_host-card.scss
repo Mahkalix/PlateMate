@@ -158,31 +158,26 @@
   text-underline-offset: 2px;
 
   &__arrow {
-    position: relative;
     display: block;
     width: 24px;
     height: 24px;
+  }
+}
 
-    &::before {
-      position: absolute;
-      top: 11px;
-      left: 4px;
-      width: 16px;
-      height: 2px;
-      background: currentColor;
-      content: "";
-    }
+.pm-host-card--showcase .pm-host-card__portrait-frame {
+  top: 5px;
+  left: 5px;
+  width: 101px;
+  height: 128px;
+  padding: 0;
+  transform: none;
+  background: transparent;
 
-    &::after {
-      position: absolute;
-      top: 7px;
-      right: 4px;
-      width: 8px;
-      height: 8px;
-      transform: rotate(45deg);
-      border-top: 2px solid currentColor;
-      border-right: 2px solid currentColor;
-      content: "";
-    }
+  img {
+    object-fit: contain;
+  }
+
+  &::before {
+    content: none;
   }
 }
