@@ -14,7 +14,7 @@ Compose construit le frontend React et l'API, démarre PostgreSQL et le worker, 
 
 | Adresse locale | Fonction |
 |---|---|
-| [localhost:8080](http://localhost:8080/) | Maintenance (`/`) et communauté (`/whatsapp/`) |
+| [localhost:8080](http://localhost:8080/) | Communauté WhatsApp (`/` et `/whatsapp/`) |
 | [localhost:3000/api/ready](http://localhost:3000/api/ready) | API et connexion à PostgreSQL |
 | `localhost:5432` | PostgreSQL, accessible uniquement depuis cette machine |
 
@@ -43,7 +43,7 @@ Le mode par défaut est `AUTH_MODE=local`. Stripe reste limité aux clés de tes
 
 ## Frontend
 
-Le frontend React, TypeScript et Vite sert la page de maintenance sur `/`, la communauté sur `/whatsapp/`, puis l'équipe et les mentions légales. Vercel construit et publie `frontend/dist`.
+Le frontend React, TypeScript et Vite sert la communauté WhatsApp sur `/` et `/whatsapp/`, puis l'équipe et les mentions légales. La page indique « Site en construction ». Vercel construit et publie `frontend/dist`.
 
 ```sh
 cd frontend

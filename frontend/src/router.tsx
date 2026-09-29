@@ -2,14 +2,13 @@ import { Link, Route, Routes } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import { Community } from "./pages/Community";
 import { Legal } from "./pages/Legal";
-import { Maintenance } from "./pages/Maintenance";
 import { Team } from "./pages/Team";
 
 export function AppRouter() {
   return (
     <Layout>
       <Routes>
-        <Route path="/" element={<Maintenance />} />
+        <Route path="/" element={<Community />} />
         <Route path="/whatsapp" element={<Community />} />
         <Route path="/equipe" element={<Team />} />
         <Route path="/mentions-legales" element={<Legal />} />
