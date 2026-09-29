@@ -1,0 +1,85 @@
+x-api-environment: &api-environment
+  DATABASE_URL: postgres://platemate:platemate@db:5432/platemate
+  NODE_ENV: development
+  AUTH_MODE: ${AUTH_MODE:-local}
+  AUTH0_ISSUER_BASE_URL: ${AUTH0_ISSUER_BASE_URL:-}
+  AUTH0_AUDIENCE: ${AUTH0_AUDIENCE:-}
+  APP_ORIGIN: http://localhost:8080
+  API_PUBLIC_URL: http://localhost:3000
+  MEDIA_DIR: /data/media
+  STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+  STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+  STRIPE_CONNECT_WEBHOOK_SECRET: ${STRIPE_CONNECT_WEBHOOK_SECRET:-}
+
+services:
+  db:
+    image: postgres:17-alpine
+    ports:
+      - "127.0.0.1:5432:5432"
+    environment:
+      POSTGRES_USER: platemate
+      POSTGRES_PASSWORD: platemate
+      POSTGRES_DB: platemate
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U platemate -d platemate"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  db-test:
+    image: postgres:17-alpine
+    profiles: [test]
+    environment:
+      POSTGRES_USER: platemate
+      POSTGRES_PASSWORD: platemate
+      POSTGRES_DB: platemate_test
+    ports:
+      - "127.0.0.1:5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U platemate -d platemate_test"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: ./backend
+    environment: *api-environment
+    command: ["sh", "-c", "node src/server.js --migrate && node src/server.js"]
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - media:/data/media
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/ready').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  worker:
+    build: ./backend
+    environment: *api-environment
+    command: ["node", "src/worker.js", "--loop"]
+    depends_on:
+      api:
+        condition: service_healthy
+    volumes:
+      - media:/data/media
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "127.0.0.1:8080:8080"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8080/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:
+  media:

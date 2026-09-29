@@ -5,7 +5,7 @@ COPY package*.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 COPY src ./src
 COPY sql ./sql
-RUN groupadd --system platemate && useradd --system --gid platemate platemate && mkdir /data && chown platemate:platemate /data
+RUN groupadd --system platemate && useradd --system --gid platemate platemate && mkdir -p /data/media && chown -R platemate:platemate /data
 USER platemate
 ENV MEDIA_DIR=/data/media
 EXPOSE 3000

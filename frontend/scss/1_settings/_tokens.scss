@@ -1,0 +1,21 @@
+// Couleurs PlateMate : maquette de l'application et page communautaire.
+$wine: #620009;
+$cream: #faf4d4;
+$yellow: #ffcc58;
+$red: #d12e31;
+$community-wine: #803037;
+$community-yellow: #f5d000;
+$community-cream: #faf7ef;
+$ink: #392825;
+$muted: #766862;
+
+$mobile: 560px;
+$tablet: 950px;
+
+@mixin community-theme {
+  --wine: #{$community-wine};
+  --yellow: #{$community-yellow};
+  --cream: #{$community-cream};
+  --ink: #{$ink};
+  --muted: #{$muted};
+}

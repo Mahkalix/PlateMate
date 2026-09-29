@@ -1,33 +1,70 @@
 # PlateMate
 
-PlateMate met les expériences culinaires au centre. Les visiteurs découvrent le menu et l'hôte (photo, présentation, langues, centres d'intérêt), puis filtrent par cuisine, thème, ambiance, ville, date, régime et nombre de places. Le questionnaire peut alimenter ces filtres ; il n'y a pas de score de compatibilité. Voir le [cadrage produit](docs/product-direction.md).
+PlateMate met les expériences culinaires au centre. Les visiteurs découvrent le menu et l'hôte (photo, présentation, langues, centres d'intérêt), puis filtrent par cuisine, thème, ambiance, ville, date, régime et nombre de places. Le questionnaire peut alimenter ces filtres ; il n'y a pas de score de compatibilité. Voir le [périmètre fonctionnel du backend](backend/FONCTIONNALITES.md).
 
-## Accueil provisoire et ancienne page
+## Démarrer avec Docker
 
-La racine `/` affiche une page de maintenance aux couleurs du Figma pendant la construction de l'application. La page statique du groupe WhatsApp reste dans [`/whatsapp/`](whatsapp/) et son lien est accessible depuis l'accueil. Pour les voir localement :
+Installer Docker avec le plugin Compose, puis lancer ces commandes **depuis la racine du dépôt** :
 
 ```sh
-python3 -m http.server 8080
-# http://localhost:8080/ (maintenance)
-# http://localhost:8080/whatsapp/ (ancien site)
+docker compose up --build -d --wait
 ```
 
-Le site statique n'est pas l'application de réservation. Son identité visuelle reprend le Figma PlateMate ; le logo WhatsApp est issu de Simple Icons. Les licences des polices sont conservées avec leurs fichiers.
+Compose construit le frontend React et l'API, démarre PostgreSQL et le worker, puis applique les migrations avant de servir l'API. L'attente `--wait` vérifie les services dotés d'un healthcheck. Le premier build peut prendre plusieurs minutes.
 
-## Backend
+| Adresse locale | Fonction |
+|---|---|
+| [localhost:8080](http://localhost:8080/) | Communauté WhatsApp (`/` et `/whatsapp/`) |
+| [localhost:3000/api/ready](http://localhost:3000/api/ready) | API et connexion à PostgreSQL |
+| `localhost:5432` | PostgreSQL, accessible uniquement depuis cette machine |
 
-Le [guide backend](backend/README.md) contient les commandes d'installation, les tests PostgreSQL, le parcours Stripe test, Auth0, les routes et les conditions de déploiement.
+Le frontend public ne présente pas encore les écrans de réservation. Pour tester le parcours API après démarrage :
 
 ```sh
 cd backend
 npm ci
-cp .env.example .env
+npm run demo
+cd ..
+```
+
+Les comptes et réservations créés par la démo restent dans la base locale. Les commandes courantes, depuis la racine :
+
+```sh
+docker compose ps                      # état des services
+docker compose logs -f api frontend    # logs en direct (Ctrl+C quitte les logs)
+docker compose up --build -d --wait    # reconstruire après une modification
+docker compose down                    # arrêter en conservant les données
+docker compose down -v                 # réinitialiser aussi la base et les médias locaux
+```
+
+`down -v` efface les volumes Docker `pgdata` et `media` : l'utiliser uniquement pour repartir de zéro. En cas de port 3000, 5432 ou 8080 déjà utilisé, libérer ce port avant le démarrage.
+
+Le mode par défaut est `AUTH_MODE=local`. Stripe reste limité aux clés de test ; sans clé, le paiement est indisponible. Pour tester Checkout et les webhooks, renseigner `STRIPE_SECRET_KEY=sk_test_...`, `STRIPE_WEBHOOK_SECRET` et `STRIPE_CONNECT_WEBHOOK_SECRET` dans un fichier `.env` **à la racine**, puis recréer les services API et worker avec `docker compose up --build -d --wait`. La CLI Stripe tourne sur la machine hôte. Voir le [guide backend](backend/README.md) pour la procédure de paiement test. Ne pas versionner `.env`.
+
+## Frontend
+
+Le frontend React, TypeScript et Vite sert la communauté WhatsApp sur `/` et `/whatsapp/`, puis l'équipe et les mentions légales. La page indique « Site en construction ». Vercel construit et publie `frontend/dist`.
+
+```sh
+cd frontend
+npm ci
+npm run start
+```
+
+Cette commande démarre le serveur de développement Vite sur `http://localhost:8080` et recharge les modifications React/SCSS. Si Docker tourne déjà, arrêter son frontend avec `docker compose stop frontend` depuis la racine pour libérer le port 8080. Docker sert le build compilé et ne recharge pas le code en direct. Voir le [guide frontend](frontend/README.md) pour les routes, le SCSS et le build statique. Les parcours Auth0, réservation et paiement ne sont pas encore reliés à l'interface.
+
+## Backend sans Docker Compose complet
+
+Le [guide backend](backend/README.md) contient les commandes d'installation, les tests PostgreSQL, le parcours Stripe test, Auth0 et les conditions de déploiement. Le [catalogue fonctionnel](backend/FONCTIONNALITES.md) sépare les fonctions codées des fonctions prévues.
+
+```sh
 docker compose up -d --wait db
+cd backend
+npm ci
+cp .env.example .env
 npm run migrate
 npm run dev
 # puis dans un autre terminal : npm run demo
 ```
 
-L'API gère les profils privés et fiches hôte publiques, les expériences et menus, la publication, les dates et capacités, les demandes acceptées par l'hôte, Stripe Checkout, les annulations/remboursements, la messagerie, les avis et les revenus des hôtes avec Stripe Connect. Cette version accepte uniquement Stripe en mode test. L'authentification Auth0 est imposée pour un déploiement HTTPS ; les comptes locaux servent à la démo de développement. Les confirmations de paiement viennent exclusivement des webhooks signés.
-
-La [PR #1](https://github.com/Mahkalix/PlateMate/pull/1) livre un socle backend à tester pendant la construction du frontend. Les URL Auth0 dépendront des routes du futur frontend ; les parcours Stripe Connect doivent être essayés avec des comptes de test. Le site `/whatsapp/` conserve son chemin. Aucun paiement réel n'est activé.
+Le backend est réservé aux essais avec Stripe en mode test. Le détail des fonctions et des limites est dans le [catalogue fonctionnel](backend/FONCTIONNALITES.md).
