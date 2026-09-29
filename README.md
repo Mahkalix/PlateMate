@@ -12,19 +12,17 @@ docker compose up --build -d --wait
 
 Ouvrir [l'accueil](http://localhost:8080/) ou [la page WhatsApp](http://localhost:8080/whatsapp/). L'API répond sur [localhost:3000/api/ready](http://localhost:3000/api/ready). La base PostgreSQL, les migrations, l'API, le worker et le frontend démarrent ensemble. Pour arrêter : `docker compose down`. Les données PostgreSQL et les médias restent dans des volumes Docker. Ce démarrage utilise l'authentification locale et les paiements Stripe en mode test uniquement ; pour renseigner les clés de test, voir le [guide backend](backend/README.md).
 
-## Accueil provisoire
+## Frontend
 
-La page communautaire est l'accueil provisoire sur `/`, avec la mention « Site en construction ». Elle reste également accessible sous [`/whatsapp/`](frontend/public/whatsapp/). Les fichiers publiés sont dans `frontend/public/`, le dossier servi par Vercel. Pour les voir localement :
+Le frontend React, TypeScript et Vite sert la page de maintenance sur `/`, la communauté sur `/whatsapp/`, puis l'équipe et les mentions légales. Vercel construit et publie `frontend/dist`.
 
 ```sh
 cd frontend
+npm ci
 npm run start
-# http://localhost:8080/ et http://localhost:8080/whatsapp/
 ```
 
-Les sources et commandes SCSS sont décrites dans le [guide frontend](frontend/README.md). Les feuilles compilées sont versionnées pour l'hébergement statique.
-
-Le site statique n'est pas l'application de réservation. Le logo WhatsApp est issu de Simple Icons. Les licences des polices sont conservées avec leurs fichiers.
+Voir le [guide frontend](frontend/README.md) pour les routes, le SCSS et le build statique. Les parcours Auth0, réservation et paiement ne sont pas encore reliés à l'interface.
 
 ## Backend sans Docker Compose complet
 

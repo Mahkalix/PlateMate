@@ -396,3 +396,33 @@ footer {
     gap: 20px 14px;
   }
 }
+
+.maintenance {
+  .intro {
+    padding-bottom: 55px;
+  }
+  .intro p:last-of-type {
+    max-width: 350px;
+  }
+}
+.maintenance-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 48px;
+  margin-top: 20px;
+  padding: 0 22px;
+  border-radius: 10px;
+  background: var(--wine);
+  color: var(--cream);
+  font-weight: 700;
+}
+.maintenance-link:hover {
+  background: var(--ink);
+}
+.not-found {
+  min-height: 50vh;
+  text-align: center;
+  padding: 65px 0;
+}

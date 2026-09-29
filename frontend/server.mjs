@@ -4,7 +4,7 @@ import { stat } from 'node:fs/promises';
 import { extname, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const root = resolve(fileURLToPath(new URL('./public/', import.meta.url)));
+const root = resolve(fileURLToPath(new URL('./dist/', import.meta.url)));
 const types = {
   '.html': 'text/html; charset=utf-8',
   '.css': 'text/css; charset=utf-8',
@@ -26,8 +26,17 @@ createServer(async (req, res) => {
     const pathname = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
     filename = resolve(root, `.${pathname}`);
     if (filename !== root && !filename.startsWith(root + sep)) throw new Error('Invalid path');
-    const info = await stat(filename);
-    if (info.isDirectory()) filename = resolve(filename, 'index.html');
+    let info;
+    try { info = await stat(filename); } catch {
+      if (!pathname.includes('.') || pathname.endsWith('.html')) filename = resolve(root, 'index.html');
+      else throw new Error('Invalid file');
+      info = await stat(filename);
+    }
+    if (info.isDirectory()) {
+      const directoryIndex = resolve(filename, 'index.html');
+      try { await stat(directoryIndex); filename = directoryIndex; }
+      catch { filename = resolve(root, 'index.html'); }
+    }
     const file = await stat(filename);
     if (!file.isFile()) throw new Error('Invalid file');
     res.writeHead(200, {
