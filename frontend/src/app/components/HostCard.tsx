@@ -1,52 +1,55 @@
-import { Link } from "react-router-dom";
 import type { Experience } from "../lib/api";
+import { CardAction } from "./CardAction";
+import { InterestTag } from "./InterestTag";
 
 export function HostCard({ experience }: { experience: Experience }) {
+  const interests = experience.hostInterests?.slice(0, 3) ?? [];
+
   return (
-    <article className="pm-host-card">
+    <article
+      className="pm-host-card"
+      aria-label={experience.title + ", avec " + experience.hostName}
+    >
       <div className="pm-host-card__photo">
         {experience.photoUrl ? (
-          <img
-            src={experience.photoUrl}
-            alt={experience.title}
-            loading="lazy"
-          />
+          <img src={experience.photoUrl} alt="" loading="lazy" />
         ) : (
-          <span aria-hidden="true" className="pm-host-card__empty">
+          <span className="pm-host-card__empty" aria-hidden="true">
             {experience.cuisine}
           </span>
         )}
-        {experience.hostPhotoUrl && (
+      </div>
+      {experience.hostPhotoUrl && (
+        <div className="pm-host-card__portrait-frame">
           <img
-            className="pm-host-card__portrait"
             src={experience.hostPhotoUrl}
-            alt={`Portrait de ${experience.hostName}`}
+            alt={"Portrait de " + experience.hostName}
             loading="lazy"
           />
+        </div>
+      )}
+      <div className="pm-host-card__identity">
+        <p className="pm-host-card__host">{experience.hostName}</p>
+        <h3>{experience.title}</h3>
+      </div>
+      <div className="pm-host-card__interests">
+        <p>Mes intérêts :</p>
+        {interests.length > 0 && (
+          <ul
+            className="pm-host-card__tags"
+            aria-label="Centres d’intérêt de l’hôte"
+          >
+            {interests.map((interest) => (
+              <li key={interest}>
+                <InterestTag>{interest}</InterestTag>
+              </li>
+            ))}
+          </ul>
         )}
       </div>
-      <div className="pm-host-card__body">
-        <p className="pm-host-card__level">Hôte PlateMate</p>
-        <h3>{experience.hostName}</h3>
-        <div className="pm-host-card__tags">
-          <span>{experience.cuisine}</span>
-          {experience.hostInterests?.slice(0, 2).map((item) => (
-            <span key={item}>{item}</span>
-          ))}
-        </div>
-        <p className="pm-host-card__meta">
-          {experience.city}
-          {experience.nextDate
-            ? ` · ${new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long" }).format(new Date(experience.nextDate))}`
-            : ""}
-        </p>
-        <Link
-          to={`/experiences/${experience.id}`}
-          className="pm-host-card__link"
-        >
-          Voir l’expérience <span aria-hidden="true">→</span>
-        </Link>
-      </div>
+      <CardAction to={"/experiences/" + experience.id}>
+        Voir l’expérience
+      </CardAction>
     </article>
   );
 }
