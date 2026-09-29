@@ -14,7 +14,7 @@ Compose construit le frontend React et l'API, démarre PostgreSQL et le worker, 
 
 | Adresse locale | Fonction |
 |---|---|
-| [localhost:8080](http://localhost:8080/) | Communauté WhatsApp (`/` et `/whatsapp/`) |
+| [localhost:8080](http://localhost:8080/) | Aperçu de l’application Figma (`/`), communauté WhatsApp (`/whatsapp/`) |
 | [localhost:3000/api/ready](http://localhost:3000/api/ready) | API et connexion à PostgreSQL |
 | `localhost:5432` | PostgreSQL, accessible uniquement depuis cette machine |
 
@@ -43,7 +43,7 @@ Le mode par défaut est `AUTH_MODE=local`. Stripe reste limité aux clés de tes
 
 ## Frontend
 
-Le frontend React, TypeScript et Vite sert la communauté WhatsApp sur `/` et `/whatsapp/`, puis l'équipe et les mentions légales. La page indique « Site en construction ». Vercel construit et publie `frontend/dist`.
+Le frontend React, TypeScript et Vite propose un aperçu de l’application sur `/`, `/explorer`, `/experiences/:id`, `/devenir-hote` et `/a-propos`. La page communautaire reste sur `/whatsapp/`. Les éléments réutilisables sont dans `frontend/src/app/components` et les couleurs de l’application dans `frontend/scss/3_generic/_app-base.scss` (à partir des tokens). Vercel construit et publie `frontend/dist`.
 
 ```sh
 cd frontend
@@ -51,7 +51,7 @@ npm ci
 npm run start
 ```
 
-Cette commande démarre le serveur de développement Vite sur `http://localhost:8080` et recharge les modifications React/SCSS. Si Docker tourne déjà, arrêter son frontend avec `docker compose stop frontend` depuis la racine pour libérer le port 8080. Docker sert le build compilé et ne recharge pas le code en direct. Voir le [guide frontend](frontend/README.md) pour les routes, le SCSS et le build statique. Les parcours Auth0, réservation et paiement ne sont pas encore reliés à l'interface.
+Cette commande démarre le serveur de développement Vite sur `http://localhost:8080` et recharge les modifications React/SCSS. Si Docker tourne déjà, arrêter son frontend avec `docker compose stop frontend` depuis la racine pour libérer le port 8080. Docker sert le build compilé et ne recharge pas le code en direct. Voir le [guide frontend](frontend/README.md) pour les routes, le SCSS et le build statique. L’exploration lit l’API publique ; la connexion et la réservation ne sont pas encore branchées.
 
 ## Backend sans Docker Compose complet
 

@@ -1,0 +1,85 @@
+.pm-host-card {
+  border: 2px solid var(--pm-red);
+  border-radius: 20px;
+  background: white;
+  padding: 8px 9px 16px;
+  text-align: center;
+  min-width: 0;
+  &__photo {
+    height: 245px;
+    position: relative;
+    border-radius: 12px;
+    overflow: visible;
+    background: #e7d7c6;
+    > img:not(.pm-host-card__portrait) {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 12px;
+    }
+  }
+  &__empty {
+    display: grid;
+    place-items: center;
+    height: 100%;
+    color: var(--pm-wine);
+    font:
+      900 1.6rem "BBB ReadMe",
+      Georgia,
+      serif;
+  }
+  &__portrait {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: 70px;
+    height: 86px;
+    object-fit: cover;
+    border: 5px solid white;
+    box-shadow: 2px 2px 5px #0004;
+    transform: rotate(-3deg);
+  }
+  &__body {
+    padding: 16px 5px 0;
+  }
+  &__level {
+    text-transform: uppercase;
+    font-size: 0.76rem;
+    font-weight: 900;
+    color: var(--pm-red);
+    margin-bottom: 0;
+  }
+  h3 {
+    font:
+      900 1.25rem "BBB ReadMe",
+      Georgia,
+      serif;
+    text-transform: uppercase;
+    margin: 0 0 10px;
+  }
+  &__tags {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 4px;
+    min-height: 27px;
+    span {
+      padding: 3px 9px;
+      border-radius: 99px;
+      background: var(--pm-sky);
+      font-size: 0.72rem;
+    }
+  }
+  &__meta {
+    font-size: 0.72rem;
+    margin: 12px 0;
+  }
+  &__link {
+    display: inline-flex;
+    gap: 9px;
+    color: var(--pm-red) !important;
+    font-size: 0.85rem;
+    font-weight: 800;
+    text-underline-offset: 3px;
+  }
+}
