@@ -26,8 +26,6 @@
     width: 100%;
     height: 100%;
     object-fit: contain;
-    filter: brightness(0) saturate(100%) invert(25%) sepia(92%) saturate(2411%)
-      hue-rotate(338deg) brightness(91%);
   }
   &--light img {
     filter: none;

@@ -14,7 +14,7 @@ export function AppShell() {
     <div className="app">
       <header className="pm-header">
         <Link to="/" className="pm-logo" aria-label="PlateMate, accueil">
-          <img src="/figma/logo-cream.png" alt="" />
+          <img src="/figma/logo-red.png" alt="" />
         </Link>
         <button
           className="pm-menu-toggle"
