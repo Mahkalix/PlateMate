@@ -1,0 +1,112 @@
+.pm-table-card {
+  position: relative;
+  flex: 1 0 21%;
+  min-width: 0;
+  height: 445px;
+  padding: 12px;
+  background: var(--pm-teal);
+  color: var(--pm-teal);
+  border: 0;
+  border-radius: 5px;
+  overflow: hidden;
+  &:hover,
+  &:focus-visible {
+    z-index: 5;
+  }
+  &:nth-child(2n) {
+    transform: translateY(-42px);
+  }
+  &:nth-child(3) {
+    transform: translateY(-72px);
+    z-index: 2;
+  }
+  + .pm-table-card {
+    margin-left: -1.25%;
+  }
+  .meal-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border: 7px solid var(--pm-yellow);
+    border-radius: 5px;
+  }
+  .polaroid {
+    position: absolute;
+    top: 24px;
+    left: 15px;
+    width: 29%;
+    background: white;
+    padding: 4px 4px 7px;
+    color: #160d09;
+    font-weight: 700;
+    font-size: 13px;
+    transform: rotate(2deg);
+    img {
+      display: block;
+      width: 100%;
+      height: 76px;
+      object-fit: cover;
+    }
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -8px;
+      width: 40px;
+      height: 11px;
+      background: url("/home/Rectangle10.webp") center/cover;
+      transform: rotate(-42deg);
+    }
+  }
+  .card-info {
+    position: absolute;
+    display: grid;
+    justify-items: center;
+    align-content: center;
+    gap: 6px;
+    inset: 44% 4% 0;
+    background: url("/home/Vector.svg") center top/100% 100% no-repeat;
+    padding: 32px 12px 15px;
+    strong {
+      font:
+        900 clamp(24px, 2.7vw, 40px)/0.95 "BBB ReadMe",
+        serif;
+      text-transform: uppercase;
+    }
+    small {
+      color: var(--pm-ink);
+      font-weight: 700;
+    }
+    span {
+      font-size: 12px;
+      color: var(--pm-ink);
+      background: #cdddb6;
+      border-radius: 20px;
+      padding: 2px 9px;
+    }
+    img {
+      width: 24px;
+      height: 24px;
+    }
+  }
+}
+@media (max-width: 980px) {
+  .pm-featured__cards .pm-table-card:nth-child(n) {
+    flex: 0 0 230px;
+    height: 330px;
+    transform: none;
+    margin: 0;
+    scroll-snap-align: start;
+  }
+}
+.pm-dialog {
+  max-width: min(425px, 90vw);
+  padding: 2rem;
+  border: 0;
+  border-radius: 15px;
+  background: var(--pm-background);
+  color: var(--pm-ink);
+}
+.pm-dialog::backdrop {
+  background: #100909aa;
+}

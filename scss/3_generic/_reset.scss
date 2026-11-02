@@ -1,0 +1,6 @@
+// Reset ciblé : les liens, listes et contrôles gardent leurs styles accessibles.
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}

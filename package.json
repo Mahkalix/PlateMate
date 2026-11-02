@@ -1,0 +1,26 @@
+{
+  "name": "platemate-frontend",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "start": "vite --host 0.0.0.0 --port 8080",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host 0.0.0.0 --port 8080",
+    "format": "prettier --write \"scss/**/*.scss\" \"src/**/*.{ts,tsx}\" \"vite.config.ts\"",
+    "format:check": "prettier --check \"scss/**/*.scss\" \"src/**/*.{ts,tsx}\" \"vite.config.ts\""
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^5.2.0",
+    "prettier": "^3.9.9",
+    "sass": "^1.105.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.6"
+  },
+  "dependencies": {
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-router-dom": "^7.18.4"
+  }
+}
