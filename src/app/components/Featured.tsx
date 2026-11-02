@@ -1,3 +1,4 @@
+import { TableCard } from "./TableCard";
 import { useRef, useState } from "react";
 const cards = [
   ["Usain", "La French Touch", "BackgroundImage2", "Image26"],
@@ -17,32 +18,17 @@ export function Featured() {
         aria-label="Les tables à la une"
       >
         {cards.map(([host, title, photo, portrait], i) => (
-          <button
+          <TableCard
             key={i}
-            className="pm-table-card"
-            aria-label={title + " avec " + host}
-            onClick={() => {
+            host={host}
+            title={title}
+            photo={photo}
+            portrait={portrait}
+            onSelect={() => {
               setSelected(i);
               dialog.current?.showModal();
             }}
-          >
-            <img
-              className="meal-photo"
-              src={"/home/" + photo + ".webp"}
-              alt=""
-              loading="lazy"
-            />
-            <span className="polaroid">
-              <img src={"/home/" + portrait + ".webp"} alt="" />
-              {host}
-            </span>
-            <span className="card-info">
-              <strong>{title}</strong>
-              <small>Mes intérêts :</small>
-              <span>Musique · Jiu Jitsu · Films</span>
-              <img src="/home/ArrowLeft.svg" alt="" />
-            </span>
-          </button>
+          />
         ))}
       </div>
       <dialog className="pm-dialog" ref={dialog}>
