@@ -1,0 +1,25 @@
+import { Button } from "../components/Button";
+
+export function HostInvitation() {
+  return (
+    <section id="hotes" className="pm-host-cta">
+      <div>
+        <p className="pm-eyebrow">Devenez hôte PlateMate</p>
+        <h2>
+          Cuisinez.
+          <br />
+          Partagez.
+          <br />
+          Gagnez.
+        </h2>
+        <Button to="/whatsapp" variant="yellow">
+          En savoir plus
+        </Button>
+      </div>
+      <div className="pm-host-cta__photo" aria-hidden="true">
+        <img src="/home/ColourWhite.webp" alt="" />
+        <span>Hôte</span>
+      </div>
+    </section>
+  );
+}
