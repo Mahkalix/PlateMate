@@ -32,6 +32,10 @@
     color: #fff;
     &.is-scrolled {
       background: var(--pm-red);
+      .pm-nav a,
+      .pm-nav a:hover {
+        color: white;
+      }
       .pm-header__login {
         border: 0;
         box-shadow: inset 0 0 0 0.1rem var(--pm-cream);
@@ -41,6 +45,9 @@
     .pm-nav a:hover,
     .pm-nav a.is-active {
       color: var(--pm-yellow);
+    }
+    :is(a, button):focus-visible {
+      outline-color: white;
     }
   }
 
