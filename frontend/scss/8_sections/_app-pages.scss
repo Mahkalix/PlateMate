@@ -163,15 +163,27 @@
   overflow: hidden;
   min-height: 4rem;
   line-height: 1.2;
-  padding: 0 32px;
   background: var(--pm-red);
   color: var(--pm-yellow);
   font-weight: 900;
   letter-spacing: 0;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 32px;
+  &__group {
+    display: flex;
+    flex: none;
+    min-width: 100%;
+    justify-content: space-around;
+    align-items: center;
+    gap: 3.2rem;
+    padding-inline-end: 3.2rem;
+    animation: ticker-scroll 32s linear infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    &__group {
+      animation: none;
+    }
+  }
   font-size: 20px;
   font-weight: 700;
   b {
@@ -187,6 +199,11 @@
     line-height: normal;
     letter-spacing: 0.12em;
     background: var(--pm-teal);
+  }
+}
+@keyframes ticker-scroll {
+  to {
+    transform: translateX(-100%);
   }
 }
 .pm-steps {

@@ -12,11 +12,15 @@ export function WordBanner({
       className={teal ? "pm-ticker pm-ticker--teal" : "pm-ticker"}
       aria-hidden="true"
     >
-      {words.map((word, index) => (
-        <Fragment key={word}>
-          {index > 0 && <span>—</span>}
-          <b>{word}</b>
-        </Fragment>
+      {[0, 1].map((copy) => (
+        <div className="pm-ticker__group" key={copy}>
+          {words.map((word) => (
+            <Fragment key={word}>
+              <b>{word}</b>
+              <span>—</span>
+            </Fragment>
+          ))}
+        </div>
       ))}
     </div>
   );
