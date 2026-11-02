@@ -292,6 +292,7 @@
     strong {
       display: block;
       font-size: 1.25rem;
+      line-height: 1.35;
     }
     > img {
       flex: none;
@@ -412,6 +413,7 @@
 .pm-gallery__title .pm-eyebrow,
 .pm-host-cta .pm-eyebrow {
   font-size: clamp(0.875rem, 1.53vw, 1.375rem);
+  letter-spacing: 0.02em;
   line-height: 1.2;
   margin: 0 0 20px;
 }
