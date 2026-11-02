@@ -1,4 +1,6 @@
 import { Router } from "express";
+import { profileController } from "../controllers/profile.js";
+import { ProfileRepository } from "../repositories/profile.js";
 import { rateLimit } from "express-rate-limit";
 import type pg from "pg";
 import { AuthRepository } from "../repositories/auth.js";
@@ -22,5 +24,11 @@ export function authRoutes(db: pg.Pool) {
   router.post("/auth/refresh", c.refresh);
   router.post("/auth/logout", c.authenticated, c.logout);
   router.get("/me", c.authenticated, c.me);
+  const profile = profileController(new ProfileRepository(db));
+  router
+    .route("/me/profile")
+    .all(c.authenticated)
+    .get(profile.read)
+    .put(profile.save);
   return router;
 }

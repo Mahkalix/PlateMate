@@ -42,3 +42,6 @@ Références : [Wireframe Figma](https://www.figma.com/design/qtiIzlBfRLB3xK20yC
 | Export, effacement et consentement | Écrans de gestion à dessiner avant réalisation de ces parcours. La minimisation US15 est **Must transverse** dès la conception. La notice actuelle ne recueille pas un consentement. | US15 | Non couvert |
 
 **Bilan.** 14 familles d’écrans hors repères, dont 3 couvertes par le contrat, 10 partielles et 1 non couverte. Trois endpoints techniques ou de session sans écran dédié. Les parcours différés ne sont pas comptés comme endpoints livrés. Chaque futur test porte le préfixe « USxx / Écran » ou « USxx / SANS ÉCRAN ». Exemple : « US02 / Explorer public — un jeton falsifié reçoit 401 sans aucun profil ». Aucune suite applicative exécutée à ce stade.
+### S2 · Profil et confidentialité
+
+US03–05 sont vérifiées sur GET et PUT /me/profile. La source physique est profiles.details, document JSONB validé par schéma strict et remplacé atomiquement. Les champs de profil du tableau sont ses propriétés logiques. Le badge is_verified et le consentement horodaté sont des colonnes séparées. Le service limite toute lecture/écriture privée à l’identité authentifiée. US15 applique déjà la minimisation. Export et effacement restent différés jusqu’aux écrans de gestion.
