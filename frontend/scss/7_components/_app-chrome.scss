@@ -98,12 +98,11 @@
   font-weight: 800;
 }
 .pm-footer {
-  box-sizing: border-box;
-  min-height: 277px;
+  display: grid;
+  row-gap: clamp(4rem, calc(100vw / 12), 12rem);
+  padding: 3.8rem clamp(2rem, 5.14vw, 7.4rem);
   background: var(--pm-ink);
   color: var(--pm-cream);
-  padding: 42px clamp(20px, 5.14vw, 74px) 20px;
-  border-top: 0;
   a {
     padding: 0;
     text-decoration: none;
@@ -112,28 +111,27 @@
     }
   }
   &__top {
-    display: flex;
-    gap: 6.4rem;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     align-items: center;
-    justify-content: space-between;
   }
   .pm-logo {
-    width: 140px;
-    height: 79px;
+    width: 14rem;
+    height: 7.9rem;
   }
   &__social {
     display: flex;
-    gap: 16px;
+    justify-self: center;
+    gap: 2rem;
     > span,
     > a {
       display: grid;
       place-items: center;
-      font-size: 2.24rem;
-      width: 40px;
-      height: 40px;
+      width: 4rem;
+      height: 4rem;
       img {
-        width: 32px;
-        height: 32px;
+        width: 3.2rem;
+        height: 3.2rem;
       }
       background: var(--pm-cream);
       color: var(--pm-red);
@@ -141,35 +139,33 @@
     }
   }
   nav {
+    justify-self: end;
+    width: max-content;
+    min-width: 100%;
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem 4.2rem;
-    max-width: 500px;
+    gap: 1rem clamp(2rem, 3vw, 4.2rem);
     font-size: 1.6rem;
     line-height: normal;
-    strong {
-      width: 100%;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
+    a {
+      white-space: nowrap;
     }
   }
   &__legal {
     display: flex;
     flex-wrap: wrap;
-    gap: 26px;
+    gap: 1rem 2.6rem;
   }
   &__bottom {
-    margin-top: clamp(32px, 7.08vw, 102px);
     display: flex;
-    gap: clamp(20px, 4.17vw, 60px);
+    gap: clamp(2rem, 10.4167vw, 15rem);
     justify-content: center;
-    align-items: baseline;
-    font:
-      400 1.2rem/normal "DM Sans Variable",
-      sans-serif;
-    a,
-    span {
-      font: inherit;
+    align-items: center;
+    font-size: 1.2rem;
+    line-height: normal;
+    > span {
+      flex: 0 1 25.1rem;
+      text-align: right;
     }
   }
 }
