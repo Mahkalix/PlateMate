@@ -1,5 +1,5 @@
 import type pg from "pg";
-import type { Profile } from "../services/profile.js";
+import { completeness, type Profile } from "../services/profile.js";
 export class ProfileRepository {
   constructor(private db: pg.Pool) {}
   async get(userId: string) {
@@ -13,21 +13,11 @@ export class ProfileRepository {
     const row = result.rows[0];
     if (!row) return { profile: null };
     const p: Profile = row.details;
-    const required = [
-      p.firstName,
-      p.lastName,
-      p.city,
-      p.languages.length,
-      p.ambiences.length,
-      p.affinities.length,
-    ];
     return {
       profile: p,
       badges: {
         isVerified: row.is_verified,
-        completeness: Math.floor(
-          (100 * required.filter(Boolean).length) / required.length,
-        ),
+        completeness: completeness(p),
       },
     };
   }

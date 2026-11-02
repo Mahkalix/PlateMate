@@ -4,6 +4,8 @@ Le nouveau backend TypeScript se trouve dans `backend/mvp`. Il utilise son propr
 
 ## Lancement local
 
+Le MVP met en relation des personnes selon leurs langues, leurs affinités et leurs contraintes alimentaires. Le backend couvre la découverte, les messages privés, les rencontres, les avis et la gestion du compte. L’intention de paiement est simulée. Le frontend existant utilise encore l’API historique.
+
 Avec Node 24, depuis la racine, lancer `docker compose up -d --wait db` puis `docker compose --profile test up -d --wait db-test`. Dans `backend/mvp`, lancer `npm ci`, copier `.env.example` vers `.env`, définir JWT_SECRET avec un secret aléatoire privé, puis lancer `npm run migrate`, `npm run seed` et `npm start`. Le seed idempotent crée un compte de démonstration sans mot de passe connu. Le port par défaut est 3001. GET /health vérifie la connexion PostgreSQL.
 
 ## Tests
@@ -12,11 +14,47 @@ Depuis backend/mvp, utiliser npm test pour toute la suite, npm run test:unit, np
 
 ## Architecture et limites
 
+```mermaid
+flowchart LR
+  A[Client] --> B[Express et contrôle de session]
+  B --> C[Contrôleurs HTTP et validation Zod]
+  C --> D[Services de matching et de réservation]
+  C --> E[Repositories SQL paramétrés]
+  D --> E
+  E --> F[(PostgreSQL)]
+```
+
+| Sprint | Stories | Parcours et code dans backend/mvp |
+|---|---|---|
+| S0 | Socle | src/app.ts, src/migrations.ts, sql, test |
+| S1 | US01–02 | routes/auth.ts, services/auth.ts, sessions |
+| S2 | US03–05, US15 | services/profile.ts, consentement, édition du profil privé |
+| S3 | US06–09 | services/scoring.ts, repositories/explorer.ts |
+| S4 | US10–14 | controllers/host.ts, repositories/social.ts, avis et badges |
+| S5 | US16–17 | services/booking.ts, repositories/bookings.ts, historique et intention simulée |
+| Compléments après S5 | US10–11, US14–15 | Messagerie, avis, export personnel et effacement, après dessin des parcours |
+| Post-MVP | US18 | Stripe Connect |
+
+**Confidentialité.** Les hashes d’authentification, le nom complet et les contraintes sensibles sont exclus des profils publics. Seuls les intérêts que les deux personnes ont rendus publics peuvent être nommés. L’export porte sur les données détenues ou créées par l’appelant. Le compte et les données qui lui sont rattachées sont supprimés en base par une transaction avec cascades.
+
+**Résultats locaux.** 87 tests sur 87 réussis. Sur les services et la configuration, 64/65 lignes, 70/71 instructions, 32/33 branches et 26/26 fonctions. Le scoring et la machine à états sont couverts à 100 %. Les migrations, deux exécutions successives du seed et une requête HTTP réelle sur /health ont été vérifiées sur la base dédiée.
+
+**Hypothèses et limites.** Les quatre écrans complémentaires sont des propositions à revoir avec le frontend. L’adresse exacte du domicile reste exclue du modèle. Le vocabulaire des contraintes est normalisé par casse et espaces, mais deux synonymes distincts ne sont pas assimilés. Une capacité alimentaire inconnue exclut le contexte. Les filtres SQL réduisent le jeu de candidats avant le tri en mémoire. Les gros volumes, la rétention des sauvegardes et les notifications restent à traiter avant une mise en production. Les contrôleurs et repositories sont exercés via HTTP mais ne sont pas inclus dans le pourcentage des services.
+
 Contrôle de mutation S1 effectué sur PostgreSQL. Après retrait du contrôle de présence de la session, « US01 / SANS ÉCRAN déconnexion : access et refresh révoqués » a reçu 200 au lieu de 401 sur GET /me. Le contrôle a été rétabli et la suite complète relancée. Les mutations scoring, allergies et réservations relèvent des futurs sprints.
 
 La connexion utilise bcrypt (coût 12), un JWT HS256 de dix minutes et un refresh opaque dont seule l’empreinte est conservée en base. Le cookie HttpOnly, SameSite=Strict et Secure en production limite l’accès au refresh. Le frontend doit conserver l’access token en mémoire. La session a une durée absolue de sept jours. La limitation des essais est locale au processus Express et suppose une instance unique. Voir [le contrat HTTP](docs/api.md).
 
 Express assure le transport HTTP, PostgreSQL impose les contraintes persistantes et les migrations SQL versionnées sont transactionnelles. Le schéma séparé évite de réinterpréter les réservations commerciales existantes. La suite locale couvre les nouveaux contrats uniquement. Voir [le schéma](docs/schema-mvp.md), [les critères](docs/backlog.md) et [la traçabilité](docs/traceability.md).
+
+### Matching du MVP et tests de mutation S3
+
+Après exclusion des contextes dont les capacités déclarées ne couvrent pas chaque allergie et intolérance du visiteur, le score arrondi vaut 40 × fraction des langues communes + 40 × fraction des affinités communes + 20 × fraction des régimes pris en charge. Chaque fraction utilise le nombre de critères du visiteur comme dénominateur et vaut zéro si ce nombre est nul. Pour un visiteur parlant français et anglais, aimant jazz et cinéma et suivant un régime végan, les cinq exemples testés sont : tout commun = 100 ; une langue, une affinité et le régime = 60 ; les deux langues seules = 40 ; les deux affinités seules = 40 ; rien de commun = 0. Le contexte le mieux classé représente chaque personne. Les identifiants départagent les ex æquo.
+
+Contrôles manuels. Mettre à zéro le poids des langues a fait échouer quatre tests US06. Inverser le contrôle des allergènes a fait échouer « un score maximal ne neutralise jamais une incompatibilité ». Les deux mutations ont été annulées.
+### Réservations et mutations S5
+
+La mutation autorisant completed → pending a été détectée par le test de cette transition. Inverser la condition qui réserve les décisions à l’hôte a fait échouer le scénario HTTP US16. Les deux mutations ont été annulées. Le paiement simulé ne déclenche aucun mouvement de fonds.
 
 ## Application historique
 
@@ -90,11 +128,4 @@ npm run dev
 
 Le backend est réservé aux essais avec Stripe en mode test. Le détail des fonctions et des limites est dans le [catalogue fonctionnel](backend/FONCTIONNALITES.md).
 
-### Matching du MVP et tests de mutation S3
 
-Après exclusion des contextes dont les capacités déclarées ne couvrent pas chaque allergie et intolérance du visiteur, le score arrondi vaut 40 × fraction des langues communes + 40 × fraction des affinités communes + 20 × fraction des régimes pris en charge. Chaque fraction utilise le nombre de critères du visiteur comme dénominateur et vaut zéro si ce nombre est nul. Pour un visiteur parlant français et anglais, aimant jazz et cinéma et suivant un régime végan, les cinq exemples testés sont : tout commun = 100 ; une langue, une affinité et le régime = 60 ; les deux langues seules = 40 ; les deux affinités seules = 40 ; rien de commun = 0. Le contexte le mieux classé représente chaque personne. Les identifiants départagent les ex æquo.
-
-Contrôles manuels. Mettre à zéro le poids des langues a fait échouer quatre tests US06. Inverser le contrôle des allergènes a fait échouer « un score maximal ne neutralise jamais une incompatibilité ». Les deux mutations ont été annulées.
-### Réservations et mutations S5
-
-La mutation autorisant completed → pending a été détectée par le test de cette transition. Inverser la condition qui réserve les décisions à l’hôte a fait échouer le scénario HTTP US16. Les deux mutations ont été annulées. Le paiement simulé ne déclenche aucun mouvement de fonds.

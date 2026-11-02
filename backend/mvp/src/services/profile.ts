@@ -29,3 +29,14 @@ export const profileInput = z
   )
   .refine((p) => p.publicInterests.every((i) => p.affinities.includes(i)));
 export type Profile = z.infer<typeof profileInput>;
+export function completeness(p: Profile) {
+  const required = [
+    p.firstName,
+    p.lastName,
+    p.city,
+    p.languages.length,
+    p.ambiences.length,
+    p.affinities.length,
+  ];
+  return Math.floor((100 * required.filter(Boolean).length) / required.length);
+}

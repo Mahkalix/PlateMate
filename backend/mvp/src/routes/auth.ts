@@ -1,4 +1,6 @@
 import { Router } from "express";
+import { socialController } from "../controllers/social.js";
+import { SocialRepository } from "../repositories/social.js";
 import { bookingController } from "../controllers/bookings.js";
 import { Bookings } from "../repositories/bookings.js";
 import { hostController } from "../controllers/host.js";
@@ -54,5 +56,15 @@ export function authRoutes(db: pg.Pool) {
     c.authenticated,
     bookings.payment,
   );
+  const social = socialController(new SocialRepository(db));
+  router.get("/conversations", c.authenticated, social.conversations);
+  router
+    .route("/conversations/:peer/messages")
+    .all(c.authenticated)
+    .get(social.thread)
+    .post(social.send);
+  router.post("/bookings/:id/review", c.authenticated, social.review);
+  router.get("/me/export", c.authenticated, social.personal);
+  router.delete("/me/account", c.authenticated, social.erase);
   return router;
 }

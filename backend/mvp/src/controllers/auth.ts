@@ -18,6 +18,7 @@ export function authController(service: AuthService) {
   }
   const authenticated: RequestHandler = async (req, res, next) => {
     res.locals.identity = await service.authenticate(req.get("authorization"));
+    res.set("Cache-Control", "no-store");
     next();
   };
   const register: RequestHandler = async (req, res) => {

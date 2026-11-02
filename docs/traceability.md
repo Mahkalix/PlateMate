@@ -54,3 +54,13 @@ US12 et la partie profil vérifié/complétude de US13 sont exercées par HTTP. 
 ### S5 · Réservation
 
 GET /me/bookings, POST /bookings, PATCH /bookings/:id/status et POST /bookings/:id/payment-intent couvrent les deux onglets. Le dernier endpoint matérialise US17 pour un invité dont la réservation est acceptée. Les transitions sont consignées par acteur et date. Le détail d’une adresse privée reste exclu tant que sa saisie et sa communication ne sont pas validées.
+### Parcours complémentaires dessinés après S5, avant leur code
+
+[Page Figma de proposition](https://www.figma.com/design/qtiIzlBfRLB3xK20yCRfuj/PlateMate?node-id=822-2). Les lignes suivantes remplacent les reports précédents pour US10, US11, US14 et US15. Le front demeure hors périmètre.
+
+| Écran | Données affichées | Actions | États | Endpoint(s) | Table(s) et champs | User story | Statut |
+|---|---|---|---|---|---|---|---|
+| Messages 822:3 | Prénom, aperçu du dernier message | Ouvrir un fil | Chargement, 200 items vides ou liste, 401 | GET /conversations | messages.sender_id, recipient_id, body, id et profiles.details.firstName | US10, US11 | Couvert |
+| Conversation 822:14 | Auteur, heure et texte | Premier message et réponse | Fil vide 200, envoi 201, contenu invalide 422, tiers inaccessible 404 | GET et POST /conversations/:peer/messages | messages.id, sender_id, recipient_id, body, created_at | US10, US11 | Couvert |
+| Après la rencontre 822:28 | Profil évalué, note, commentaire | Publier | 201, réservation étrangère 404, inachevée ou doublon 409 | POST /bookings/:id/review | reviews.booking_id, author_id, subject_id, rating, comment | US14 | Couvert |
+| Mon compte 822:45 | Données privées personnelles et consentement | Télécharger, confirmer la suppression | Export 200, confirmation manquante 422, effacement 204, jeton révoqué 401 | GET /me/export, DELETE /me/account | users, profiles, sessions, données créées dans contexts, bookings, messages et reviews | US15 | Couvert |

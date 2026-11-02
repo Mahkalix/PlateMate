@@ -70,6 +70,9 @@ it("US06 US07 US08 US09 / Explorer : tri, filtres, pagination, confidentialité 
       "firstName",
       "hostId",
       "isVerified",
+      "reviewCount",
+      "averageRating",
+      "completeness",
       "kind",
       "score",
     ].sort(),
@@ -81,6 +84,11 @@ it("US06 US07 US08 US09 / Explorer : tri, filtres, pagination, confidentialité 
       .expect(200)
   ).body;
   expect(detail.commonInterests).toEqual(["jazz"]);
+  expect(detail).toMatchObject({
+    guestsWelcomed: 0,
+    reviewCount: 0,
+    averageRating: null,
+  });
   expect(JSON.stringify(detail)).not.toContain("arachide");
   await get({ limit: 0 }).expect(422);
 });

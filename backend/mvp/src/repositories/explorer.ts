@@ -1,5 +1,5 @@
 import type pg from "pg";
-import type { Profile } from "../services/profile.js";
+import { completeness, type Profile } from "../services/profile.js";
 import { score, compatible } from "../services/scoring.js";
 import { ProfileRepository } from "./profile.js";
 export type Filters = {
@@ -20,7 +20,7 @@ export class ExplorerRepository {
     );
     if (!viewer) return [];
     const { rows } = await this.db.query(
-      `SELECT c.*,p.details,p.is_verified FROM contexts c JOIN profiles p ON p.user_id=c.host_id WHERE c.host_id<>$1 AND ($2::text IS NULL OR (p.details->'languages') ? $2) AND ($3::text IS NULL OR c.ambience=$3) AND ($4::text IS NULL OR $4=ANY(c.supported_diets)) AND ($5::text IS NULL OR c.kind=$5) AND ($6::uuid IS NULL OR c.host_id=$6) AND ($7::uuid IS NULL OR c.id=$7) ORDER BY c.host_id,c.id`,
+      `SELECT c.*,p.details,p.is_verified, (SELECT count(*)::int FROM reviews WHERE subject_id=c.host_id) AS review_count,(SELECT avg(rating)::float FROM reviews WHERE subject_id=c.host_id) AS average_rating,(SELECT coalesce(sum(b.party_size),0)::int FROM bookings b JOIN context_slots s ON s.id=b.slot_id JOIN contexts ctx ON ctx.id=s.context_id WHERE ctx.host_id=c.host_id AND b.status='completed') AS guests_welcomed FROM contexts c JOIN profiles p ON p.user_id=c.host_id WHERE c.host_id<>$1 AND ($2::text IS NULL OR (p.details->'languages') ? $2) AND ($3::text IS NULL OR c.ambience=$3) AND ($4::text IS NULL OR $4=ANY(c.supported_diets)) AND ($5::text IS NULL OR c.kind=$5) AND ($6::uuid IS NULL OR c.host_id=$6) AND ($7::uuid IS NULL OR c.id=$7) ORDER BY c.host_id,c.id`,
       [
         userId,
         filters.language,
@@ -46,11 +46,15 @@ export class ExplorerRepository {
           firstName: p.firstName,
           city: p.city,
           isVerified: r.is_verified,
+          reviewCount: r.review_count,
+          averageRating: r.average_rating,
+          completeness: completeness(p),
           score: score(viewer, { ...p, diets: r.supported_diets }),
         };
         return detail
           ? {
               ...card,
+              guestsWelcomed: r.guests_welcomed,
               description: p.description,
               neighborhood: p.neighborhood,
               languages: p.languages,
@@ -65,7 +69,7 @@ export class ExplorerRepository {
   async slots(context: string) {
     return (
       await this.db.query(
-        'SELECT id,starts_at AS "startsAt",capacity FROM context_slots WHERE context_id=$1 AND starts_at>now() ORDER BY starts_at',
+        `SELECT id,starts_at AS "startsAt",capacity,capacity-coalesce((SELECT sum(party_size)::int FROM bookings WHERE slot_id=context_slots.id AND status IN ('accepted','completed')),0) AS "remainingPlaces" FROM context_slots WHERE context_id=$1 AND starts_at>now() ORDER BY starts_at`,
         [context],
       )
     ).rows;
