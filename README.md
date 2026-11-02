@@ -4,6 +4,18 @@ Le nouveau backend TypeScript se trouve dans `backend/mvp`. Il utilise son propr
 
 ## Lancement local
 
+### API et PostgreSQL dans Docker
+
+Depuis la racine, utiliser la pile dédiée au MVP. Elle crée un volume PostgreSQL persistant, applique les migrations au démarrage de l’API et publie uniquement le port HTTP sur la boucle locale. Le fichier Compose à la racine concerne l’application historique.
+
+1. Pour une première installation, copier `backend/mvp/.env.example` vers `backend/mvp/.env`. Renseigner `JWT_SECRET` et `MVP_DB_PASSWORD` avec deux valeurs distinctes. Pour générer chacune, utiliser `node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"`. Conserver ce fichier local et le même mot de passe tant que le volume est utilisé.
+2. Lancer `docker compose -f backend/mvp/compose.yaml up --build -d --wait`.
+3. Ouvrir [la santé de l’API locale](http://localhost:3001/health). Pour vérifier un cycle complet de compte depuis l’hôte avec Node 24, lancer `node backend/mvp/test-compose.mjs`. Le script crée puis efface son compte de test.
+4. Pour charger les données de démonstration, lancer `docker compose -f backend/mvp/compose.yaml exec api npm run seed`.
+5. Pour arrêter les services en conservant les données, lancer `docker compose -f backend/mvp/compose.yaml down`.
+
+### API exécutée sur l’hôte
+
 Le MVP met en relation des personnes selon leurs langues, leurs affinités et leurs contraintes alimentaires. Le backend couvre la découverte, les messages privés, les rencontres, les avis et la gestion du compte. L’intention de paiement est simulée. Le frontend existant utilise encore l’API historique.
 
 Avec Node 24, depuis la racine, lancer `docker compose up -d --wait db` puis `docker compose --profile test up -d --wait db-test`. Dans `backend/mvp`, lancer `npm ci`, copier `.env.example` vers `.env`, définir JWT_SECRET avec un secret aléatoire privé, puis lancer `npm run migrate`, `npm run seed` et `npm start`. Le seed idempotent crée un compte de démonstration sans mot de passe connu. Le port par défaut est 3001. GET /health vérifie la connexion PostgreSQL.
