@@ -75,10 +75,14 @@
       display: flex;
     }
   }
-  .app:has(.pm-hero) .pm-nav.is-open {
+  .app:has(.pm-hero) .pm-header .pm-nav.is-open {
     padding: 16px;
     border-radius: 12px;
-    background: var(--pm-ink);
+    background: var(--pm-red);
+    a,
+    a:hover {
+      color: white;
+    }
   }
   .pm-hero {
     min-height: 590px;

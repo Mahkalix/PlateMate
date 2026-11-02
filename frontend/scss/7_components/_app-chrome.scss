@@ -28,7 +28,7 @@
   }
   .pm-header {
     min-height: 104px;
-    background: var(--pm-ink);
+    background: transparent;
     color: #fff;
     &.is-scrolled {
       background: var(--pm-red);
