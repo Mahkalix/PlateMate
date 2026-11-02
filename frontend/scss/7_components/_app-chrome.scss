@@ -150,3 +150,19 @@
     }
   }
 }
+
+.pm-header .pm-nav a {
+  font-family: "DM Sans Variable", sans-serif;
+  font-size: 1rem;
+  line-height: normal;
+  font-weight: 700;
+  color: #faf4d4;
+  text-align: left;
+  padding: 4px 0;
+
+  &[aria-current="page"] {
+    font-weight: 800;
+    text-decoration: underline;
+    text-underline-offset: 6px;
+  }
+}
