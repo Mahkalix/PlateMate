@@ -9,7 +9,9 @@ export function HomeFooter() {
           <img src="/home/ColourWhite.webp" alt="PlateMate, accueil" />
         </a>
         <div className="pm-footer__social">
-          <img src="/home/Tiktok.svg" alt="TikTok" />
+          <span>
+            <img src="/home/Tiktok.svg" alt="TikTok" />
+          </span>
           <a
             href="https://www.instagram.com/weareplatemate/"
             aria-label="Instagram PlateMate"
@@ -22,7 +24,7 @@ export function HomeFooter() {
         </nav>
       </div>
       <div className="pm-footer__bottom">
-        <span>© 2026 PlateMate. Tous droits réservés.</span>
+        <span>© 2025 PlateMate. Tous droits réservés.</span>
         <div className="pm-footer__legal">
           <Link to="/mentions-legales">Mentions légales</Link>
           <a href="/mentions-legales#privacy-title">Confidentialité</a>

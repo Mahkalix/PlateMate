@@ -14,8 +14,8 @@ export function WordBanner({
     >
       {words.map((word, index) => (
         <Fragment key={word}>
-          {index > 0 && <span> — </span>}
-          {word}
+          {index > 0 && <span>—</span>}
+          <b>{word}</b>
         </Fragment>
       ))}
     </div>

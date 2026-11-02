@@ -9,7 +9,7 @@ export function FeaturedTables() {
           <h2>Des tables qui ont du caractère.</h2>
         </div>
         <a href="#cartes">
-          Découvrir <img src="/home/ArrowRightCircle1.svg" alt="" />
+          Découvrez <img src="/home/ArrowRightCircle1.svg" alt="" />
         </a>
       </div>
       <Featured />

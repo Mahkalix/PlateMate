@@ -16,6 +16,14 @@
     border-radius: 4cqw;
     box-shadow: 0 0 0 1cqw var(--pm-yellow);
     overflow: hidden;
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border: 1cqw solid var(--pm-yellow);
+      border-radius: inherit;
+      pointer-events: none;
+    }
     background: #ffe1a2;
   }
   &__meal {
@@ -48,15 +56,16 @@
     place-content: center;
     height: 17.3%;
     font:
-      900 11.5cqw/1 "BBB ReadMe",
+      900 9.46cqw/1.2 "BBB ReadMe",
       serif;
     text-transform: uppercase;
+    letter-spacing: -0.025em;
   }
   &__interests {
     top: 73.54%;
     color: var(--pm-ink);
     font:
-      700 4cqw/1.2 "DM Sans",
+      600 4.73cqw/1 "DM Sans",
       sans-serif;
   }
   &__tags {
@@ -66,7 +75,10 @@
     margin-top: 1.6cqw;
     span {
       border-radius: 100px;
-      background: #49cddd;
+      background: #cdddb6;
+      font:
+        500 4.05cqw/1 "DM Sans",
+        sans-serif;
       padding: 1.7cqw 2.5cqw;
       white-space: nowrap;
     }
@@ -77,13 +89,14 @@
     left: 45.1%;
     width: 15%;
     aspect-ratio: 1;
-    border: 2px solid currentColor;
+    background: var(--pm-red);
+    box-shadow: 0 0 0 2px var(--pm-red);
     border-radius: 50%;
     display: grid;
     place-items: center;
     img {
       width: 60%;
-      transform: rotate(180deg);
+      display: block;
     }
   }
   &__portrait {
@@ -96,7 +109,7 @@
     background: white;
     color: var(--pm-ink);
     font:
-      700 4.4cqw/1.45 "DM Sans",
+      500 4.73cqw/1.45 "DM Sans",
       sans-serif;
     img {
       width: 100%;
