@@ -3,7 +3,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 2rem;
+  gap: 3.2rem;
   padding: clamp(16px, 2.78vw, 40px) clamp(16px, 5.14vw, 74px) 20px;
   background: var(--pm-background);
   .pm-logo {
@@ -11,7 +11,7 @@
     height: 79px;
   }
   &__login {
-    font-size: 0.75rem;
+    font-size: 1.2rem;
     text-transform: uppercase;
     letter-spacing: 0.06em;
   }
@@ -53,15 +53,15 @@
 }
 .pm-nav {
   display: flex;
-  gap: clamp(0.8rem, 1.95vw, 28px);
+  gap: clamp(1.28rem, 1.95vw, 28px);
   align-items: center;
   a {
     text-decoration: none;
     text-transform: uppercase;
-    font-size: 0.85rem;
+    font-size: 1.36rem;
     letter-spacing: 0.08em;
     font-weight: 800;
-    padding: 0.55rem 0;
+    padding: 0.88rem 0;
     white-space: nowrap;
   }
   a:hover,
@@ -91,7 +91,7 @@
   }
   &__top {
     display: flex;
-    gap: 4rem;
+    gap: 6.4rem;
     align-items: center;
     justify-content: space-between;
   }
@@ -106,7 +106,7 @@
     > a {
       display: grid;
       place-items: center;
-      font-size: 1.4rem;
+      font-size: 2.24rem;
       width: 40px;
       height: 40px;
       img {
@@ -123,7 +123,7 @@
     flex-wrap: wrap;
     gap: 10px 32px;
     max-width: 500px;
-    font-size: 0.82rem;
+    font-size: 1.312rem;
     strong {
       width: 100%;
       text-transform: uppercase;
@@ -153,7 +153,7 @@
 
 .pm-header .pm-nav a {
   font-family: "DM Sans Variable", sans-serif;
-  font-size: 1rem;
+  font-size: 1.6rem;
   line-height: normal;
   font-weight: 700;
   color: #faf4d4;
