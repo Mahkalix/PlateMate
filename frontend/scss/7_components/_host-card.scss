@@ -120,16 +120,17 @@
       object-fit: cover;
       display: block;
     }
-    &::before {
-      content: "";
-      position: absolute;
-      top: -2%;
-      left: -15%;
-      width: 55%;
-      height: 14%;
-      transform: rotate(-45deg);
-      background: url("/home/Rectangle10.webp") center/cover;
-    }
+  }
+  // Le PNG comprend déjà l’inclinaison du ruban.
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 1.06%;
+    width: 20.95%;
+    aspect-ratio: 63 / 67;
+    background: url("/home/portrait-tape.png") center / contain no-repeat;
+    pointer-events: none;
   }
 }
 .pm-dialog {
