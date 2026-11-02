@@ -3,11 +3,33 @@ import type { Profile } from "../services/profile.js";
 export class ProfileRepository {
   constructor(private db: pg.Pool) {}
   async get(userId: string) {
+    return (await this.owner(userId)).profile;
+  }
+  async owner(userId: string) {
     const result = await this.db.query(
-      "SELECT details FROM profiles WHERE user_id=$1",
+      "SELECT details,is_verified FROM profiles WHERE user_id=$1",
       [userId],
     );
-    return result.rows[0]?.details ?? null;
+    const row = result.rows[0];
+    if (!row) return { profile: null };
+    const p: Profile = row.details;
+    const required = [
+      p.firstName,
+      p.lastName,
+      p.city,
+      p.languages.length,
+      p.ambiences.length,
+      p.affinities.length,
+    ];
+    return {
+      profile: p,
+      badges: {
+        isVerified: row.is_verified,
+        completeness: Math.floor(
+          (100 * required.filter(Boolean).length) / required.length,
+        ),
+      },
+    };
   }
   async save(userId: string, details: Profile) {
     await this.db.query(

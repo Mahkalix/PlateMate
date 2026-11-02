@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { hostController } from "../controllers/host.js";
 import { explorerController } from "../controllers/explorer.js";
 import { ExplorerRepository } from "../repositories/explorer.js";
 import { profileController } from "../controllers/profile.js";
@@ -39,5 +40,8 @@ export function authRoutes(db: pg.Pool) {
     c.authenticated,
     explorer.detail,
   );
+  const host = hostController(db);
+  router.post("/me/host", c.authenticated, host.register);
+  router.post("/me/contexts", c.authenticated, host.publish);
   return router;
 }

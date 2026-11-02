@@ -48,3 +48,6 @@ US03–05 sont vérifiées sur GET et PUT /me/profile. La source physique est pr
 ### S3 · Explorer
 
 US06–09 disposent de tests de classement, pagination par offset, quatre filtres, état vide, confidentialité, injection SQL et régression du pivot. La liste ne contient que les champs de sa projection. Les créneaux sont liés au contexte par context_slots.context_id.
+### S4 · Partie réalisable
+
+US12 et la partie profil vérifié/complétude de US13 sont exercées par HTTP. Le propriétaire ne peut modifier le badge. Les avis comme signal de confiance, la publication d’avis et la messagerie sont différés. Aucun parcours complet correspondant n’a été ajouté à Figma.
