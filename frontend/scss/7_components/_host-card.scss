@@ -24,7 +24,7 @@
       border-radius: inherit;
       pointer-events: none;
     }
-    background: #ffe1a2;
+    background: var(--pm-card-secondary);
   }
   &__meal {
     position: absolute;
@@ -63,9 +63,10 @@
   }
   &__interests {
     top: 73.54%;
+    letter-spacing: -0.02em;
     color: var(--pm-ink);
     font:
-      600 4.73cqw/1 "DM Sans",
+      600 4.73cqw/1 "DM Sans Variable",
       sans-serif;
   }
   &__tags {
@@ -75,11 +76,12 @@
     margin-top: 1.6cqw;
     span {
       border-radius: 100px;
-      background: #cdddb6;
+      background: var(--pm-tag);
       font:
-        500 4.05cqw/1 "DM Sans",
+        500 4.05cqw/1 "DM Sans Variable",
         sans-serif;
       padding: 1.7cqw 2.5cqw;
+      letter-spacing: normal;
       white-space: nowrap;
     }
   }
@@ -105,11 +107,12 @@
     left: 5.07%;
     width: 31.75%;
     padding: 1.2cqw 1.2cqw 2cqw;
+    letter-spacing: -0.02em;
     transform: rotate(1.77deg);
     background: white;
     color: var(--pm-ink);
     font:
-      500 4.73cqw/1.45 "DM Sans",
+      500 4.73cqw/1 "DM Sans Variable",
       sans-serif;
     img {
       width: 100%;
