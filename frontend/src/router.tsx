@@ -1,14 +1,16 @@
-import { Link, Route, Routes } from "react-router-dom";
+import { Link, Route, Routes, useLocation } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import { Community } from "./pages/Community";
 import { Legal } from "./pages/Legal";
 import { Team } from "./pages/Team";
 
+import { HomePage } from "./app/pages/HomePage";
 export function AppRouter() {
+  const { pathname } = useLocation();
+  if (pathname === "/") return <HomePage />;
   return (
     <Layout>
       <Routes>
-        <Route path="/" element={<Community />} />
         <Route path="/whatsapp" element={<Community />} />
         <Route path="/equipe" element={<Team />} />
         <Route path="/mentions-legales" element={<Legal />} />
