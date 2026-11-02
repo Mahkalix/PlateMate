@@ -111,6 +111,38 @@ it("US14 / Après la rencontre : contrôle participant, completed et doublon", a
       .set("Authorization", auth)
       .send({ rating: 5, comment: "Merci pour la rencontre" });
   await post(other.auth).expect(404);
+  const roster = "/me/slots/" + slot.id + "/guests";
+  await api.get(roster).set("Authorization", other.auth).expect(404);
+  await api.get(roster).set("Authorization", guest.auth).expect(404);
+  await api
+    .get(roster)
+    .set("Authorization", host.auth)
+    .expect(200, {
+      capacity: 2,
+      confirmedPlaces: 0,
+      remainingPlaces: 2,
+      pendingRequests: 1,
+      guests: [],
+    });
+  await pool.query(
+    "update bookings set status='accepted',party_size=2 where id=$1",
+    [b.id],
+  );
+  await api
+    .get(roster)
+    .set("Authorization", host.auth)
+    .expect(200, {
+      capacity: 2,
+      confirmedPlaces: 2,
+      remainingPlaces: 0,
+      pendingRequests: 0,
+      guests: [{ firstName: profile.firstName, partySize: 2 }],
+    });
+  const reviews = "/profiles/" + host.id + "/reviews";
+  await api
+    .get(reviews)
+    .set("Authorization", other.auth)
+    .expect(200, { items: [], nextOffset: null });
   await post(guest.auth).expect(409);
   await pool.query("update bookings set status='completed' where id=$1", [
     b.id,
@@ -120,4 +152,29 @@ it("US14 / Après la rencontre : contrôle participant, completed et doublon", a
   expect(
     (await pool.query("select subject_id,rating from reviews")).rows,
   ).toEqual([{ subject_id: host.id, rating: 5 }]);
+  const page = (
+    await api
+      .get(reviews + "?sort=highest&limit=1")
+      .set("Authorization", other.auth)
+      .expect(200)
+  ).body;
+  expect(page).toEqual({
+    items: [
+      {
+        authorFirstName: profile.firstName,
+        rating: 5,
+        comment: "Merci pour la rencontre",
+        createdAt: expect.any(String),
+      },
+    ],
+    nextOffset: null,
+  });
+  await api
+    .get(reviews + "?sort=invalid")
+    .set("Authorization", other.auth)
+    .expect(422);
+  await api
+    .get(reviews + "?offset=1")
+    .set("Authorization", other.auth)
+    .expect(200, { items: [], nextOffset: null });
 }, 15000);

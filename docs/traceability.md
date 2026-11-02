@@ -57,3 +57,6 @@ GET /me/bookings, POST /bookings, PATCH /bookings/:id/status et POST /bookings/:
 ### Parcours sans référence confirmée
 
 La proposition 822:2 est écartée. Les API de messagerie (US10–11), de publication d’avis (US14), d’export et de suppression (US15) sont livrées et testées. Leurs parcours complets sont classés SANS ÉCRAN de référence. Il manque également le contrôle de consentement explicite sur le formulaire de profil. Signaler ces lacunes à l’équipe produit.
+### Actions des écrans d’origine
+- Réservations hôte 815:2783, « Voir les invités » (US16) : lecture des participants confirmés d’un créneau par le seul organisateur. Les groupes en attente ne consomment aucune place.
+- Détail 460:371, « Voir les avis » et « Trier » (US09, US13, US14) : lecture paginée par les utilisateurs connectés, note, commentaire, prénom et date. Le formulaire de publication reste sans écran de référence confirmé.

@@ -49,6 +49,7 @@ export function authRoutes(db: pg.Pool) {
   router.post("/me/contexts", c.authenticated, host.publish);
   const bookings = bookingController(new Bookings(db));
   router.get("/me/bookings", c.authenticated, bookings.list);
+  router.get("/me/slots/:id/guests", c.authenticated, bookings.guests);
   router.post("/bookings", c.authenticated, bookings.create);
   router.patch("/bookings/:id/status", c.authenticated, bookings.update);
   router.post(
@@ -64,6 +65,7 @@ export function authRoutes(db: pg.Pool) {
     .get(social.thread)
     .post(social.send);
   router.post("/bookings/:id/review", c.authenticated, social.review);
+  router.get("/profiles/:id/reviews", c.authenticated, social.reviews);
   router.get("/me/export", c.authenticated, social.personal);
   router.delete("/me/account", c.authenticated, social.erase);
   return router;

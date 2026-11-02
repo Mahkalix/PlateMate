@@ -36,3 +36,7 @@ Toutes demandent Authorization: Bearer et répondent 401 si la session manque ou
 | DELETE /me/account | {confirm:true} | 204 après suppression en base, 422 sans confirmation explicite |
 ### Révision du contrat de matching
 POST /me/contexts accepte languages et themes, deux listes facultatives. Les données antérieures gardent des listes vides, sans héritage de l’hôte. GET /explorer compte et pagine les repas. Le détail expose languages et themes propres au repas. PATCH /bookings/:id/status renvoie 409 booking_no_longer_eligible si la compatibilité stricte ne peut plus être établie à l’acceptation. La demande reste en attente.
+### Invités du créneau et avis publiés
+GET /me/slots/:id/guests exige le jeton de l’hôte du repas. Réponse 200 avec capacity, confirmedPlaces, remainingPlaces, pendingRequests et guests (prénom et taille du groupe). Les places acceptées et terminées sont comptabilisées. Les demandes en attente sont comptées séparément. Créneau inconnu ou appartenant à autrui : 404.
+
+GET /profiles/:id/reviews exige une session valide. Réponse 200 avec items et nextOffset. Les champs sont authorFirstName, rating, comment et createdAt. Paramètres sort (recent par défaut, highest ou lowest), limit (1 à 50) et offset (positif ou nul). Les avis antérieurs à la migration 008 conservent une date inconnue (null). Profil inexistant : 404. Paramètres invalides : 422.

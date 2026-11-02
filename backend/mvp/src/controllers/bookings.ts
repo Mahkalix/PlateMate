@@ -42,5 +42,13 @@ export function bookingController(repo: Bookings) {
       .parse(req.query.view);
     res.json({ items: await repo.list(res.locals.identity.user.id, view) });
   };
-  return { create, update, payment, list };
+  const guests: RequestHandler = async (req, res) => {
+    res.json(
+      await repo.guests(
+        res.locals.identity.user.id,
+        z.uuid().parse(req.params.id),
+      ),
+    );
+  };
+  return { create, update, payment, list, guests };
 }

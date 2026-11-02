@@ -59,5 +59,25 @@ export function socialController(repo: SocialRepository) {
     await repo.erase(res.locals.identity.user.id);
     res.clearCookie("refresh", { path: "/auth/refresh" }).sendStatus(204);
   };
-  return { conversations, thread, send, review, personal, erase };
+  const reviews: RequestHandler = async (req, res) => {
+    const { sort, limit, offset } = z
+      .object({
+        sort: z.enum(["recent", "highest", "lowest"]).default("recent"),
+        limit: z.coerce.number().int().min(1).max(50).default(20),
+        offset: z.coerce.number().int().min(0).default(0),
+      })
+      .strict()
+      .parse(req.query);
+    const rows = await repo.reviews(
+      z.uuid().parse(req.params.id),
+      sort,
+      limit + 1,
+      offset,
+    );
+    res.json({
+      items: rows.slice(0, limit),
+      nextOffset: rows.length > limit ? offset + limit : null,
+    });
+  };
+  return { conversations, thread, send, review, personal, erase, reviews };
 }

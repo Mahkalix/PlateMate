@@ -57,4 +57,25 @@ export class SocialRepository {
   async erase(me: string) {
     await this.db.query("DELETE FROM users WHERE id=$1", [me]);
   }
+  async reviews(subject: string, sort: string, limit: number, offset: number) {
+    if (
+      !(
+        await this.db.query("SELECT 1 FROM profiles WHERE user_id=$1", [
+          subject,
+        ])
+      ).rowCount
+    )
+      throw new AuthError(404, "not_found");
+    return (
+      await this.db.query(
+        `
+      SELECT p.details->>'firstName' AS "authorFirstName",r.rating,r.comment,r.created_at AS "createdAt"
+      FROM reviews r JOIN profiles p ON p.user_id=r.author_id WHERE r.subject_id=$1
+      ORDER BY CASE WHEN $2='highest' THEN r.rating END DESC,
+        CASE WHEN $2='lowest' THEN r.rating END ASC,
+        r.created_at DESC NULLS LAST,r.booking_id,r.author_id LIMIT $3 OFFSET $4`,
+        [subject, sort, limit, offset],
+      )
+    ).rows;
+  }
 }

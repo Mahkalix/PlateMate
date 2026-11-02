@@ -124,4 +124,25 @@ export class Bookings {
       )
     ).rows;
   }
+  async guests(actor: string, slot: string) {
+    const { rows } = await this.db.query(
+      `
+      SELECT s.capacity,
+        coalesce(sum(b.party_size),0)::int AS "confirmedPlaces",
+        (SELECT count(*)::int FROM bookings WHERE slot_id=s.id AND status='pending') AS "pendingRequests",
+        coalesce(jsonb_agg(jsonb_build_object('firstName',p.details->>'firstName','partySize',b.party_size)
+          ORDER BY p.details->>'firstName',b.id) FILTER (WHERE b.id IS NOT NULL),'[]'::jsonb) AS guests
+      FROM context_slots s JOIN contexts c ON c.id=s.context_id
+      LEFT JOIN bookings b ON b.slot_id=s.id AND b.status IN ('accepted','completed')
+      LEFT JOIN profiles p ON p.user_id=b.guest_id
+      WHERE s.id=$1 AND c.host_id=$2 GROUP BY s.id`,
+      [slot, actor],
+    );
+    if (!rows.length) throw new AuthError(404, "not_found");
+    const result = rows[0];
+    return {
+      ...result,
+      remainingPlaces: result.capacity - result.confirmedPlaces,
+    };
+  }
 }
