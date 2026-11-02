@@ -45,3 +45,6 @@ Références : [Wireframe Figma](https://www.figma.com/design/qtiIzlBfRLB3xK20yC
 ### S2 · Profil et confidentialité
 
 US03–05 sont vérifiées sur GET et PUT /me/profile. La source physique est profiles.details, document JSONB validé par schéma strict et remplacé atomiquement. Les champs de profil du tableau sont ses propriétés logiques. Le badge is_verified et le consentement horodaté sont des colonnes séparées. Le service limite toute lecture/écriture privée à l’identité authentifiée. US15 applique déjà la minimisation. Export et effacement restent différés jusqu’aux écrans de gestion.
+### S3 · Explorer
+
+US06–09 disposent de tests de classement, pagination par offset, quatre filtres, état vide, confidentialité, injection SQL et régression du pivot. La liste ne contient que les champs de sa projection. Les créneaux sont liés au contexte par context_slots.context_id.

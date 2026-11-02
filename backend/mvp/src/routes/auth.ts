@@ -1,4 +1,6 @@
 import { Router } from "express";
+import { explorerController } from "../controllers/explorer.js";
+import { ExplorerRepository } from "../repositories/explorer.js";
 import { profileController } from "../controllers/profile.js";
 import { ProfileRepository } from "../repositories/profile.js";
 import { rateLimit } from "express-rate-limit";
@@ -30,5 +32,12 @@ export function authRoutes(db: pg.Pool) {
     .all(c.authenticated)
     .get(profile.read)
     .put(profile.save);
+  const explorer = explorerController(new ExplorerRepository(db));
+  router.get("/explorer", c.authenticated, explorer.list);
+  router.get(
+    "/profiles/:host/contexts/:context",
+    c.authenticated,
+    explorer.detail,
+  );
   return router;
 }
