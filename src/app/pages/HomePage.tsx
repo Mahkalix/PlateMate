@@ -25,9 +25,12 @@ export function HomePage() {
             "JAPONAISE",
             "INDIENNE",
             "MEXICAINE",
+            "LIBANAISE",
+            "THAÏLANDAISE",
           ]}
         />
         <HowItWorks />
+        <CommunityGallery />
         <WordBanner
           teal
           words={[
@@ -37,9 +40,10 @@ export function HomePage() {
             "AUTHENTIQUE",
             "GÉNÉREUX",
             "CURIEUX",
+            "CHALEUREUX",
+            "INOUBLIABLE",
           ]}
         />
-        <CommunityGallery />
         <HostInvitation />
       </main>
       <HomeFooter />

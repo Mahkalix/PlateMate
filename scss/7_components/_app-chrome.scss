@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 2rem;
-  padding: 12px max(32px, calc((100vw - 1280px) / 2));
+  padding: clamp(16px, 2.78vw, 40px) clamp(16px, 5.14vw, 74px) 20px;
   background: var(--pm-background);
   .pm-logo {
     width: 140px;
@@ -53,7 +53,7 @@
 }
 .pm-nav {
   display: flex;
-  gap: clamp(0.8rem, 2vw, 2.5rem);
+  gap: clamp(0.8rem, 1.95vw, 28px);
   align-items: center;
   a {
     text-decoration: none;
@@ -82,7 +82,7 @@
   min-height: 277px;
   background: var(--pm-ink);
   color: var(--pm-cream);
-  padding: 48px max(32px, calc((100vw - 1280px) / 2)) 28px;
+  padding: 42px clamp(20px, 5.14vw, 74px) 20px;
   a {
     text-decoration: none;
     &:hover {
