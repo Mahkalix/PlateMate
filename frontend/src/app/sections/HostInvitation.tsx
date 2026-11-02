@@ -8,7 +8,7 @@ export function HostInvitation() {
         <h2>
           Cuisinez.
           <br />
-          Partagez.
+          <span>Partagez.</span>
           <br />
           Gagnez.
         </h2>
