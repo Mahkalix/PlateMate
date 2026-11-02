@@ -1,4 +1,21 @@
-# PlateMate
+# PlateMate · MVP de matching
+
+Le nouveau backend TypeScript se trouve dans `backend/mvp`. Il utilise son propre schéma PostgreSQL. Le frontend et le service historique conservent leur fonctionnement pendant la migration. Les instructions historiques figurent en deuxième partie.
+
+## Lancement local
+
+Avec Node 24, depuis la racine, lancer `docker compose up -d --wait db` puis `docker compose --profile test up -d --wait db-test`. Dans `backend/mvp`, lancer `npm ci`, copier `.env.example` vers `.env`, définir JWT_SECRET avec un secret aléatoire privé, puis lancer `npm run migrate`, `npm run seed` et `npm start`. Le seed idempotent crée un compte de démonstration sans mot de passe connu. Le port par défaut est 3001. GET /health vérifie la connexion PostgreSQL.
+
+## Tests
+
+Depuis backend/mvp, utiliser npm test pour toute la suite, npm run test:unit, npm run test:integration ou npm run test:security pour une catégorie, et npm run test:coverage pour mesurer les services et utilitaires. Vitest et Supertest utilisent la base platemate_test sur le port 5433. TEST_DATABASE_URL permet de changer de serveur. La préparation recrée le schéma de test par migrations puis nettoie les données entre les cas. Le workflow Matching API applique les seuils de 80 %. Les résultats sont consignés dans chaque commit de sprint. Les tests de charge, E2E navigateur et audits externes restent hors périmètre.
+
+## Architecture et limites
+
+Express assure le transport HTTP, PostgreSQL impose les contraintes persistantes et les migrations SQL versionnées sont transactionnelles. Le schéma séparé évite de réinterpréter les réservations commerciales existantes. La suite locale couvre les nouveaux contrats uniquement. Voir [le schéma](docs/schema-mvp.md), [les critères](docs/backlog.md) et [la traçabilité](docs/traceability.md).
+
+## Application historique
+
 
 PlateMate met les expériences culinaires au centre. Les visiteurs découvrent le menu et l'hôte (photo, présentation, langues, centres d'intérêt), puis filtrent par cuisine, thème, ambiance, ville, date, régime et nombre de places. Le questionnaire peut alimenter ces filtres ; il n'y a pas de score de compatibilité. Voir le [périmètre fonctionnel du backend](backend/FONCTIONNALITES.md).
 
@@ -68,3 +85,4 @@ npm run dev
 ```
 
 Le backend est réservé aux essais avec Stripe en mode test. Le détail des fonctions et des limites est dans le [catalogue fonctionnel](backend/FONCTIONNALITES.md).
+
