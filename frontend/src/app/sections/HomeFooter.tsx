@@ -23,7 +23,11 @@ export function HomeFooter() {
       </div>
       <div className="pm-footer__bottom">
         <span>© 2026 PlateMate. Tous droits réservés.</span>
-        <Link to="/mentions-legales">Mentions légales</Link>
+        <div className="pm-footer__legal">
+          <Link to="/mentions-legales">Mentions légales</Link>
+          <a href="/mentions-legales#privacy-title">Confidentialité</a>
+          <span title="Conditions générales à venir">CGU</span>
+        </div>
       </div>
     </footer>
   );

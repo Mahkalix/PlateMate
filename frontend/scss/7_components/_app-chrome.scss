@@ -92,17 +92,16 @@
   &__top {
     display: flex;
     gap: 4rem;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
-    min-height: 150px;
   }
   .pm-logo {
-    width: 160px;
-    height: 100px;
+    width: 140px;
+    height: 79px;
   }
   &__social {
     display: flex;
-    gap: 12px;
+    gap: 16px;
     a {
       display: grid;
       place-items: center;
@@ -126,9 +125,15 @@
       letter-spacing: 0.08em;
     }
   }
-  &__bottom {
+  &__legal {
     display: flex;
-    gap: 3rem;
+    flex-wrap: wrap;
+    gap: 26px;
+  }
+  &__bottom {
+    margin-top: clamp(32px, 7.08vw, 102px);
+    display: flex;
+    gap: clamp(20px, 4.17vw, 60px);
     justify-content: center;
     font-size: 0.72rem;
   }

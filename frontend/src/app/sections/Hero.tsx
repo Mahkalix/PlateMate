@@ -7,8 +7,7 @@ export function Hero() {
         <p className="pm-eyebrow">Expériences culinaires uniques</p>
         <h1>
           Nouvelles saveurs,
-          <br />
-          nouvelles rencontres.
+          <span>nouvelles rencontres.</span>
         </h1>
         <p>
           Des hôtes passionnés vous ouvrent leur cuisine. Réservez votre place,
