@@ -541,6 +541,19 @@
   }
 }
 @media (min-width: 981px) {
+  .pm-steps__grid {
+    // Le texte peut occuper le bas de la rangée sans être rogné.
+    min-height: 34.4rem;
+    align-content: start;
+    padding-bottom: 0;
+  }
+  .pm-step:first-child h3 {
+    margin-top: 2.8rem;
+  }
+  .pm-gallery__share {
+    // Le bloc texte est centré dans les 99 px de la maquette.
+    padding-block: 2.2rem;
+  }
   .pm-featured {
     width: 100%;
     padding-inline: max(3.2rem, calc((100% - 129.2rem) / 2));
