@@ -58,6 +58,7 @@ export class ExplorerRepository {
         return detail
           ? {
               ...card,
+              contributionCents: r.contribution_cents,
               guestsWelcomed: r.guests_welcomed,
               description: p.description,
               neighborhood: p.neighborhood,

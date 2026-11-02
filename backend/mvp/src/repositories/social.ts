@@ -55,7 +55,16 @@ export class SocialRepository {
     ).rows[0];
   }
   async erase(me: string) {
-    await this.db.query("DELETE FROM users WHERE id=$1", [me]);
+    const result = await this.db.query(
+      `DELETE FROM users WHERE id=$1
+      AND NOT EXISTS (SELECT 1 FROM settlements WHERE host_id=$1 AND state<>'paid')
+      AND NOT EXISTS (SELECT 1 FROM bookings b JOIN context_slots s ON s.id=b.slot_id
+        JOIN contexts c ON c.id=s.context_id WHERE b.status='accepted'
+        AND b.payment_intent_status='paid' AND $1 IN (b.guest_id,c.host_id)) RETURNING id`,
+      [me],
+    );
+    if (!result.rowCount)
+      throw new AuthError(409, "financial_operation_pending");
   }
   async reviews(subject: string, sort: string, limit: number, offset: number) {
     if (

@@ -13,6 +13,7 @@ const slot = z
   .strict();
 const context = z
   .object({
+    contributionCents: z.number().int().min(0).max(100000).default(0),
     title: z.string().trim().min(1).max(120),
     kind: tag,
     ambience: tag,
@@ -47,8 +48,8 @@ export function hostController(db: pg.Pool) {
   const publish: RequestHandler = async (req, res) => {
     const p = context.parse(req.body);
     const result = await db.query(
-      `WITH ctx AS (INSERT INTO contexts(host_id,title,kind,ambience,safe_for,supported_diets,languages,themes)
-       SELECT user_id,$2,$3,$4,$5,$6,$8,$9 FROM host_profiles WHERE user_id=$1 RETURNING id),
+      `WITH ctx AS (INSERT INTO contexts(host_id,title,kind,ambience,safe_for,supported_diets,languages,themes,contribution_cents)
+       SELECT user_id,$2,$3,$4,$5,$6,$8,$9,$10 FROM host_profiles WHERE user_id=$1 RETURNING id),
        slots AS (INSERT INTO context_slots(context_id,starts_at,capacity) SELECT ctx.id,s."startsAt",s.capacity FROM ctx CROSS JOIN jsonb_to_recordset($7::jsonb) AS s("startsAt" timestamptz,capacity integer)) SELECT id FROM ctx`,
       [
         res.locals.identity.user.id,
@@ -60,6 +61,7 @@ export function hostController(db: pg.Pool) {
         JSON.stringify(p.slots),
         p.languages,
         p.themes,
+        p.contributionCents,
       ],
     );
     if (!result.rowCount) {

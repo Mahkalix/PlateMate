@@ -1,3 +1,4 @@
+import { walletRoutes } from "./wallet.js";
 import { Router } from "express";
 import { socialController } from "../controllers/social.js";
 import { SocialRepository } from "../repositories/social.js";
@@ -68,5 +69,6 @@ export function authRoutes(db: pg.Pool) {
   router.get("/profiles/:id/reviews", c.authenticated, social.reviews);
   router.get("/me/export", c.authenticated, social.personal);
   router.delete("/me/account", c.authenticated, social.erase);
+  router.use(walletRoutes(db, c.authenticated));
   return router;
 }

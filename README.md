@@ -139,3 +139,15 @@ npm run dev
 ```
 
 Le backend est réservé aux essais avec Stripe en mode test. Le détail des fonctions et des limites est dans le [catalogue fonctionnel](backend/FONCTIONNALITES.md).
+## US17–US18 · Portefeuille et Stripe Connect en mode test
+
+Le parcours s’exécute dans l’API Express de `backend/mvp`. Les montants sont des centimes EUR. L’hôte fixe la contribution par place lors de la publication (`contributionCents`, zéro par défaut). L’API fige le total de la réservation à sa création. Pour cette version de test, toute la contribution revient à l’hôte. Une réservation payée annulée avant sa clôture donne lieu à un remboursement intégral sur le portefeuille.
+
+1. L’hôte ouvre `POST /me/host/onboarding` pour obtenir un lien Connect Express de test. La configuration de l’application fournit les URL de retour via `APP_ORIGIN`.
+2. L’invité appelle `POST /me/wallet/topups` avec `amountCents` et un UUID `requestId` stable pour chaque tentative logique. Le client utilise le `clientSecret` pour confirmer le paiement de test auprès de Stripe.
+3. Configurer un endpoint Stripe de plateforme pour `payment_intent.succeeded` sur `POST /stripe/webhook`. Le serveur vérifie la signature sur le corps brut. Le solde et les mouvements sont disponibles sur `GET /me/wallet`.
+4. Après acceptation, `POST /bookings/:id/payment-intent` débite le portefeuille de l’invité. Un débit insuffisant renvoie 409. Le paiement répété sur la même réservation acceptée retrouve le résultat précédent.
+5. La clôture par l’hôte, après le début du créneau, crée le reversement dans la même transaction que le passage à completed. Le worker intégré à l’API traite les comptes connectés éligibles. Il crée un transfert puis un virement distinct par réservation lorsque le solde EUR connecté est disponible. Le statut hôte est consultable sur `GET /me/host/settlements`.
+6. Configurer un second endpoint Stripe pour les comptes connectés sur `POST /stripe/connect/webhook` avec `payout.paid` et `payout.failed`. Le worker rapproche également les virements en traitement. Un échec bancaire doit être examiné par un opérateur. Après une réponse ambiguë vieille de 23 heures, rapprocher manuellement les identifiants avec Stripe avant toute réémission.
+
+Secrets locaux ou CI : `STRIPE_SECRET_KEY` (sk_test_ uniquement), `STRIPE_WEBHOOK_SECRET`, `STRIPE_CONNECT_WEBHOOK_SECRET`. Ne pas les committer. Les tests signent des événements avec le SDK et simulent ses réponses réseau. La base PostgreSQL est réelle. Une exécution dans un compte Stripe de test nécessite des identifiants et un compte connecté de test.

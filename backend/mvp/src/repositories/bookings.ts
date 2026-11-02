@@ -45,7 +45,7 @@ export class Bookings {
     return this.transaction(async (c) => {
       const s = (
         await c.query(
-          "SELECT s.*,ctx.host_id,ctx.safe_for,p.details FROM context_slots s JOIN contexts ctx ON ctx.id=s.context_id LEFT JOIN profiles p ON p.user_id=$2 WHERE s.id=$1 AND s.starts_at>now() FOR UPDATE OF s",
+          "SELECT s.*,ctx.contribution_cents,ctx.host_id,ctx.safe_for,p.details FROM context_slots s JOIN contexts ctx ON ctx.id=s.context_id LEFT JOIN profiles p ON p.user_id=$2 WHERE s.id=$1 AND s.starts_at>now() FOR UPDATE OF s",
           [slot, actor],
         )
       ).rows[0];
@@ -59,8 +59,8 @@ export class Bookings {
       await this.capacity(c, slot, size, s.capacity);
       const b = (
         await c.query(
-          "INSERT INTO bookings(slot_id,guest_id,party_size) VALUES($1,$2,$3) ON CONFLICT DO NOTHING RETURNING id,status",
-          [slot, actor, size],
+          "INSERT INTO bookings(slot_id,guest_id,party_size,amount_cents) VALUES($1,$2,$3,$4) ON CONFLICT DO NOTHING RETURNING id,status",
+          [slot, actor, size, s.contribution_cents * size],
         )
       ).rows[0];
       if (!b) throw new AuthError(409, "already_booked");
@@ -103,23 +103,71 @@ export class Bookings {
       }
       if (status === "completed" && b.starts_at > new Date())
         throw new AuthError(409, "slot_not_started");
+      if (status === "completed" && b.amount_cents > 0) {
+        if (b.payment_intent_status !== "paid")
+          throw new AuthError(409, "payment_required");
+        await c.query(
+          "INSERT INTO settlements(booking_id,host_id,cents) VALUES($1,$2,$3)",
+          [id, b.host_id, b.amount_cents],
+        );
+      }
+      if (status === "cancelled" && b.payment_intent_status === "paid") {
+        await c.query(
+          "INSERT INTO wallet_entries(user_id,kind,cents,reference) VALUES($1,'refund',$2,$3)",
+          [b.guest_id, b.amount_cents, id],
+        );
+        await c.query(
+          "UPDATE bookings SET payment_intent_status='refunded' WHERE id=$1",
+          [id],
+        );
+      }
       await c.query("UPDATE bookings SET status=$2 WHERE id=$1", [id, status]);
       await this.record(c, id, status, actor);
       return { id, status };
     });
   }
   async payment(actor: string, id: string) {
-    const r = await this.db.query(
-      "UPDATE bookings SET payment_intent_status='simulated' WHERE id=$1 AND guest_id=$2 AND status='accepted' RETURNING payment_intent_status AS \"paymentIntentStatus\"",
-      [id, actor],
-    );
-    if (!r.rowCount) throw new AuthError(404, "not_found");
-    return r.rows[0];
+    return this.transaction(async (c) => {
+      const booking = (
+        await c.query(
+          "SELECT amount_cents,payment_intent_status,status FROM bookings WHERE id=$1 AND guest_id=$2 FOR UPDATE",
+          [id, actor],
+        )
+      ).rows[0];
+      if (!booking || booking.status !== "accepted")
+        throw new AuthError(404, "not_found");
+      if (booking.payment_intent_status === "paid")
+        return { paymentIntentStatus: "paid" };
+      const amount = booking.amount_cents;
+      if (amount > 0) {
+        await c.query("SELECT id FROM users WHERE id=$1 FOR NO KEY UPDATE", [
+          actor,
+        ]);
+        const balance = (
+          await c.query(
+            "SELECT COALESCE(SUM(cents),0) AS cents FROM wallet_entries WHERE user_id=$1",
+            [actor],
+          )
+        ).rows[0].cents;
+        if (Number(balance) < amount)
+          throw new AuthError(409, "insufficient_balance");
+        await c.query(
+          "INSERT INTO wallet_entries(user_id,kind,cents,reference) VALUES($1,'payment',$2,$3)",
+          [actor, -amount, id],
+        );
+      }
+      const state = amount > 0 ? "paid" : "simulated";
+      await c.query(
+        "UPDATE bookings SET payment_intent_status=$2 WHERE id=$1",
+        [id, state],
+      );
+      return { paymentIntentStatus: state };
+    });
   }
   async list(actor: string, view: "host" | "guest") {
     return (
       await this.db.query(
-        `SELECT b.id,b.slot_id AS "slotId",c.id AS "contextId",c.title AS "contextTitle",s.starts_at AS "startsAt",b.party_size AS "partySize",b.status,b.payment_intent_status AS "paymentIntentStatus",p.details->>'firstName' AS "counterpartName",ARRAY(SELECT e.status::text FROM booking_status_events e WHERE e.booking_id=b.id ORDER BY e.id) AS history FROM bookings b JOIN context_slots s ON s.id=b.slot_id JOIN contexts c ON c.id=s.context_id JOIN profiles p ON p.user_id=CASE WHEN $2='host' THEN b.guest_id ELSE c.host_id END WHERE CASE WHEN $2='host' THEN c.host_id ELSE b.guest_id END=$1 ORDER BY s.starts_at,b.id`,
+        `SELECT b.id,b.amount_cents AS "amountCents",b.slot_id AS "slotId",c.id AS "contextId",c.title AS "contextTitle",s.starts_at AS "startsAt",b.party_size AS "partySize",b.status,b.payment_intent_status AS "paymentIntentStatus",p.details->>'firstName' AS "counterpartName",ARRAY(SELECT e.status::text FROM booking_status_events e WHERE e.booking_id=b.id ORDER BY e.id) AS history FROM bookings b JOIN context_slots s ON s.id=b.slot_id JOIN contexts c ON c.id=s.context_id JOIN profiles p ON p.user_id=CASE WHEN $2='host' THEN b.guest_id ELSE c.host_id END WHERE CASE WHEN $2='host' THEN c.host_id ELSE b.guest_id END=$1 ORDER BY s.starts_at,b.id`,
         [actor, view],
       )
     ).rows;

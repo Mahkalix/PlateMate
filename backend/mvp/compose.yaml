@@ -19,6 +19,10 @@ services:
       DATABASE_URL: postgres://platemate:${MVP_DB_PASSWORD}@db:5432/platemate
       JWT_SECRET: ${JWT_SECRET:?Définir JWT_SECRET avec au moins 32 octets}
       NODE_ENV: ${NODE_ENV:-development}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      STRIPE_CONNECT_WEBHOOK_SECRET: ${STRIPE_CONNECT_WEBHOOK_SECRET:-}
+      APP_ORIGIN: ${APP_ORIGIN:-http://localhost:8080}
       PORT: 3001
     depends_on:
       db:

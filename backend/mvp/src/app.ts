@@ -1,3 +1,4 @@
+import { stripeWebhook } from "./routes/wallet.js";
 import express, { type ErrorRequestHandler } from "express";
 import type pg from "pg";
 import { pool } from "./pool.js";
@@ -15,6 +16,15 @@ export function createApp(db: pg.Pool) {
     );
     next();
   });
+  for (const [path, connect] of [
+    ["/stripe/webhook", false],
+    ["/stripe/connect/webhook", true],
+  ] as const)
+    app.post(
+      path,
+      express.raw({ type: "application/json", limit: "256kb" }),
+      stripeWebhook(db, connect),
+    );
   app.use(express.json({ limit: "16kb" }));
   app.get("/health", async (_req, res) => {
     try {

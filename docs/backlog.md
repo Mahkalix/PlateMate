@@ -21,6 +21,6 @@ Transcription du tableau 4.3 de [DEV JALON 2](https://docs.google.com/document/d
 | US15 | Préparer la minimisation RGPD. | Données personnelles limitées aux besoins réels du matching. | Must | 5 | Transverse |
 | US16 | Créer une demande de réservation. | Demande associée à un profil/contexte, statut visible, confirmation possible par l’hôte. | Must | 8 | S5 |
 | US17 | Confirmer une intention de paiement. | Paiement simulé ou préautorisation documentée, sans reversement hôte réel dans ce jalon. | Should | 5 | S5 |
-| US18 | Paiement Stripe Connect complet. | Paiement sécurisé, rattachement à une réservation et préparation du reversement hôte. | Could | 13 | Post-MVP |
+| US18 | Portefeuille et Stripe Connect de test. | Rechargement signé et idempotent, débit après acceptation, remboursement sur annulation, transfert et virement après clôture, suivi des échecs. | Must | 13 | MVP test |
 ### Révision validée de US06–09 et US16
 Le tableau conserve la transcription du jalon. Le contrat actuel compare le profil du visiteur aux langues, thèmes et régimes du repas. Chaque repas conserve sa propre carte. Le filtre langue interroge les langues annoncées pour le repas. À l’acceptation, contrôler à nouveau les allergies et intolérances courantes sans les dévoiler à l’hôte.
