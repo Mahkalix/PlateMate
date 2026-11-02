@@ -18,6 +18,8 @@ const context = z
     ambience: tag,
     safeFor: tags,
     supportedDiets: tags,
+    languages: tags.default([]),
+    themes: tags.default([]),
     slots: z
       .array(slot)
       .min(1)
@@ -45,7 +47,9 @@ export function hostController(db: pg.Pool) {
   const publish: RequestHandler = async (req, res) => {
     const p = context.parse(req.body);
     const result = await db.query(
-      `WITH ctx AS (INSERT INTO contexts(host_id,title,kind,ambience,safe_for,supported_diets) SELECT user_id,$2,$3,$4,$5,$6 FROM host_profiles WHERE user_id=$1 RETURNING id), slots AS (INSERT INTO context_slots(context_id,starts_at,capacity) SELECT ctx.id,s."startsAt",s.capacity FROM ctx CROSS JOIN jsonb_to_recordset($7::jsonb) AS s("startsAt" timestamptz,capacity integer)) SELECT id FROM ctx`,
+      `WITH ctx AS (INSERT INTO contexts(host_id,title,kind,ambience,safe_for,supported_diets,languages,themes)
+       SELECT user_id,$2,$3,$4,$5,$6,$8,$9 FROM host_profiles WHERE user_id=$1 RETURNING id),
+       slots AS (INSERT INTO context_slots(context_id,starts_at,capacity) SELECT ctx.id,s."startsAt",s.capacity FROM ctx CROSS JOIN jsonb_to_recordset($7::jsonb) AS s("startsAt" timestamptz,capacity integer)) SELECT id FROM ctx`,
       [
         res.locals.identity.user.id,
         p.title,
@@ -54,6 +58,8 @@ export function hostController(db: pg.Pool) {
         p.safeFor,
         p.supportedDiets,
         JSON.stringify(p.slots),
+        p.languages,
+        p.themes,
       ],
     );
     if (!result.rowCount) {

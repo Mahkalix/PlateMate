@@ -34,3 +34,5 @@ Toutes demandent Authorization: Bearer et répondent 401 si la session manque ou
 | POST /bookings/:id/review | rating entier de 1 à 5, comment de 1 à 1 000 caractères | 201 {rating,comment}, 404 si tiers, 409 si rencontre inachevée ou avis déjà laissé |
 | GET /me/export | — | 200 fichier JSON de données personnelles, sans secrets d’authentification |
 | DELETE /me/account | {confirm:true} | 204 après suppression en base, 422 sans confirmation explicite |
+### Révision du contrat de matching
+POST /me/contexts accepte languages et themes, deux listes facultatives. Les données antérieures gardent des listes vides, sans héritage de l’hôte. GET /explorer compte et pagine les repas. Le détail expose languages et themes propres au repas. PATCH /bookings/:id/status renvoie 409 booking_no_longer_eligible si la compatibilité stricte ne peut plus être établie à l’acceptation. La demande reste en attente.

@@ -51,7 +51,7 @@ flowchart LR
 
 **Résultats locaux.** 87 tests sur 87 réussis. Sur les services et la configuration, 64/65 lignes, 70/71 instructions, 32/33 branches et 26/26 fonctions. Le scoring et la machine à états sont couverts à 100 %. Les migrations, deux exécutions successives du seed et une requête HTTP réelle sur /health ont été vérifiées sur la base dédiée.
 
-**Hypothèses et limites.** Les quatre écrans complémentaires sont des propositions à revoir avec le frontend. L’adresse exacte du domicile reste exclue du modèle. Le vocabulaire des contraintes est normalisé par casse et espaces, mais deux synonymes distincts ne sont pas assimilés. Une capacité alimentaire inconnue exclut le contexte. Les filtres SQL réduisent le jeu de candidats avant le tri en mémoire. Les gros volumes, la rétention des sauvegardes et les notifications restent à traiter avant une mise en production. Les contrôleurs et repositories sont exercés via HTTP mais ne sont pas inclus dans le pourcentage des services.
+**Hypothèses et limites.** Les quatre écrans complémentaires ont été validés. L’adresse exacte du domicile reste exclue du modèle. Le vocabulaire des contraintes est normalisé par casse et espaces, mais deux synonymes distincts ne sont pas assimilés. Une capacité alimentaire inconnue exclut le contexte. Les filtres SQL réduisent le jeu de candidats avant le tri en mémoire. Les gros volumes, la rétention des sauvegardes et les notifications restent à traiter avant une mise en production. Le rapport distingue services, contrôleurs et repositories.
 
 Contrôle de mutation S1 effectué sur PostgreSQL. Après retrait du contrôle de présence de la session, « US01 / SANS ÉCRAN déconnexion : access et refresh révoqués » a reçu 200 au lieu de 401 sur GET /me. Le contrôle a été rétabli et la suite complète relancée. Les mutations scoring, allergies et réservations relèvent des futurs sprints.
 
@@ -61,7 +61,7 @@ Express assure le transport HTTP, PostgreSQL impose les contraintes persistantes
 
 ### Matching du MVP et tests de mutation S3
 
-Après exclusion des contextes dont les capacités déclarées ne couvrent pas chaque allergie et intolérance du visiteur, le score arrondi vaut 40 × fraction des langues communes + 40 × fraction des affinités communes + 20 × fraction des régimes pris en charge. Chaque fraction utilise le nombre de critères du visiteur comme dénominateur et vaut zéro si ce nombre est nul. Pour un visiteur parlant français et anglais, aimant jazz et cinéma et suivant un régime végan, les cinq exemples testés sont : tout commun = 100 ; une langue, une affinité et le régime = 60 ; les deux langues seules = 40 ; les deux affinités seules = 40 ; rien de commun = 0. Le contexte le mieux classé représente chaque personne. Les identifiants départagent les ex æquo.
+Après exclusion des contextes dont les capacités déclarées ne couvrent pas chaque allergie et intolérance du visiteur, le score arrondi vaut 40 × fraction des langues communes + 40 × fraction des affinités communes + 20 × fraction des régimes pris en charge. Chaque fraction utilise le nombre de critères du visiteur comme dénominateur et vaut zéro si ce nombre est nul. Pour un visiteur parlant français et anglais, aimant jazz et cinéma et suivant un régime végan, les cinq exemples testés sont : tout commun = 100 ; une langue, une affinité et le régime = 60 ; les deux langues seules = 40 ; les deux affinités seules = 40 ; rien de commun = 0. Chaque repas compatible a sa propre carte. Les langues et les thèmes sont déclarés pour ce repas. Les critères non renseignés rapportent zéro point. Les pondérations 40/40/20 sont provisoires. Les identifiants départagent les ex æquo.
 
 Contrôles manuels. Mettre à zéro le poids des langues a fait échouer quatre tests US06. Inverser le contrôle des allergènes a fait échouer « un score maximal ne neutralise jamais une incompatibilité ». Les deux mutations ont été annulées.
 ### Réservations et mutations S5
@@ -139,5 +139,3 @@ npm run dev
 ```
 
 Le backend est réservé aux essais avec Stripe en mode test. Le détail des fonctions et des limites est dans le [catalogue fonctionnel](backend/FONCTIONNALITES.md).
-
-

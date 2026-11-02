@@ -14,8 +14,8 @@ try {
        ), host AS (
          INSERT INTO host_profiles SELECT user_id FROM profile RETURNING user_id
        ), context AS (
-         INSERT INTO contexts(host_id,title,kind,ambience,supported_diets,safe_for)
-         SELECT user_id,'Promenade à Grenoble','balade','calme',ARRAY['vegan'],ARRAY['arachide'] FROM host RETURNING id
+         INSERT INTO contexts(host_id,title,kind,ambience,supported_diets,safe_for,languages,themes)
+         SELECT user_id,'Promenade à Grenoble','balade','calme',ARRAY['vegan'],ARRAY['arachide'],ARRAY['fr'],ARRAY['jazz'] FROM host RETURNING id
        ) INSERT INTO context_slots(context_id,starts_at,capacity)
          SELECT id,now()+interval '30 days',4 FROM context`,
       [

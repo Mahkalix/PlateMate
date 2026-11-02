@@ -38,4 +38,4 @@ erDiagram
  users ||--o{ reviews : publie_ou_recoit
 ```
 
-Les colonnes physiques et leurs contraintes sont définies par les six migrations de backend/mvp/sql. Les deux membres d’un échange sont identifiés par sender_id et recipient_id. Un événement de réservation conserve son acteur et son horodatage. Le profil validé est stocké dans details en JSONB pour être remplacé atomiquement. Le badge et la date du consentement restent séparés du document modifiable par le propriétaire.
+Les colonnes physiques et leurs contraintes sont définies par les sept migrations de backend/mvp/sql. Les deux membres d’un échange sont identifiés par sender_id et recipient_id. Un événement de réservation conserve son acteur et son horodatage. Le profil validé est stocké dans details en JSONB pour être remplacé atomiquement. Le badge et la date du consentement restent séparés du document modifiable par le propriétaire.

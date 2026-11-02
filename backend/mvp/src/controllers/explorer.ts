@@ -16,17 +16,11 @@ export function explorerController(repo: ExplorerRepository) {
   const list: RequestHandler = async (req, res) => {
     const filters = query.parse(req.query);
     const ranked = await repo.candidates(res.locals.identity.user.id, filters);
-    const seen = new Set<string>();
-    const unique = ranked.filter((c) => {
-      if (seen.has(c.hostId)) return false;
-      seen.add(c.hostId);
-      return true;
-    });
     const end = filters.offset + filters.limit;
     res.json({
-      items: unique.slice(filters.offset, end),
-      total: unique.length,
-      nextOffset: end < unique.length ? end : null,
+      items: ranked.slice(filters.offset, end),
+      total: ranked.length,
+      nextOffset: end < ranked.length ? end : null,
     });
   };
   const detail: RequestHandler = async (req, res) => {

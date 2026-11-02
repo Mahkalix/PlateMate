@@ -82,6 +82,22 @@ export class Bookings {
       if (!allows(b.status, status))
         throw new AuthError(409, "invalid_transition");
       if (status === "accepted") {
+        const current = await c.query(
+          `SELECT p.details,ctx.safe_for FROM profiles p
+           JOIN context_slots s ON s.id=$2 JOIN contexts ctx ON ctx.id=s.context_id
+           WHERE p.user_id=$1 FOR SHARE OF p,ctx`,
+          [b.guest_id, b.slot_id],
+        );
+        const match = current.rows[0];
+        if (
+          !match ||
+          !compatible(
+            match.details.allergies,
+            match.details.intolerances,
+            match.safe_for,
+          )
+        )
+          throw new AuthError(409, "booking_no_longer_eligible");
         if (b.starts_at <= new Date()) throw new AuthError(409, "slot_started");
         await this.capacity(c, b.slot_id, b.party_size, b.capacity);
       }

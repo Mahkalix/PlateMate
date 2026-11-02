@@ -34,7 +34,7 @@ it("US06 US07 US08 US09 / Explorer : tri, filtres, pagination, confidentialité 
       user.id,
     ]);
     await pool.query(
-      "insert into contexts(host_id,title,kind,ambience,supported_diets,safe_for) values($1,$2,$3,$4,$5,$6)",
+      "insert into contexts(host_id,title,kind,ambience,supported_diets,safe_for,languages,themes) values($1,$2,$3,$4,$5,$6,$7,$8)",
       [
         user.id,
         "Rencontre",
@@ -42,19 +42,38 @@ it("US06 US07 US08 US09 / Explorer : tri, filtres, pagination, confidentialité 
         "calme",
         ["vegan"],
         safe ? ["arachide"] : [],
+        [lang],
+        ["jazz"],
       ],
     );
   }
   const get = (q: object) =>
     api.get("/explorer").set("Authorization", auth).query(q);
+  const secondMeal = await pool.query(
+    "insert into contexts(host_id,title,kind,ambience,safe_for,languages,themes) select host_id,'Deuxième repas','dîner','animée',safe_for,ARRAY['it'],ARRAY['cinéma'] from contexts where languages=ARRAY['fr'] and cardinality(safe_for)>0 returning id",
+  );
+  expect(
+    (await get({ language: "it" })).body.items.map(
+      (c: { contextId: string }) => c.contextId,
+    ),
+  ).toEqual([secondMeal.rows[0].id]);
   const page = (await get({ limit: 1 }).expect(200)).body;
-  expect(page.total).toBe(2);
+  expect(page.total).toBe(3);
+  expect(page.items[0].score).toBe(100);
+  await pool.query(
+    "update profiles set details=details || $1::jsonb where user_id=$2",
+    [
+      JSON.stringify({ languages: ["de"], affinities: ["danse"] }),
+      page.items[0].hostId,
+    ],
+  );
+  expect((await get({ language: "fr" })).body.items[0].score).toBe(100);
   expect(page.items[0].firstName).toBe("Host1");
   const next = (await get({ limit: 1, offset: 1 }).expect(200)).body;
   expect(next.items[0].firstName).toBe("Host2");
   for (const q of [
     { language: "de" },
-    { ambience: "animée" },
+    { ambience: "inconnue" },
     { diet: "halal" },
     { kind: "atelier" },
     { kind: "' OR 1=1 --" },

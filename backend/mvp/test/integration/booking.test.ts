@@ -59,6 +59,19 @@ it("US16 US17 / Réservations : participants, capacité, transitions, intention 
   await update(first.id, other.auth, "accepted").expect(404);
   await update(first.id, guest.auth, "accepted").expect(403);
   const second = (await book(other.auth).expect(201)).body;
+  await api
+    .put("/me/profile")
+    .set("Authorization", guest.auth)
+    .send({ ...profile, intolerances: ["lactose"] })
+    .expect(200);
+  await update(first.id, host.auth, "accepted").expect(409, {
+    error: "booking_no_longer_eligible",
+  });
+  await api
+    .put("/me/profile")
+    .set("Authorization", guest.auth)
+    .send(profile)
+    .expect(200);
   const results = await Promise.all([
     update(first.id, host.auth, "accepted"),
     update(second.id, host.auth, "accepted"),
