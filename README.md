@@ -12,6 +12,10 @@ Depuis backend/mvp, utiliser npm test pour toute la suite, npm run test:unit, np
 
 ## Architecture et limites
 
+Contrôle de mutation S1 effectué sur PostgreSQL. Après retrait du contrôle de présence de la session, « US01 / SANS ÉCRAN déconnexion : access et refresh révoqués » a reçu 200 au lieu de 401 sur GET /me. Le contrôle a été rétabli et la suite complète relancée. Les mutations scoring, allergies et réservations relèvent des futurs sprints.
+
+La connexion utilise bcrypt (coût 12), un JWT HS256 de dix minutes et un refresh opaque dont seule l’empreinte est conservée en base. Le cookie HttpOnly, SameSite=Strict et Secure en production limite l’accès au refresh. Le frontend doit conserver l’access token en mémoire. La session a une durée absolue de sept jours. La limitation des essais est locale au processus Express et suppose une instance unique. Voir [le contrat HTTP](docs/api.md).
+
 Express assure le transport HTTP, PostgreSQL impose les contraintes persistantes et les migrations SQL versionnées sont transactionnelles. Le schéma séparé évite de réinterpréter les réservations commerciales existantes. La suite locale couvre les nouveaux contrats uniquement. Voir [le schéma](docs/schema-mvp.md), [les critères](docs/backlog.md) et [la traçabilité](docs/traceability.md).
 
 ## Application historique

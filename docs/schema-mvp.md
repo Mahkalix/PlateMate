@@ -2,6 +2,13 @@
 
 ```mermaid
 erDiagram
+ users ||--o{ sessions : ouvre
+ sessions {
+ uuid id PK
+ uuid user_id FK
+ text refresh_hash UK
+ timestamptz expires_at
+ }
  users { 
  uuid id PK
  text email UK
