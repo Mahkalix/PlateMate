@@ -11,8 +11,14 @@
     margin-left: 0;
     padding: 8px 0 20px;
     scroll-snap-type: x mandatory;
+    display: flex;
+    aspect-ratio: auto;
 
-    .pm-host-card:nth-child(n) {
+    .pm-table-card:nth-child(n) {
+      position: relative;
+      flex: 0 0 min(78%, 260px);
+      inset: auto;
+      width: auto;
       margin-left: 0;
       transform: none;
       scroll-snap-align: start;

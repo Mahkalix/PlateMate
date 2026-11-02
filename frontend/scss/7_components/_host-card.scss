@@ -1,102 +1,119 @@
 .pm-table-card {
   position: relative;
-  flex: 1 0 21%;
-  min-width: 0;
-  height: 445px;
-  padding: 12px;
+  container-type: inline-size;
+  aspect-ratio: 296 / 427;
+  height: auto;
+  align-self: start;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
   background: var(--pm-teal);
   color: var(--pm-teal);
-  border: 0;
-  border-radius: 5px;
-  overflow: hidden;
-  &:hover,
-  &:focus-visible {
-    z-index: 5;
-  }
-  &:nth-child(2n) {
-    transform: translateY(-42px);
-  }
-  &:nth-child(3) {
-    transform: translateY(-72px);
-    z-index: 2;
-  }
-  + .pm-table-card {
-    margin-left: -1.25%;
-  }
-  .meal-photo {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border: 7px solid var(--pm-yellow);
-    border-radius: 5px;
-  }
-  .polaroid {
+
+  &__frame {
     position: absolute;
-    top: 24px;
-    left: 15px;
-    width: 29%;
-    background: white;
-    padding: 4px 4px 7px;
-    color: #160d09;
-    font-weight: 700;
-    font-size: 13px;
-    transform: rotate(2deg);
+    inset: 4.68% 5.07% 3.28%;
+    border-radius: 4cqw;
+    box-shadow: 0 0 0 1cqw var(--pm-yellow);
+    overflow: hidden;
+    background: #ffe1a2;
+  }
+  &__meal {
+    position: absolute;
+    inset: -8.77% 0 auto;
+    width: 100%;
+    height: 101.25%;
+    object-fit: cover;
+  }
+  // The Figma paper cutout is mirrored around its top-left origin.
+  &__paper {
+    position: absolute;
+    top: 59.93%;
+    left: 132.53%;
+    width: 126%;
+    height: 80.13%;
+    transform-origin: top left;
+    transform: matrix(-0.92823, -0.37201, -0.37201, 0.92823, 0, 0);
+    background: url("/home/Vector.svg") center / 100% 100% no-repeat;
+  }
+  &__title,
+  &__interests {
+    position: absolute;
+    inset-inline: 9%;
+    text-align: center;
+  }
+  &__title {
+    top: 53.69%;
+    display: grid;
+    place-content: center;
+    height: 17.3%;
+    font:
+      900 11.5cqw/1 "BBB ReadMe",
+      serif;
+    text-transform: uppercase;
+  }
+  &__interests {
+    top: 73.54%;
+    color: var(--pm-ink);
+    font:
+      700 4cqw/1.2 "DM Sans",
+      sans-serif;
+  }
+  &__tags {
+    display: flex;
+    justify-content: center;
+    gap: 1.5cqw;
+    margin-top: 1.6cqw;
+    span {
+      border-radius: 100px;
+      background: #49cddd;
+      padding: 1.7cqw 2.5cqw;
+      white-space: nowrap;
+    }
+  }
+  &__arrow {
+    position: absolute;
+    top: 86.56%;
+    left: 45.1%;
+    width: 15%;
+    aspect-ratio: 1;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
     img {
-      display: block;
+      width: 60%;
+      transform: rotate(180deg);
+    }
+  }
+  &__portrait {
+    position: absolute;
+    top: 5.15%;
+    left: 5.07%;
+    width: 31.75%;
+    padding: 1.2cqw 1.2cqw 2cqw;
+    transform: rotate(1.77deg);
+    background: white;
+    color: var(--pm-ink);
+    font:
+      700 4.4cqw/1.45 "DM Sans",
+      sans-serif;
+    img {
       width: 100%;
-      height: 76px;
+      aspect-ratio: 89 / 105;
       object-fit: cover;
+      display: block;
     }
     &::before {
       content: "";
       position: absolute;
-      top: 0;
-      left: -8px;
-      width: 40px;
-      height: 11px;
+      top: -2%;
+      left: -15%;
+      width: 55%;
+      height: 14%;
+      transform: rotate(-45deg);
       background: url("/home/Rectangle10.webp") center/cover;
-      transform: rotate(-42deg);
     }
-  }
-  .card-info {
-    position: absolute;
-    display: grid;
-    justify-items: center;
-    align-content: center;
-    gap: 6px;
-    inset: 44% 4% 0;
-    background: url("/home/Vector.svg") center top/100% 100% no-repeat;
-    padding: 32px 12px 15px;
-    strong {
-      font:
-        900 clamp(24px, 2.7vw, 40px)/0.95 "BBB ReadMe",
-        serif;
-      text-transform: uppercase;
-    }
-    small {
-      color: var(--pm-ink);
-      font-weight: 700;
-    }
-    span {
-      font-size: 12px;
-      color: var(--pm-ink);
-      background: #cdddb6;
-      border-radius: 20px;
-      padding: 2px 9px;
-    }
-    img {
-      width: 24px;
-      height: 24px;
-    }
-  }
-}
-@media (max-width: 980px) {
-  .pm-featured__cards .pm-table-card:nth-child(n) {
-    flex: 0 0 230px;
-    height: 330px;
-    transform: none;
-    margin: 0;
-    scroll-snap-align: start;
   }
 }
 .pm-dialog {

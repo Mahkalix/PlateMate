@@ -54,6 +54,7 @@
   }
 }
 .pm-featured {
+  width: min(calc(100% - 64px), 1292px);
   position: relative;
   box-sizing: border-box;
   height: auto;
@@ -84,29 +85,36 @@
   }
 }
 .pm-featured__cards {
-  display: flex;
-  width: calc(100% + 10px);
-  height: 377px;
-  margin-left: -5px;
-  .pm-host-card {
-    flex: 0 0 280px;
-    &:hover,
-    &:focus-within {
-      z-index: 3;
+  position: relative;
+  aspect-ratio: 1292 / 457;
+  margin-top: -32px;
+  .pm-table-card {
+    position: absolute;
+    width: 22.91%;
+    top: 33.04%;
+    &:nth-child(1) {
+      left: 0;
     }
-    &:not(:first-child) {
-      margin-left: -30px;
-    }
-    &:nth-child(1),
-    &:nth-child(5) {
-      transform: translateY(70px);
-    }
-    &:nth-child(2),
-    &:nth-child(4) {
-      transform: translateY(33px);
+    &:nth-child(2) {
+      left: 18.58%;
+      top: 22.76%;
+      z-index: 1;
     }
     &:nth-child(3) {
-      transform: translateY(-16px);
+      left: 39.09%;
+      top: 16.19%;
+      z-index: 2;
+    }
+    &:nth-child(4) {
+      left: 58.82%;
+      top: 22.76%;
+      z-index: 1;
+    }
+    &:nth-child(5) {
+      left: 78.02%;
+    }
+    &:focus-visible {
+      z-index: 3;
     }
   }
 }
@@ -301,9 +309,7 @@
 .pm-featured {
   overflow: hidden;
 }
-.pm-featured__cards {
-  margin-top: 48px;
-}
+
 .pm-section-heading h2 {
   font-family: "BBB ReadMe", serif;
   text-transform: uppercase;
