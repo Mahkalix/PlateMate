@@ -310,8 +310,8 @@
     }
     > img {
       flex: none;
-      width: 44px;
-      height: 44px;
+      width: 40px;
+      height: 40px;
     }
     p {
       margin: 0;
@@ -549,4 +549,15 @@
       min-width: 150px;
     }
   }
+}
+
+.pm-host-cta .pm-button {
+  min-width: 170px;
+  min-height: 42px;
+  padding: 8px 16px;
+}
+.pm-host-cta .pm-button img,
+.pm-steps__action .pm-button img {
+  width: 24px;
+  height: 24px;
 }

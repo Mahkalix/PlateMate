@@ -37,7 +37,8 @@ export function HowItWorks() {
         <div className="pm-steps__action">
           <p>Prêt à passer à table ?</p>
           <Button to="#tables" variant="outline">
-            Explorer les expériences
+            Explorer les expériences{" "}
+            <img src="/home/ArrowRightCircle1.svg" alt="" />
           </Button>
         </div>
       </div>

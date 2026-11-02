@@ -13,7 +13,7 @@ export function HostInvitation() {
           Gagnez.
         </h2>
         <Button to="/whatsapp" variant="yellow">
-          En savoir plus
+          En savoir plus <img src="/home/ArrowRightCircle.svg" alt="" />
         </Button>
       </div>
       <div className="pm-host-cta__photo" aria-hidden="true">
