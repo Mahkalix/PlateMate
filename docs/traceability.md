@@ -51,3 +51,6 @@ US06–09 disposent de tests de classement, pagination par offset, quatre filtre
 ### S4 · Partie réalisable
 
 US12 et la partie profil vérifié/complétude de US13 sont exercées par HTTP. Le propriétaire ne peut modifier le badge. Les avis comme signal de confiance, la publication d’avis et la messagerie sont différés. Aucun parcours complet correspondant n’a été ajouté à Figma.
+### S5 · Réservation
+
+GET /me/bookings, POST /bookings, PATCH /bookings/:id/status et POST /bookings/:id/payment-intent couvrent les deux onglets. Le dernier endpoint matérialise US17 pour un invité dont la réservation est acceptée. Les transitions sont consignées par acteur et date. Le détail d’une adresse privée reste exclu tant que sa saisie et sa communication ne sont pas validées.

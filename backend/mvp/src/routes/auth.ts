@@ -1,4 +1,6 @@
 import { Router } from "express";
+import { bookingController } from "../controllers/bookings.js";
+import { Bookings } from "../repositories/bookings.js";
 import { hostController } from "../controllers/host.js";
 import { explorerController } from "../controllers/explorer.js";
 import { ExplorerRepository } from "../repositories/explorer.js";
@@ -43,5 +45,14 @@ export function authRoutes(db: pg.Pool) {
   const host = hostController(db);
   router.post("/me/host", c.authenticated, host.register);
   router.post("/me/contexts", c.authenticated, host.publish);
+  const bookings = bookingController(new Bookings(db));
+  router.get("/me/bookings", c.authenticated, bookings.list);
+  router.post("/bookings", c.authenticated, bookings.create);
+  router.patch("/bookings/:id/status", c.authenticated, bookings.update);
+  router.post(
+    "/bookings/:id/payment-intent",
+    c.authenticated,
+    bookings.payment,
+  );
   return router;
 }

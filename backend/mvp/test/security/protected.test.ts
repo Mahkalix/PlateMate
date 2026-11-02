@@ -3,6 +3,10 @@ import { SignJWT } from "jose";
 import { client } from "../auth-fixture.js";
 const id = "00000000-0000-4000-8000-000000000001";
 const routes = [
+  ["get", "/me/bookings"],
+  ["post", "/bookings"],
+  ["patch", "/bookings/" + id + "/status"],
+  ["post", "/bookings/" + id + "/payment-intent"],
   ["post", "/me/host"],
   ["post", "/me/contexts"],
   ["get", "/explorer"],
