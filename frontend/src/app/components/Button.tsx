@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 type Base = {
@@ -13,17 +12,11 @@ type NativeProps = Base &
 export function Button(props: LinkProps | NativeProps) {
   const className =
     `pm-button pm-button--${props.variant || "red"} ${props.className || ""}`.trim();
-  if ("to" in props && props.to?.startsWith("#"))
+  if ("to" in props && props.to)
     return (
       <a href={props.to} className={className}>
         {props.children}
       </a>
-    );
-  if ("to" in props && props.to)
-    return (
-      <Link className={className} to={props.to}>
-        {props.children}
-      </Link>
     );
   const {
     children,

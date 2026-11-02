@@ -12,7 +12,7 @@ export function HostInvitation() {
           <br />
           Gagnez.
         </h2>
-        <Button to="/whatsapp" variant="yellow">
+        <Button to="#fonctionnement" variant="yellow">
           En savoir plus <img src="/home/ArrowRightCircle.svg" alt="" />
         </Button>
       </div>

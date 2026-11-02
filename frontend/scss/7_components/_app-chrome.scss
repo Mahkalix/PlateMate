@@ -23,7 +23,7 @@
   height: 0;
 }
 .app:has(.pm-hero) {
-  :is(#tables, #cartes, #hotes) {
+  :is(#tables, #cartes, #hotes, #fonctionnement, #communaute) {
     scroll-margin-top: var(--nav-height);
   }
   .pm-header {

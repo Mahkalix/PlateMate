@@ -1,5 +1,10 @@
 @use "../1_settings/tokens" as token;
 
+body {
+  margin: 0;
+  font-size: 1.6rem;
+}
+
 .app {
   --pm-wine: #{token.$wine};
   --pm-red: #{token.$red};
@@ -22,6 +27,7 @@
     sans-serif;
   a {
     color: inherit;
+    text-decoration: none;
   }
   button,
   input {

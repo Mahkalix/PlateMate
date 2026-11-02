@@ -1,6 +1,6 @@
 export function CommunityGallery() {
   return (
-    <section className="pm-gallery">
+    <section id="communaute" className="pm-gallery">
       <div className="pm-gallery__title">
         <div className="pm-container">
           <p className="pm-eyebrow">La communauté en images</p>

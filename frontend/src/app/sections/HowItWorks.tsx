@@ -16,7 +16,7 @@ const steps = [
 
 export function HowItWorks() {
   return (
-    <section className="pm-steps">
+    <section id="fonctionnement" className="pm-steps">
       <header className="pm-steps__title">
         <div className="pm-container">
           <p className="pm-eyebrow">Comment ça marche</p>

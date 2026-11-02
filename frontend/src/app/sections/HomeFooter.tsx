@@ -1,5 +1,4 @@
 import { HomeNavLinks } from "../components/HomeNavLinks";
-import { Link } from "react-router-dom";
 
 export function HomeFooter() {
   return (
@@ -26,8 +25,8 @@ export function HomeFooter() {
       <div className="pm-footer__bottom">
         <span>© 2025 PlateMate. Tous droits réservés.</span>
         <div className="pm-footer__legal">
-          <Link to="/mentions-legales">Mentions légales</Link>
-          <a href="/mentions-legales#privacy-title">Confidentialité</a>
+          <span>Mentions légales</span>
+          <span>Confidentialité</span>
           <span title="Conditions générales à venir">CGU</span>
         </div>
       </div>

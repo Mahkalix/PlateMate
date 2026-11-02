@@ -2,7 +2,7 @@ const nav = [
   ["Accueil", "#accueil"],
   ["Explorer", "#tables"],
   ["Devenir hôte", "#hotes"],
-  ["À propos", "/equipe"],
+  ["À propos", "#communaute"],
 ];
 
 export function HomeNavLinks({ onNavigate }: { onNavigate?: () => void }) {

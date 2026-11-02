@@ -437,20 +437,6 @@
     margin-top: 0;
   }
 }
-@font-face {
-  font-family: "BBB ReadMe";
-  src: url("/whatsapp/assets/fonts/BBBReadMe-Black.woff2") format("woff2");
-  font-weight: 900;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "BBB ReadMe";
-  src: url("/whatsapp/assets/fonts/BBBReadMe-BlackItalic.woff2") format("woff2");
-  font-style: italic;
-  font-weight: 900;
-  font-display: swap;
-}
 .app .pm-hero h1 {
   color: var(--pm-cream);
   margin: 0 0 12px;
