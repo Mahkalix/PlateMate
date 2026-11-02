@@ -23,13 +23,14 @@ export function CommunityGallery() {
           href="https://www.instagram.com/weareplatemate/"
           className="pm-gallery__share"
         >
-          <strong>
-            <img src="/home/InstagramIcon.svg" alt="" /> Partagez vos moments
-          </strong>
-          <p>
-            Partagez vos plus beaux moments avec nous sur Instagram en nous
-            identifiant @weareplatemate.
-          </p>
+          <img src="/home/InstagramIcon.svg" alt="" />
+          <div>
+            <strong>Partagez vos moments</strong>
+            <p>
+              Partagez vos plus beaux moments avec nous sur Instagram en nous
+              identifiant @weareplatemate.
+            </p>
+          </div>
         </a>
       </div>
     </section>

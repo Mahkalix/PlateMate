@@ -6,7 +6,6 @@ export function HomeHeader() {
   const login = useRef<HTMLDialogElement>(null);
   return (
     <>
-      {" "}
       <header className="pm-header">
         <a href="#accueil" className="pm-logo" aria-label="PlateMate, accueil">
           <img src="/home/ColourWhite.webp" alt="PlateMate" />
@@ -34,8 +33,12 @@ export function HomeHeader() {
           Se connecter
         </button>
       </header>
-      <dialog ref={login} className="pm-dialog">
-        <h2>Se connecter</h2>
+      <dialog
+        aria-labelledby="home-login-title"
+        ref={login}
+        className="pm-dialog"
+      >
+        <h2 id="home-login-title">Se connecter</h2>
         <p>La connexion sera disponible lors du raccordement au backend.</p>
         <form method="dialog">
           <button autoFocus className="pm-button pm-button--red">

@@ -31,8 +31,12 @@ export function Featured() {
           />
         ))}
       </div>
-      <dialog className="pm-dialog" ref={dialog}>
-        <h2>{cards[selected][1]}</h2>
+      <dialog
+        aria-labelledby="table-detail-title"
+        className="pm-dialog"
+        ref={dialog}
+      >
+        <h2 id="table-detail-title">{cards[selected][1]}</h2>
         <p>À table avec {cards[selected][0]}.</p>
         <p>Cette table est présentée dans la preview de l’accueil.</p>
         <form method="dialog">

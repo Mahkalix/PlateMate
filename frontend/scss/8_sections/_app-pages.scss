@@ -16,9 +16,16 @@
     text-transform: uppercase;
     font-style: italic;
   }
+  .pm-eyebrow {
+    font-size: clamp(0.9rem, 1.67vw, 1.5rem);
+    letter-spacing: 0.02em;
+    margin-bottom: 12px;
+  }
   p:not(.pm-eyebrow) {
-    max-width: 730px;
-    font-size: 1.2rem;
+    max-width: 744px;
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.2;
   }
   &__actions {
     display: flex;
@@ -157,14 +164,12 @@
   min-height: 698px;
   background: var(--pm-background);
   color: var(--pm-ink);
-  padding: 24px 0 48px;
+  padding-bottom: 48px;
 
-  &::before {
-    position: absolute;
-    inset: 0 0 auto;
-    height: 152px;
+  &__title {
+    min-height: 152px;
+    padding-block: 24px;
     background: var(--pm-teal);
-    content: "";
   }
 
   .pm-container {
@@ -178,16 +183,19 @@
 
   h2 {
     text-transform: uppercase;
-    margin-bottom: 80px;
+    margin: 0;
   }
   &__grid {
+    list-style: none;
+    padding: 32px 0;
+    margin: 24px 0;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 32px;
   }
   &__action {
     text-align: center;
-    margin-top: 60px;
+    margin-top: 24px;
     p {
       font-weight: 800;
     }
@@ -230,7 +238,8 @@
       serif;
   }
   h3 {
-    margin-top: 20px;
+    font-size: clamp(1.25rem, 1.81vw, 1.625rem);
+    margin: 20px 0 8px;
     font-weight: 900;
     color: var(--pm-teal);
   }
@@ -281,7 +290,13 @@
     border-radius: 12px;
     background: var(--pm-cream);
     strong {
-      white-space: nowrap;
+      display: block;
+      font-size: 1.25rem;
+    }
+    > img {
+      flex: none;
+      width: 44px;
+      height: 44px;
     }
     p {
       margin: 0;
@@ -317,7 +332,7 @@
 .pm-section-heading img,
 .pm-hero__actions img,
 .pm-header__login img,
-.pm-gallery__share img {
+.pm-gallery__share strong img {
   width: 20px;
   height: 20px;
   vertical-align: middle;
@@ -360,10 +375,20 @@
   font-style: normal;
   font-display: swap;
 }
+@font-face {
+  font-family: "BBB ReadMe";
+  src: url("/whatsapp/assets/fonts/BBBReadMe-BlackItalic.woff2") format("woff2");
+  font-style: italic;
+  font-weight: 900;
+  font-display: swap;
+}
 .app .pm-hero h1 {
   color: var(--pm-cream);
   margin: 0 0 14px;
-  font-size: clamp(2.5rem, 5.4vw, 5rem);
+  font:
+    italic 900 clamp(2.5rem, 4.45vw, 4rem)/1.1 "BBB ReadMe",
+    serif;
+  letter-spacing: 0;
 }
 .app .pm-hero {
   background-image:
@@ -377,6 +402,18 @@
 }
 .app .pm-gallery h2 {
   color: var(--pm-red);
+}
+.app .pm-steps h2,
+.app .pm-gallery h2,
+.app .pm-host-cta h2 {
+  font-size: clamp(2rem, 3.4vw, 3rem);
+}
+.pm-steps__title .pm-eyebrow,
+.pm-gallery__title .pm-eyebrow,
+.pm-host-cta .pm-eyebrow {
+  font-size: clamp(0.875rem, 1.53vw, 1.375rem);
+  line-height: 1.2;
+  margin: 0 0 20px;
 }
 .app .pm-host-cta h2 {
   color: var(--pm-yellow);
