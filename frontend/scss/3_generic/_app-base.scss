@@ -9,12 +9,15 @@
   --pm-ink: #{token.$app-ink};
   --pm-background: #{token.$app-background};
   --pm-mint: #{token.$mint};
+  --pm-card-secondary: #{token.$card-secondary};
+  --pm-tag: #{token.$tag};
   --pm-sky: #d5edf0;
   min-height: 100vh;
   background: var(--pm-background);
+  font-variation-settings: "opsz" 14;
   color: var(--pm-ink);
   font:
-    1.6rem/1.5 "DM Sans",
+    1.6rem/1.5 "DM Sans Variable",
     Arial,
     sans-serif;
   a {
