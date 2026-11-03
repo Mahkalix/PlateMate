@@ -1,0 +1,188 @@
+.pm-header {
+  min-height: 103px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 3.2rem;
+  padding: clamp(16px, 2.78vw, 40px) clamp(16px, 5.14vw, 74px) 20px;
+  background: var(--pm-background);
+  .pm-logo {
+    width: 140px;
+    height: 79px;
+  }
+  &__login {
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+}
+.pm-sticky-nav {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  height: 0;
+}
+.app:has(.pm-hero) {
+  :is(#tables, #cartes, #hotes, #fonctionnement, #communaute) {
+    scroll-margin-top: var(--nav-height);
+  }
+  .pm-header {
+    min-height: 104px;
+    background: transparent;
+    color: #fff;
+    &.is-scrolled {
+      background: var(--pm-red);
+      .pm-nav a,
+      .pm-nav a:hover {
+        color: white;
+      }
+      .pm-header__login {
+        border: 0;
+        box-shadow: inset 0 0 0 0.1rem var(--pm-cream);
+      }
+    }
+
+    .pm-nav a:hover,
+    .pm-nav a.is-active {
+      color: var(--pm-yellow);
+    }
+    :is(a, button):focus-visible {
+      outline-color: white;
+    }
+  }
+
+  .pm-header__login {
+    background: var(--pm-red);
+    color: #fff !important;
+  }
+}
+.pm-logo {
+  display: block;
+  flex: 0 0 auto;
+  overflow: hidden;
+  position: relative;
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  &--light img {
+    filter: none;
+  }
+}
+.pm-nav {
+  display: flex;
+  gap: clamp(1.28rem, 1.95vw, 28px);
+  align-items: center;
+  a {
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 1.36rem;
+    letter-spacing: 0.08em;
+    font-weight: 800;
+    padding: 0.88rem 0;
+    white-space: nowrap;
+  }
+  a:hover,
+  a.is-active {
+    color: var(--pm-red);
+    text-decoration: underline;
+    text-underline-offset: 7px;
+  }
+}
+.pm-menu-toggle {
+  display: none;
+  border: 0;
+  background: none;
+  font-weight: 800;
+}
+.pm-footer {
+  display: grid;
+  row-gap: clamp(4rem, calc(100vw / 12), 12rem);
+  padding: 3.8rem clamp(2rem, 5.14vw, 7.4rem);
+  background: var(--pm-ink);
+  color: var(--pm-cream);
+  a {
+    padding: 0;
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+  &__top {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: center;
+  }
+  .pm-logo {
+    width: 14rem;
+    height: 7.9rem;
+  }
+  &__social {
+    display: flex;
+    justify-self: center;
+    gap: 2rem;
+    > span,
+    > a {
+      display: grid;
+      place-items: center;
+      width: 4rem;
+      height: 4rem;
+      img {
+        width: 3.2rem;
+        height: 3.2rem;
+      }
+      background: var(--pm-cream);
+      color: var(--pm-red);
+      border-radius: 1.42857rem;
+    }
+  }
+  nav {
+    justify-self: end;
+    width: max-content;
+    min-width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 1rem clamp(2rem, 3vw, 4.2rem);
+    font-size: 1.6rem;
+    line-height: normal;
+    a {
+      white-space: nowrap;
+    }
+  }
+  &__legal {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2.6rem;
+  }
+  &__bottom {
+    display: flex;
+    gap: clamp(2rem, 4.1667vw, 6rem);
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    line-height: normal;
+    > span {
+      flex: 0 1 25.1rem;
+      text-align: right;
+    }
+  }
+}
+
+.pm-header .pm-nav a {
+  font-family: "DM Sans Variable", sans-serif;
+  font-size: 1.6rem;
+  line-height: normal;
+  font-weight: 700;
+  color: var(--pm-cream);
+  text-align: left;
+  padding: 4px 0;
+
+  &[aria-current="page"] {
+    font-weight: 800;
+    text-decoration: underline;
+    text-underline-offset: 6px;
+  }
+}
