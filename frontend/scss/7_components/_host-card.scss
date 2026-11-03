@@ -1,0 +1,151 @@
+.pm-table-card {
+  position: relative;
+  container-type: inline-size;
+  aspect-ratio: 296 / 427;
+  height: auto;
+  align-self: start;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: var(--pm-teal);
+  color: var(--pm-teal);
+
+  &__frame {
+    position: absolute;
+    inset: 4.68% 5.07% 3.28%;
+    border-radius: 4cqw;
+    box-shadow: 0 0 0 1cqw var(--pm-yellow);
+    overflow: hidden;
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border: 1cqw solid var(--pm-yellow);
+      border-radius: inherit;
+      pointer-events: none;
+    }
+    background: var(--pm-card-secondary);
+  }
+  &__meal {
+    position: absolute;
+    inset: -8.77% 0 auto;
+    width: 100%;
+    height: 101.25%;
+    object-fit: cover;
+  }
+  // The Figma paper cutout is mirrored around its top-left origin.
+  &__paper {
+    position: absolute;
+    top: 59.93%;
+    left: 132.53%;
+    width: 126%;
+    height: 80.13%;
+    transform-origin: top left;
+    transform: matrix(-0.92823, -0.37201, -0.37201, 0.92823, 0, 0);
+    background: url("/home/Vector.svg") center / 100% 100% no-repeat;
+  }
+  &__title,
+  &__interests {
+    position: absolute;
+    inset-inline: 9%;
+    text-align: center;
+  }
+  &__title {
+    top: 53.69%;
+    display: grid;
+    place-content: center;
+    height: 17.3%;
+    font:
+      900 9.46cqw/1.2 "BBB ReadMe",
+      serif;
+    text-transform: uppercase;
+    letter-spacing: -0.025em;
+  }
+  &__interests {
+    top: 73.54%;
+    letter-spacing: -0.02em;
+    color: var(--pm-ink);
+    font:
+      600 4.73cqw/1 "DM Sans Variable",
+      sans-serif;
+  }
+  &__tags {
+    display: flex;
+    justify-content: center;
+    gap: 1.69cqw;
+    margin-top: 1.69cqw;
+    span {
+      border-radius: 100px;
+      background: var(--pm-tag);
+      font:
+        500 4.05cqw/1 "DM Sans Variable",
+        sans-serif;
+      padding: 2.03cqw 3.38cqw;
+      letter-spacing: normal;
+      white-space: nowrap;
+    }
+  }
+  &__arrow {
+    position: absolute;
+    top: 86.56%;
+    left: 45.1%;
+    width: 15%;
+    aspect-ratio: 1;
+    background: var(--pm-red);
+    box-shadow: 0 0 0 2px var(--pm-red);
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    img {
+      width: 60%;
+      display: block;
+    }
+  }
+  &__portrait {
+    position: absolute;
+    top: 5.15%;
+    left: 5.07%;
+    width: 31.75%;
+    padding: 1.2cqw 1.2cqw 2cqw;
+    letter-spacing: -0.02em;
+    transform: rotate(1.77deg);
+    background: white;
+    color: var(--pm-ink);
+    font:
+      500 4.73cqw/1 "DM Sans Variable",
+      sans-serif;
+    img {
+      width: 100%;
+      aspect-ratio: 89 / 105;
+      object-fit: cover;
+      display: block;
+    }
+  }
+  // Le PNG comprend déjà l’inclinaison du ruban.
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 1.06%;
+    width: 20.95%;
+    aspect-ratio: 63 / 67;
+    background: url("/home/portrait-tape.png") center / contain no-repeat;
+    pointer-events: none;
+  }
+}
+.pm-dialog {
+  max-width: min(425px, 90vw);
+  padding: 3.2rem;
+  border: 0;
+  border-radius: 15px;
+  background: var(--pm-background);
+  color: var(--pm-ink);
+}
+.pm-dialog::backdrop {
+  background: #100909aa;
+}
+.pm-dialog h2 {
+  margin: 0 0 1.2rem 0.2rem;
+  color: #766862;
+  text-transform: uppercase;
+}
