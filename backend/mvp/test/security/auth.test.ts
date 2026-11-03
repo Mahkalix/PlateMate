@@ -32,8 +32,7 @@ it("US02 / SANS ÉCRAN : refresh manquant ou inconnu refusé", async () => {
 });
 it("US01 / Connexion : la 11e tentative est limitée", async () => {
   const api = client();
-  for (let i = 0; i < 10; i++)
-    await api.post("/auth/login").send({}).expect(422);
-  const r = await api.post("/auth/login").send({}).expect(429);
+  for (let i = 0; i < 10; i++) await api.get("/auth/login").expect(302);
+  const r = await api.get("/auth/login").expect(429);
   expect(r.headers["retry-after"]).toBeDefined();
 });

@@ -9,16 +9,16 @@ Le nouveau backend TypeScript se trouve dans `backend/mvp`. Il utilise son propr
 Depuis la racine, utiliser la pile dédiée au MVP. Elle crée un volume PostgreSQL persistant, applique les migrations au démarrage de l’API et publie uniquement le port HTTP sur la boucle locale. Le fichier Compose à la racine concerne l’application historique.
 
 1. Pour une première installation, copier `backend/mvp/.env.example` vers `backend/mvp/.env`. Renseigner `JWT_SECRET` et `MVP_DB_PASSWORD` avec deux valeurs distinctes. Pour générer chacune, utiliser `node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"`. Conserver ce fichier local et le même mot de passe tant que le volume est utilisé.
-2. Lancer `docker compose -f backend/mvp/compose.yaml up --build -d --wait`.
-3. Ouvrir [la santé de l’API locale](http://localhost:3001/health). Pour vérifier un cycle complet de compte depuis l’hôte avec Node 24, lancer `node backend/mvp/test-compose.mjs`. Le script crée puis efface son compte de test.
-4. Pour charger les données de démonstration, lancer `docker compose -f backend/mvp/compose.yaml exec api npm run seed`.
+2. Configurer Auth0 selon la section ci-dessous, puis lancer `docker compose -f backend/mvp/compose.yaml up --build -d --wait`.
+3. Ouvrir [la santé de l’API locale](http://localhost:3001/health) puis [la connexion](http://localhost:3001/auth/login). La CI vérifie le parcours HTTP sur une pile Docker isolée avec un émetteur OIDC de test.
+4. Pour charger le profil de démonstration, lancer `docker compose -f backend/mvp/compose.yaml exec api npm run seed`. Ce profil éditorial n’a pas d’identité Auth0.
 5. Pour arrêter les services en conservant les données, lancer `docker compose -f backend/mvp/compose.yaml down`.
 
 ### API exécutée sur l’hôte
 
 Le MVP met en relation des personnes selon leurs langues, leurs affinités et leurs contraintes alimentaires. Le backend couvre la découverte, les messages privés, les rencontres, les avis et la gestion du compte. L’intention de paiement est simulée. Le frontend existant utilise encore l’API historique.
 
-Avec Node 24, depuis la racine, lancer `docker compose up -d --wait db` puis `docker compose --profile test up -d --wait db-test`. Dans `backend/mvp`, lancer `npm ci`, copier `.env.example` vers `.env`, définir JWT_SECRET avec un secret aléatoire privé, puis lancer `npm run migrate`, `npm run seed` et `npm start`. Le seed idempotent crée un compte de démonstration sans mot de passe connu. Le port par défaut est 3001. GET /health vérifie la connexion PostgreSQL.
+Avec Node 24, depuis la racine, lancer `docker compose up -d --wait db` puis `docker compose --profile test up -d --wait db-test`. Dans `backend/mvp`, lancer `npm ci`, configurer `.env` comme pour Docker, puis lancer `npm run migrate`, `npm run seed` et `npm start`. Le port par défaut est 3001. GET /health vérifie la connexion PostgreSQL.
 
 ## Tests
 
@@ -55,7 +55,17 @@ flowchart LR
 
 Contrôle de mutation S1 effectué sur PostgreSQL. Après retrait du contrôle de présence de la session, « US01 / SANS ÉCRAN déconnexion : access et refresh révoqués » a reçu 200 au lieu de 401 sur GET /me. Le contrôle a été rétabli et la suite complète relancée. Les mutations scoring, allergies et réservations relèvent des futurs sprints.
 
-La connexion utilise bcrypt (coût 12), un JWT HS256 de dix minutes et un refresh opaque dont seule l’empreinte est conservée en base. Le cookie HttpOnly, SameSite=Strict et Secure en production limite l’accès au refresh. Le frontend doit conserver l’access token en mémoire. La session a une durée absolue de sept jours. La limitation des essais est locale au processus Express et suppose une instance unique. Voir [le contrat HTTP](docs/api.md).
+### Connexion Auth0 avec email et mot de passe
+
+Créer ou sélectionner une **Regular Web Application** dédiée au backend MVP, avec le grant Authorization Code, la méthode d’authentification du point de terminaison de jetons **POST** et les ID tokens **RS256**. Activer uniquement la connexion **Database** email et mot de passe pour cette application, l’inscription si souhaitée, la vérification d’adresse et les protections contre les essais abusifs. Auth0 gère le mot de passe, les doublons et les emails de vérification. [Guide Auth0](https://auth0.com/docs/authenticate/database-connections).
+
+Dans `backend/mvp/.env`, renseigner `AUTH0_ISSUER_BASE_URL` (origine HTTPS du tenant), `AUTH0_CLIENT_ID`, `AUTH0_CLIENT_SECRET`, `AUTH0_CONNECTION` (nom de la connexion Database) et `AUTH0_CALLBACK_URL`. Ajouter cette dernière à **Allowed Callback URLs** dans Auth0, à l’identique (en local `http://localhost:3001/auth/callback`). Régler `APP_ORIGIN` sur l’origine fixe du futur front. Le secret du client reste côté serveur. En déploiement, utiliser HTTPS et servir les routes API sous la même origine que le front pour le cookie de session.
+
+Le navigateur ouvre `GET /auth/login` ou `GET /auth/register`. Après validation du code par Auth0, le callback initialise une session PlateMate et redirige vers `APP_ORIGIN`. Le front appelle ensuite `POST /auth/refresh` avec le cookie HttpOnly pour obtenir son bearer PlateMate de dix minutes, à conserver en mémoire. La session dure sept jours, son refresh tourne à chaque échange et la déconnexion la révoque immédiatement. Une nouvelle connexion redemande l’authentification à Auth0. [Contrat HTTP](docs/api.md).
+
+La migration 011 conserve les UUID, profils, réservations et portefeuilles, supprime les anciens hashes de mots de passe et invalide les anciennes sessions. Un sujet Auth0 est identifié par le couple émetteur et `sub`. Pour reprendre un compte historique, un opérateur doit vérifier l’identité puis renseigner ces deux champs sur l’UUID existant. Un email en collision bloque la connexion (409). Supprimer un compte dans PlateMate efface ses données locales. L’effacement de l’identité dans le tenant relève de son administrateur.
+
+Les tests US01/02 remplacent uniquement le tenant par un serveur HTTP OIDC de test qui contrôle le code et le challenge PKCE et signe des ID tokens RS256. La vérification JWKS et PostgreSQL sont réelles. Contrôle de mutation manuel : désactiver la vérification de signature des ID tokens fait échouer « US01 / Connexion : le callback refuse signature sans créer de compte ». Le parcours interactif de l’écran hébergé et la réception de l’email doivent être vérifiés sur le tenant configuré.
 
 Express assure le transport HTTP, PostgreSQL impose les contraintes persistantes et les migrations SQL versionnées sont transactionnelles. Le schéma séparé évite de réinterpréter les réservations commerciales existantes. La suite locale couvre les nouveaux contrats uniquement. Voir [le schéma](docs/schema-mvp.md), [les critères](docs/backlog.md) et [la traçabilité](docs/traceability.md).
 

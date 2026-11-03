@@ -16,10 +16,9 @@ it("US06 US07 US08 US09 / Explorer : tri, filtres, pagination, confidentialité 
     [3, "fr", false],
   ] as const) {
     const user = (
-      await pool.query(
-        "insert into users(email,password_hash) values($1,$2) returning id",
-        [i + "@x.org", "unused"],
-      )
+      await pool.query("insert into users(email) values($1) returning id", [
+        i + "@x.org",
+      ])
     ).rows[0];
     await pool.query("insert into profiles(user_id,details) values($1,$2)", [
       user.id,

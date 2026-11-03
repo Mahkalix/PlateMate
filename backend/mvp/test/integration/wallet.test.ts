@@ -28,7 +28,6 @@ import * as gateway from "../../src/stripe.js";
 import { pool } from "../../src/pool.js";
 import { settleNext } from "../../src/repositories/settlements.js";
 import { profile } from "../profile-fixture.js";
-import { credentials } from "../auth-fixture.js";
 afterEach(() => {
   vi.restoreAllMocks();
   vi.unstubAllEnvs();
@@ -41,12 +40,8 @@ it("US17 US18 / Portefeuille et Réservations : recharge signée, débit unique,
   vi.stubEnv("STRIPE_CONNECT_WEBHOOK_SECRET", "whsec_connected");
   vi.stubEnv("APP_ORIGIN", "http://localhost:8080");
   async function account(email: string) {
-    const body = { ...credentials, email };
-    const id = (await api.post("/auth/register").send(body).expect(201)).body
-      .id;
-    const auth =
-      "Bearer " +
-      (await api.post("/auth/login").send(body).expect(200)).body.accessToken;
+    const { id, access } = await signedIn(api, email);
+    const auth = "Bearer " + access;
     await api
       .put("/me/profile")
       .set("Authorization", auth)

@@ -5,8 +5,9 @@ URL locale http://localhost:3001. Corps et erreurs JSON. La réponse d’erreur 
 | Méthode et chemin | Entrée | Succès | Accès et erreurs |
 |---|---|---|---|
 | GET /health | — | 200 {status:"ready"} | Public, 503 base indisponible |
-| POST /auth/register | email, password (12 caractères minimum, 72 octets maximum) | 201 {id,email} | Public, 422 invalide, 409 doublon |
-| POST /auth/login | email, password | 200 {accessToken} et cookie refresh | Public, 422 invalide, 401 invalid_credentials |
+| GET /auth/register | Navigation du navigateur | 302 vers Universal Login avec écran d’inscription | Public, cookie temporaire HttpOnly et SameSite=Lax |
+| GET /auth/login | Navigation du navigateur | 302 vers la connexion email / mot de passe Auth0 | Public, state, nonce et PKCE S256 |
+| GET /auth/callback | Code à usage unique, state et cookie temporaire du même navigateur | 303 vers APP_ORIGIN avec cookie refresh HttpOnly | 401 si tentative invalide, email non vérifié ou identité hors Database. 409 en cas de collision d’email. Les anciens POST avec mot de passe renvoient 404. |
 | POST /auth/refresh | Cookie refresh | 200 {accessToken} et nouveau cookie | 401 si absent, inconnu, expiré ou déjà consommé |
 | GET /me | Authorization Bearer | 200 {id,email} | 401 sans session valide |
 | POST /auth/logout | Authorization Bearer | 204 et suppression du cookie | 401 sans session valide |

@@ -1,28 +1,25 @@
 import type pg from "pg";
 export class AuthRepository {
   constructor(private db: pg.Pool) {}
-  async register(email: string, hash: string) {
-    return (
-      await this.db.query(
-        "INSERT INTO users(email,password_hash) VALUES($1,$2) ON CONFLICT(email) DO NOTHING RETURNING id,email",
-        [email, hash],
-      )
-    ).rows[0];
-  }
-  async credentials(email: string) {
-    return (
-      await this.db.query("SELECT id,password_hash FROM users WHERE email=$1", [
-        email,
-      ])
-    ).rows[0];
+  async identify(identity: { issuer: string; subject: string; email: string }) {
+    try {
+      const result = await this.db.query(
+        `INSERT INTO users(auth_issuer,auth_subject,email) VALUES($1,$2,$3)
+         ON CONFLICT(auth_issuer,auth_subject) DO UPDATE SET email=excluded.email RETURNING id`,
+        [identity.issuer, identity.subject, identity.email],
+      );
+      return result.rows[0];
+    } catch (error) {
+      if ((error as { constraint?: string }).constraint === "users_email_key")
+        return null;
+      throw error;
+    }
   }
   async start(userId: string, hash: string) {
-    return (
-      await this.db.query(
-        "INSERT INTO sessions(user_id,refresh_hash) VALUES($1,$2) RETURNING id,user_id",
-        [userId, hash],
-      )
-    ).rows[0];
+    await this.db.query(
+      "INSERT INTO sessions(user_id,refresh_hash) VALUES($1,$2)",
+      [userId, hash],
+    );
   }
   async rotate(oldHash: string, newHash: string) {
     return (

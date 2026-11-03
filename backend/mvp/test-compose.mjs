@@ -1,29 +1,48 @@
-// Run against a completely started Compose stack, through the published HTTP port.
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
-
-const base = process.env.SMOKE_API_URL ?? "http://127.0.0.1:3001";
-const credentials = { email: `docker-${randomUUID()}@example.invalid`, password: randomUUID() };
-async function call(path, status, method = "GET", body, token) {
-  const response = await fetch(base + path, {
-    method,
-    headers: {
-      ...(body && { "Content-Type": "application/json" }),
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
-    body: body && JSON.stringify(body),
-    signal: AbortSignal.timeout(10000),
-  });
-  assert.equal(response.status, status, `${method} ${path}: HTTP ${response.status}`);
-  return status === 204 ? null : response.json();
-}
-assert.deepEqual(await call("/health", 200), { status: "ready" });
-const account = await call("/auth/register", 201, "POST", credentials);
-const { accessToken } = await call("/auth/login", 200, "POST", credentials);
+import { startIssuer } from "./test/oidc-provider.ts";
+const base = "http://127.0.0.1:3001";
+const tenant = await startIssuer(49080);
 try {
-  assert.deepEqual(await call("/me", 200, "GET", undefined, accessToken), account);
+  const health = await fetch(base + "/health");
+  assert.deepEqual(await health.json(), { status: "ready" });
+  const start = await fetch(base + "/auth/login", { redirect: "manual" });
+  assert.equal(start.status, 302);
+  const email = randomUUID() + "@example.invalid";
+  const path = tenant.approve(start.headers.get("location"), email);
+  const callback = await fetch(base + path, {
+    redirect: "manual",
+    headers: { cookie: start.headers.getSetCookie()[0].split(";")[0] },
+  });
+  assert.equal(callback.status, 303);
+  assert.equal(callback.headers.get("location"), "http://localhost:8080");
+  const refresh = callback.headers
+    .getSetCookie()
+    .find((c) => c.startsWith("refresh="))
+    .split(";")[0];
+  const session = await fetch(base + "/auth/refresh", {
+    method: "POST",
+    headers: { cookie: refresh },
+  });
+  assert.equal(session.status, 200);
+  const { accessToken } = await session.json();
+  const headers = {
+    authorization: "Bearer " + accessToken,
+    "content-type": "application/json",
+  };
+  const me = await fetch(base + "/me", { headers });
+  assert.equal(me.status, 200);
+  assert.equal((await me.json()).email, email);
+  const removed = await fetch(base + "/me/account", {
+    method: "DELETE",
+    headers,
+    body: JSON.stringify({ confirm: true }),
+  });
+  assert.equal(removed.status, 204);
+  assert.equal((await fetch(base + "/me", { headers })).status, 401);
+  console.log(
+    "Docker HTTP OK: health, OIDC PKCE callback, identity, deletion and revocation (test issuer).",
+  );
 } finally {
-  await call("/me/account", 204, "DELETE", { confirm: true }, accessToken);
+  await tenant.close();
 }
-await call("/me", 401, "GET", undefined, accessToken);
-console.log("Docker HTTP OK: health, register, login, identity, deletion and revocation.");

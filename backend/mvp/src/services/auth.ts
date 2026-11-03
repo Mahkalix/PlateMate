@@ -1,24 +1,7 @@
 import { SignJWT, jwtVerify, errors } from "jose";
 import { randomBytes, createHash } from "node:crypto";
-import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { AuthRepository } from "../repositories/auth.js";
-const credentials = z
-  .object({
-    email: z.string().trim().toLowerCase().email().max(254),
-    password: z
-      .string()
-      .min(1)
-      .refine((p) => Buffer.byteLength(p) <= 72),
-  })
-  .strict();
-const registration = credentials.extend({
-  password: z
-    .string()
-    .min(12)
-    .refine((p) => Buffer.byteLength(p) <= 72),
-});
-const dummyHash = bcrypt.hashSync(randomBytes(32).toString("hex"), 12);
 const fingerprint = (token: string) =>
   createHash("sha256").update(token).digest("hex");
 export class AuthError extends Error {
@@ -39,26 +22,12 @@ export class AuthService {
       throw new Error("JWT_SECRET doit contenir au moins 32 octets");
     this.key = new TextEncoder().encode(secret);
   }
-  async register(body: unknown) {
-    const { email, password } = registration.parse(body);
-    const user = await this.repo.register(
-      email,
-      await bcrypt.hash(password, 12),
-    );
-    if (!user) throw new AuthError(409, "email_unavailable");
-    return user;
-  }
-  async login(body: unknown) {
-    const { email, password } = credentials.parse(body);
-    const user = await this.repo.credentials(email);
-    const valid = await bcrypt.compare(
-      password,
-      user?.password_hash ?? dummyHash,
-    );
-    if (!user || !valid) throw new AuthError(401, "invalid_credentials");
+  async login(identity: { issuer: string; subject: string; email: string }) {
+    const user = await this.repo.identify(identity);
+    if (!user) throw new AuthError(409, "account_link_required");
     const refresh = randomBytes(32).toString("base64url");
-    const session = await this.repo.start(user.id, fingerprint(refresh));
-    return this.tokens(session, refresh);
+    await this.repo.start(user.id, fingerprint(refresh));
+    return refresh;
   }
   async refresh(old: string) {
     const refresh = randomBytes(32).toString("base64url");

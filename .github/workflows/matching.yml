@@ -30,6 +30,12 @@ jobs:
         run: |
           export JWT_SECRET="$(openssl rand -hex 32)"
           export MVP_DB_PASSWORD="$(openssl rand -hex 32)"
+          export NODE_ENV=test
+          export AUTH0_ISSUER_BASE_URL=http://127.0.0.1:49080/
+          export AUTH0_CLIENT_ID=test-web AUTH0_CLIENT_SECRET=test-client-secret
+          export AUTH0_CALLBACK_URL=http://localhost:3001/auth/callback
+          export COMPOSE_FILE=compose.yaml:compose.smoke.yaml
           trap 'docker compose down --volumes' EXIT
-          docker compose up --build --wait --wait-timeout 120
-          node test-compose.mjs
+          docker compose up -d --build --wait --wait-timeout 120 api
+          curl --fail --silent http://127.0.0.1:3001/health
+          docker compose run --rm --build smoke

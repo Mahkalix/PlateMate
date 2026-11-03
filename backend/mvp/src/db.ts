@@ -1,16 +1,14 @@
 import { pool } from "./pool.js";
 import { migrate } from "./migrations.js";
-import bcrypt from "bcryptjs";
-import { randomBytes } from "node:crypto";
 try {
   await migrate(pool);
   if (process.argv[2] === "seed") {
     await pool.query(
       `WITH account AS (
-         INSERT INTO users(email,password_hash) VALUES($1,$2)
+         INSERT INTO users(email) VALUES($1)
          ON CONFLICT(email) DO NOTHING RETURNING id
        ), profile AS (
-         INSERT INTO profiles(user_id,details) SELECT id,$3 FROM account RETURNING user_id
+         INSERT INTO profiles(user_id,details) SELECT id,$2 FROM account RETURNING user_id
        ), host AS (
          INSERT INTO host_profiles SELECT user_id FROM profile RETURNING user_id
        ), context AS (
@@ -20,7 +18,6 @@ try {
          SELECT id,now()+interval '30 days',4 FROM context`,
       [
         "demo@example.invalid",
-        await bcrypt.hash(randomBytes(32).toString("hex"), 12),
         {
           firstName: "Amina",
           lastName: "Démo",

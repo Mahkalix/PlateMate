@@ -1,5 +1,7 @@
 # Arbitrages du MVP
 
+**US01/02, décision validée le 3 novembre 2026.** Sur l’écran Connexion 516:2813, Auth0 Universal Login prend en charge l’email et le mot de passe. Le MVP remplace le stockage local des mots de passe, conserve ses sessions applicatives révocables et active uniquement la connexion Database. Les fournisseurs Google et Apple restent hors périmètre. Le déploiement demande un client web confidentiel, une URL de retour autorisée et une procédure de liaison vérifiée pour les comptes existants.
+
 | Contexte | Décision par défaut | Preuve dans Wireframe | Option retenue | Alternative écartée ou soumise | Coût et impact |
 |---|---|---|---|---|---|
 | SSO · majeur | Email et mot de passe | Connexion 516:2813, boutons « Continuer avec Google » et « Continuer avec Apple » | Email seul. Retirer les deux boutons de la présentation MVP. | Soumettre les deux fournisseurs ensemble | Deux configurations fournisseur, callbacks, gestion des collisions et tests de liaison de comptes supplémentaires en S1. |

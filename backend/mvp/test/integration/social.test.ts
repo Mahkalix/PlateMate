@@ -1,13 +1,10 @@
 import { it, expect } from "vitest";
-import { client, credentials } from "../auth-fixture.js";
+import { client, signedIn } from "../auth-fixture.js";
 import { profile } from "../profile-fixture.js";
 import { pool } from "../../src/pool.js";
 async function account(api: ReturnType<typeof client>, email: string) {
-  const body = { ...credentials, email };
-  const id = (await api.post("/auth/register").send(body).expect(201)).body.id;
-  const auth =
-    "Bearer " +
-    (await api.post("/auth/login").send(body).expect(200)).body.accessToken;
+  const { id, access } = await signedIn(api, email);
+  const auth = "Bearer " + access;
   await api
     .put("/me/profile")
     .set("Authorization", auth)
@@ -114,16 +111,13 @@ it("US14 / Après la rencontre : contrôle participant, completed et doublon", a
   const roster = "/me/slots/" + slot.id + "/guests";
   await api.get(roster).set("Authorization", other.auth).expect(404);
   await api.get(roster).set("Authorization", guest.auth).expect(404);
-  await api
-    .get(roster)
-    .set("Authorization", host.auth)
-    .expect(200, {
-      capacity: 2,
-      confirmedPlaces: 0,
-      remainingPlaces: 2,
-      pendingRequests: 1,
-      guests: [],
-    });
+  await api.get(roster).set("Authorization", host.auth).expect(200, {
+    capacity: 2,
+    confirmedPlaces: 0,
+    remainingPlaces: 2,
+    pendingRequests: 1,
+    guests: [],
+  });
   await pool.query(
     "update bookings set status='accepted',party_size=2 where id=$1",
     [b.id],

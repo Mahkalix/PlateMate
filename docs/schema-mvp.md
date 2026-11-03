@@ -12,7 +12,8 @@ erDiagram
  users { 
  uuid id PK
  text email UK
- text password_hash
+ text auth_issuer
+ text auth_subject
  timestamptz created_at
  }
  migrations {

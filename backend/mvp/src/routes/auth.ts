@@ -12,12 +12,14 @@ import { ProfileRepository } from "../repositories/profile.js";
 import { rateLimit } from "express-rate-limit";
 import type pg from "pg";
 import { AuthRepository } from "../repositories/auth.js";
+import { Auth0Login } from "../services/auth0.js";
 import { AuthService } from "../services/auth.js";
 import { authController } from "../controllers/auth.js";
 export function authRoutes(db: pg.Pool) {
   const router = Router();
   const c = authController(
     new AuthService(new AuthRepository(db), process.env.JWT_SECRET),
+    new Auth0Login(process.env),
   );
   const limit = rateLimit({
     windowMs: 60000,
@@ -27,8 +29,9 @@ export function authRoutes(db: pg.Pool) {
     message: { error: "too_many_requests" },
   });
   router.use("/auth", limit);
-  router.post("/auth/register", c.register);
-  router.post("/auth/login", c.login);
+  router.get("/auth/register", c.register);
+  router.get("/auth/login", c.login);
+  router.get("/auth/callback", c.callback);
   router.post("/auth/refresh", c.refresh);
   router.post("/auth/logout", c.authenticated, c.logout);
   router.get("/me", c.authenticated, c.me);

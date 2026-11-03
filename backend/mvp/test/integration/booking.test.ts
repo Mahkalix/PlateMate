@@ -1,16 +1,12 @@
 import { it, expect } from "vitest";
-import { client, credentials } from "../auth-fixture.js";
+import { client, signedIn } from "../auth-fixture.js";
 import { profile } from "../profile-fixture.js";
 import { pool } from "../../src/pool.js";
 it("US16 US17 / Réservations : participants, capacité, transitions, intention simulée et historique", async () => {
   const api = client();
   async function account(email: string) {
-    const body = { ...credentials, email };
-    const id = (await api.post("/auth/register").send(body).expect(201)).body
-      .id;
-    const token = (await api.post("/auth/login").send(body).expect(200)).body
-      .accessToken;
-    const auth = "Bearer " + token;
+    const { id, access } = await signedIn(api, email);
+    const auth = "Bearer " + access;
     await api
       .put("/me/profile")
       .set("Authorization", auth)
