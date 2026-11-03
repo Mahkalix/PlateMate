@@ -115,28 +115,28 @@
   margin-top: -32px;
   .pm-table-card {
     position: absolute;
-    width: 22.91%;
-    top: 33.04%;
+    width: calc(100% * 296 / 1292);
+    top: calc(100% * 151 / 457);
     &:nth-child(1) {
       left: 0;
     }
     &:nth-child(2) {
-      left: 18.58%;
-      top: 22.76%;
+      left: calc(100% * 240 / 1292);
+      top: calc(100% * 104 / 457);
       z-index: 1;
     }
     &:nth-child(3) {
-      left: 39.09%;
-      top: 16.19%;
+      left: calc(100% * 505 / 1292);
+      top: calc(100% * 74 / 457);
       z-index: 2;
     }
     &:nth-child(4) {
-      left: 58.82%;
-      top: 22.76%;
+      left: calc(100% * 777 / 1292);
+      top: calc(100% * 101 / 457);
       z-index: 1;
     }
     &:nth-child(5) {
-      left: 78.02%;
+      left: calc(100% * 1008 / 1292);
     }
     &:focus-visible {
       z-index: 3;
@@ -546,8 +546,7 @@
   }
   .pm-featured__cards {
     // Les cartes débordent de leur groupe de 1292 px dans la maquette.
-    margin-top: -5.6rem;
-    margin-bottom: calc(100% * 107 / 1292 + 2.4rem);
+    margin-bottom: calc(100% * 107 / 1292);
   }
   .pm-header .pm-nav {
     align-items: flex-start;
