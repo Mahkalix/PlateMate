@@ -546,7 +546,8 @@
   }
   .pm-featured__cards {
     // Les cartes débordent de leur groupe de 1292 px dans la maquette.
-    margin-bottom: calc(100% * 107 / 1292);
+    margin-top: -5.6rem;
+    margin-bottom: calc(100% * 107 / 1292 + 2.4rem);
   }
   .pm-header .pm-nav {
     align-items: flex-start;
