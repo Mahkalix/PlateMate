@@ -545,8 +545,8 @@
     padding-inline: max(3.2rem, calc((100% - 129.2rem) / 2));
   }
   .pm-featured__cards {
-    // Les cartes débordent de leur groupe de 1292 px dans la maquette.
-    margin-bottom: calc(100% * 107 / 1292);
+    // Cadre 251:289 : section de 580 px, groupe terminé à 581 px.
+    margin-bottom: -0.1rem;
   }
   .pm-header .pm-nav {
     align-items: flex-start;
