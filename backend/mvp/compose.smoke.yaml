@@ -1,0 +1,13 @@
+# Usage réservé à la pile de test. L'émetteur OIDC de test écoute seulement
+# sur la boucle locale partagée avec l'API pendant l'exécution de la sonde.
+services:
+  smoke:
+    build: .
+    network_mode: service:api
+    depends_on:
+      api:
+        condition: service_healthy
+    volumes:
+      - ./test-compose.mjs:/app/test-compose.mjs:ro
+      - ./test/oidc-provider.ts:/app/test/oidc-provider.ts:ro
+    command: ["node", "--import", "tsx", "test-compose.mjs"]
