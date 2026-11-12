@@ -258,6 +258,20 @@ let c, ws;
         );
       }
       if (route === "devenir-hote") {
+        if (width === 1440) {
+          assert(
+            await ev(
+              "Math.abs(document.querySelector('.pm-host__faq').getBoundingClientRect().height - 618) <= 1",
+            ),
+            "Figma FAQ collapsed height",
+          );
+          assert(
+            await ev(
+              "Math.abs(document.querySelector('.pm-host__join').getBoundingClientRect().height - 317) <= 1",
+            ),
+            "Figma host invitation height",
+          );
+        }
         await ev('document.querySelector("summary").click()');
         assert(
           await ev(
@@ -267,6 +281,14 @@ let c, ws;
         );
       }
       if (route === "connexion") {
+        if (width === 1440) {
+          assert(
+            await ev(
+              "Math.abs(document.querySelector('.pm-login .pm-form-card').getBoundingClientRect().height - 554) <= 1",
+            ),
+            "Figma login card height",
+          );
+        }
         await ev('document.querySelector(".pm-login form").requestSubmit()');
         assert(
           await ev(

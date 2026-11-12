@@ -12,6 +12,16 @@
   }
 }
 @media (min-width: 981px) {
+  .pm-inner-page .pm-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    .pm-logo {
+      justify-self: start;
+    }
+    .pm-header__login {
+      justify-self: end;
+    }
+  }
   .pm-inner-page .pm-footer__bottom {
     gap: 0;
   }

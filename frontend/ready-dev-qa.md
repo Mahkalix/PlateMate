@@ -22,6 +22,20 @@ Chrome headless, DPR 1, polices chargées et images décodées. `npm run build` 
 
 ## Mesures et écarts encore ouverts
 
+Mise à jour pages publiques : 74 assertions réussies. Les séparateurs de FAQ ne prennent plus de place dans le flux et les boutons des pages internes utilisent les hauteurs de leur maquette. La navigation desktop interne est centrée indépendamment de la largeur du logo et du bouton de connexion.
+
+| Page | Viewport | Propriété | Figma | Avant | Après |
+| --- | ---: | --- | ---: | ---: | ---: |
+| Devenir hôte | 1440 | FAQ fermée, hauteur | 618 | 622.59375 | 617.59375 |
+| Devenir hôte | 1440 | Invitation finale, hauteur | 317 | 323.1875 | 317.578125 |
+| Connexion | 1440 | Carte, hauteur | 554 | 558.78125 | 553.171875 |
+| À propos | 1440 | Mission, hauteur | 490 | 490.25 | 490.25 |
+| À propos | 1440 | Équipe, hauteur | 702 | 701.59375 | 701.59375 |
+| À propos | 1440 | Valeurs, hauteur | 447.992 | 447.625 | 447.625 |
+| À propos | 1440 | Contact, hauteur | 502 | 502.96875 | 502.96875 |
+
+Aux trois routes, la largeur du document mesurée vaut 1440 px sur desktop et 390 px sur mobile. Le menu mobile s'ouvre sans élargir le document. Les valeurs de padding de sections mesurées sont : mission 112/83 px, équipe 72/80 px, valeurs 88/112/96 px (les 112 px incluent le conteneur intérieur de 32 px de Figma), contact 80 px. L'interprétation des wrappers doit être conservée lors d'une comparaison propriété par propriété.
+
 Mise à jour confirmations : 71 assertions passent désormais. Les cartes utilisent les groupes de la maquette (médaillon, titre et texte, actions, prochaines étapes). Le message de simulation est placé sous la carte. « Centre d'aide » reste un libellé sans destination, aucun écran correspondant n'étant fourni.
 
 | Confirmation | Viewport | Propriété | Figma | DOM local |
