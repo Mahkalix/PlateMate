@@ -160,6 +160,18 @@ vite.on("error", (error) => {
       await measureStep(1);
       assert(
         await ev(
+          `getComputedStyle(document.querySelector('[name=firstName]'), '::placeholder').color === 'rgb(109, 113, 127)'`,
+        ),
+        label + " Figma placeholder color",
+      );
+      assert(
+        await ev(
+          `getComputedStyle(document.querySelector('.pm-field label')).fontWeight === '600'`,
+        ),
+        label + " Figma field label weight",
+      );
+      assert(
+        await ev(
           'getComputedStyle(document.documentElement).fontSize==="10px"',
         ),
         label + " rem base",

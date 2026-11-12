@@ -18,7 +18,9 @@ Explorer, portefeuille, messagerie et réservations n'ont pas de frame Ready for
 
 ## Vérifications réelles
 
-Build TypeScript/Vite et formatage réussis. `npm run test:browser` : **97 assertions réussies**, aucune ignorée. Chrome headless local à 1440 et 390 px, DPR 1, polices chargées et images décodées. Base html 10 px et body 16 px ; reset inchangé.
+Build TypeScript/Vite et formatage réussis. `npm run test:browser` : **105 assertions réussies**, aucune ignorée. Chrome headless local à 1440 et 390 px, DPR 1, polices chargées et images décodées. Base html 10 px et body 16 px ; reset inchangé.
+
+Styles de champs contrôlés : token Figma `Text/placeholder` #6d717f, rendu calculé `rgb(109, 113, 127)` aux deux viewports ; libellés `DM Sans SemiBold` de graisse 600 (contre 500 auparavant). Texte des options et aides en graisse 500, tracking des libellés et options -0.028rem d'après les propriétés exportées. Le gris est centralisé dans `--pm-placeholder`. Ces changements ne modifient pas les dimensions du tableau ci-dessous.
 
 Parcours : champs et groupes obligatoires, consentements, retour avec conservation des champs, toutes les étapes, confirmations explicitement simulées, menus mobiles, FAQ, connexion de démonstration et retour aux tables de l'accueil. Aucun débordement horizontal aux étapes contrôlées.
 
