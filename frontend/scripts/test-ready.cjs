@@ -134,6 +134,30 @@ vite.on("error", (error) => {
         "Promise.all([...document.images].map(image => image.decode()))",
       );
       const label = `${width}/${host ? "host" : "profile"}`;
+      const measureStep = async (step) => {
+        measurements.push({
+          label: `${label}/step${step}`,
+          rect: await ev(
+            "(()=>{const r=document.querySelector('.pm-form-card').getBoundingClientRect();return [r.width,r.height]})()",
+          ),
+        });
+        assert(
+          await ev(`document.documentElement.scrollWidth === ${width}`),
+          `${label}/step${step} no overflow`,
+        );
+        if (width === 1440) {
+          const expectedHeight = host
+            ? [654, 554][step - 1]
+            : [562, 628][step - 1];
+          assert(
+            await ev(
+              `Math.abs(document.querySelector('.pm-form-card').getBoundingClientRect().height - ${expectedHeight}) <= 1`,
+            ),
+            `${label}/step${step} Figma height`,
+          );
+        }
+      };
+      await measureStep(1);
       assert(
         await ev(
           'getComputedStyle(document.documentElement).fontSize==="10px"',
@@ -164,6 +188,7 @@ vite.on("error", (error) => {
         ),
         label + " step2",
       );
+      await measureStep(2);
       await ev(
         'document.querySelector(".pm-form-actions button[type=button]").click()',
       );
@@ -200,6 +225,13 @@ vite.on("error", (error) => {
         await ev(`document.documentElement.scrollWidth===${width}`),
         label + " step3 no overflow",
       );
+      if (width === 1440)
+        assert(
+          await ev(
+            `Math.abs(document.querySelector('.pm-form-card').getBoundingClientRect().height - ${host ? 872 : 484}) <= 1`,
+          ),
+          label + " Figma step3 height",
+        );
       if (host) {
         if (width === 1440) {
           assert(

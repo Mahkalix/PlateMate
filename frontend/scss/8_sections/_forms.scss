@@ -18,6 +18,15 @@
     .pm-form-card--step-3 {
       width: min(100%, 73.6rem);
     }
+    .pm-form-card--step-3 {
+      gap: 3.2rem;
+      > header {
+        margin-bottom: -0.4rem;
+      }
+      > :not(header) {
+        width: min(100%, 67rem);
+      }
+    }
     .pm-choices legend {
       margin-bottom: 0.8rem;
     }
@@ -89,6 +98,9 @@
     display: flex;
     flex-direction: column;
     gap: 2.8rem;
+    > header {
+      min-height: 5.6rem;
+    }
     h2 {
       font-size: 2.8rem;
       line-height: 1.2;
@@ -204,6 +216,17 @@
   .pm-choices[data-required-group="experiences"] > div {
     grid-template-rows: repeat(3, auto);
   }
+  .pm-choices[data-required-group="diet"] > div,
+  .pm-choices[data-required-group="cuisines"] > div {
+    grid-template-rows: repeat(4, auto);
+    grid-template-columns: max-content max-content;
+    column-gap: 6.4rem;
+  }
+  .pm-choices[data-required-group="diet"] legend,
+  .pm-choices[data-required-group="cuisines"] legend {
+    font-size: 1.3rem;
+    line-height: 1.95rem;
+  }
   .pm-choices[data-required-group="atmospheres"] > div {
     display: flex;
     flex-direction: column;
@@ -238,10 +261,22 @@
     }
     .pm-button {
       border: 0;
-      min-height: 4.2rem;
+      min-height: 4.4rem;
       padding: 0.8rem 1.6rem;
       line-height: 1.65;
     }
+  }
+  .pm-form-action-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+  }
+  .pm-verification-delay {
+    margin: 0;
+    text-align: center;
+    font-size: 1.2rem;
+    line-height: 1;
+    font-weight: 500;
   }
   .pm-upload {
     position: relative;
@@ -339,6 +374,7 @@
     flex-direction: column;
     gap: 1.2rem;
     font-size: 1.4rem;
+    line-height: 1.6rem;
     label {
       display: flex;
       gap: 0.8rem;
@@ -346,6 +382,10 @@
     }
     input {
       accent-color: var(--pm-red);
+      width: 1.6rem;
+      height: 1.6rem;
+      margin: 0;
+      flex-shrink: 0;
     }
   }
   .pm-preview-notice {
@@ -514,6 +554,8 @@
       grid-template-columns: minmax(0, 1fr);
     }
     .pm-choices > div,
+    .pm-choices[data-required-group="diet"] > div,
+    .pm-choices[data-required-group="cuisines"] > div,
     .pm-choices[data-required-group="experiences"] > div,
     .pm-choices[data-required-group="days"] > div {
       grid-auto-flow: row;

@@ -1,82 +1,75 @@
-# Ready for dev : suivi de conformité
+# Ready for dev : audit front
 
-Travail en cours. Cette livraison front n'est pas une certification de conformité complète. Aucune modification backend et aucun merge.
+PR #6, branche `feat/homepage-ready`. Aucun merge ni changement backend. Référence Figma : `qtiIzlBfRLB3xK20yCRfuj`, page Wireframe `174:10`.
 
-Références : fichier Figma `qtiIzlBfRLB3xK20yCRfuj`, page Wireframe `174:10`. Les dimensions sont extraites des calques, les mesures navigateur du build local. Aucune référence mobile correspondante n'a été identifiée : le responsive est adapté, pas certifié contre une maquette mobile.
+## Périmètre
 
-| Écran | Frame Figma | Route | Statut |
+| Écran | Frame | Route | Statut |
 | --- | --- | --- | --- |
-| À propos | 516:2247 | /#/a-propos | Partiel |
-| Devenir hôte | 448:984 | /#/devenir-hote | Partiel (FAQ proposée, vidéo à valider) |
-| Connexion | 516:2813 | /#/connexion | Partiel (interaction locale, Auth0 non raccordé) |
-| Profil 1, 2, 3 | 516:2871, 516:2976, 516:3108 | /#/profil | Partiel |
-| Confirmation profil | 995:7471 | /#/profil | Partiel |
-| Candidature hôte 1, 2, 3 | 722:1467, 722:1620, 722:1713 | /#/candidature | Partiel |
-| Confirmation candidature | 722:1782 | /#/candidature | Partiel |
+| À propos | 516:2247 | /#/a-propos | Implémenté, audit détaillé partiel |
+| Devenir hôte | 448:984 | /#/devenir-hote | Partiel (vidéo à valider) |
+| Connexion | 516:2813 | /#/connexion | Partiel (preview sans Auth0) |
+| Profil 1, 2, 3 | 516:2871, 516:2976, 516:3108 | /#/profil | Implémenté, interactions locales |
+| Confirmation profil | 995:7471 | /#/profil | Implémenté, confirmation simulée |
+| Candidature 1, 2, 3 | 722:1467, 722:1620, 722:1713 | /#/candidature | Implémenté, interactions locales |
+| Confirmation candidature | 722:1782 | /#/candidature | Implémenté, confirmation simulée |
 
-Explorer, portefeuille, messagerie et réservations ne sont pas inclus : aucun écran Ready for dev correspondant retenu.
+Explorer, portefeuille, messagerie et réservations n'ont pas de frame Ready for dev retenue ici. La maquette n'a pas été modifiée.
 
-## Résultats locaux
+## Vérifications réelles
 
-Chrome headless, DPR 1, polices chargées et images décodées. `npm run build` réussi. `npm run test:browser` : 63 assertions réussies, aucune ignorée. Vérifications à 1440 et 390 px : base html 10 px et body 16 px, navigation, menus, FAQ, validation des formulaires, retours conservant les champs, confirmations explicitement simulées. Aucun stockage persistant ni requête de création de compte, candidature ou paiement.
+Build TypeScript/Vite et formatage réussis. `npm run test:browser` : **97 assertions réussies**, aucune ignorée. Chrome headless local à 1440 et 390 px, DPR 1, polices chargées et images décodées. Base html 10 px et body 16 px ; reset inchangé.
 
-## Mesures et écarts encore ouverts
+Parcours : champs et groupes obligatoires, consentements, retour avec conservation des champs, toutes les étapes, confirmations explicitement simulées, menus mobiles, FAQ, connexion de démonstration et retour aux tables de l'accueil. Aucun débordement horizontal aux étapes contrôlées.
 
-Dernière vérification des calques hôte : étape 1 = 734 × 654 px (`722:1472`), étape 2 = 736 × 554 px (`722:1625`), étape 3 = 736 × 872 px (`722:1718`). Les étapes 2 et 3 utilisent maintenant la largeur de 736 px, et non la largeur de l'étape 1. Les jours disponibles occupent deux rangées sur desktop et une colonne sur mobile. Le bloc frais respecte la hauteur Figma de 212.5 px à la tolérance de 1 px (test ajouté). La suite compte 83 assertions réussies.
+Sélection de document : fichier fictif, nom visible, focus clavier visible. Le contenu n'est ni lu ni envoyé ; revenir en arrière réinitialise la sélection. Les données de formulaire restent en mémoire, sans création de compte, candidature ou paiement réel.
 
-La carte de vérification mesure maintenant 736 × 906.375 px à 1440 px, padding 32 px ; sur mobile, 358 × 1070.46875 px, padding 24 px. L'avertissement ajouté à la preview contribue à la différence de hauteur : elle n'est pas déclarée résolue.
+## Mesures desktop (pixels CSS)
 
-Mise à jour pièce d'identité : la zone d'import mesure désormais 152 px de haut à 1440 px, comme le composant Figma. Cercle rouge de 48 px et pictogramme de 24 px ; bordure pointillée de 2 px, padding vertical de 28 px et horizontal de 12 px. Le fichier choisi reste local et son nom est visible ; il n'est ni lu ni envoyé. Revenir en arrière réinitialise cette sélection. Un fichier PDF fictif est utilisé dans les tests.
+Toutes les dimensions ci-dessous proviennent des calques ou du DOM. Tolérance géométrique demandée : 1 px. Ces relevés ne certifient pas à eux seuls chaque couleur, état, interligne et sous-composant.
 
-La suite compte désormais 81 assertions réussies, dont la hauteur d'import, le focus clavier visible, l'affichage du nom sélectionné et le refus d'avancer sans consentements. La carte de vérification hôte mesure 907.875 px de haut à 1440 px et 1071.96875 px à 390 px, avertissement de démonstration inclus. Sa conformité intégrale n'est pas déclarée. La couleur de fond du récapitulatif des frais est corrigée de #f2f2f2 à #f2f2f3 d'après Figma.
+| Page / composant | Figma largeur × hauteur | DOM largeur × hauteur | Padding DOM | État |
+| --- | --- | --- | --- | --- |
+| Profil 1 | 734 × 562 | 734 × 562 | 32 | Dans la tolérance |
+| Profil 2 | 734 × 628 | 734 × 627 | 32 | Dans la tolérance |
+| Profil 3 | 734 × 484 | 734 × 484 | 32 | Dans la tolérance |
+| Hôte 1 | 734 × 654 | 734 × 654 | 32 | Dans la tolérance |
+| Hôte 2 | 736 × 554 | 736 × 554 | 32 | Dans la tolérance |
+| Hôte 3 | 736 × 872 | 736 × 872.390625 | 32 | Dans la tolérance |
+| Confirmation profil | 600 × 384 | 600 × 384.765625 | 32 | Dans la tolérance |
+| Confirmation hôte | 600 × 723 | 600 × 722.734375 | 32 | Dans la tolérance |
+| Connexion | 440 × 554 | 440 × 553.171875 | 32 | Dans la tolérance |
+| FAQ hôte fermée | 1440 × 618 | 1440 × 617.59375 | 80 / 184 | Dans la tolérance |
+| Invitation hôte | 1440 × 317 | 1440 × 317.578125 | 80 | Dans la tolérance |
+| Mission À propos | 1440 × 490 | 1440 × 490.25 | 112 / 83 | Dans la tolérance |
+| Équipe | 1440 × 702 | 1440 × 701.59375 | 72 / 80 | Dans la tolérance |
+| Valeurs | 1440 × 447.992 | 1440 × 447.625 | 88 / 112 / 96 | Dans la tolérance |
+| Contact | 1440 × 502 | 1440 × 502.96875 | 80 | Dans la tolérance |
 
-Mise à jour pages publiques : 74 assertions réussies. Les séparateurs de FAQ ne prennent plus de place dans le flux et les boutons des pages internes utilisent les hauteurs de leur maquette. La navigation desktop interne est centrée indépendamment de la largeur du logo et du bouton de connexion.
+Les 112 px horizontaux de la section Valeurs regroupent les 80 px extérieurs et 32 px intérieurs de Figma. Les wrappers diffèrent, mais leur somme est conservée. Les sources sont `scss/8_sections/_forms.scss`, `_host.scss` et `_about.scss`.
 
-| Page | Viewport | Propriété | Figma | Avant | Après |
-| --- | ---: | --- | ---: | ---: | ---: |
-| Devenir hôte | 1440 | FAQ fermée, hauteur | 618 | 622.59375 | 617.59375 |
-| Devenir hôte | 1440 | Invitation finale, hauteur | 317 | 323.1875 | 317.578125 |
-| Connexion | 1440 | Carte, hauteur | 554 | 558.78125 | 553.171875 |
-| À propos | 1440 | Mission, hauteur | 490 | 490.25 | 490.25 |
-| À propos | 1440 | Équipe, hauteur | 702 | 701.59375 | 701.59375 |
-| À propos | 1440 | Valeurs, hauteur | 447.992 | 447.625 | 447.625 |
-| À propos | 1440 | Contact, hauteur | 502 | 502.96875 | 502.96875 |
+Corrections principales : colonnes de préférences alimentaires sur quatre rangées et champ allergies simple ; boutons de formulaire de 44 px ; zone document de 152 px (icône 24 px dans cercle 48 px) ; jours disponibles sur deux rangées ; largeur 736 px propre aux étapes hôte 2/3 ; groupes des confirmations et fond jaune #ffcc58. Le récapitulatif des frais utilise #f2f2f3 et sa hauteur de 212.5 px est testée à 1 px près.
 
-Aux trois routes, la largeur du document mesurée vaut 1440 px sur desktop et 390 px sur mobile. Le menu mobile s'ouvre sans élargir le document. Les valeurs de padding de sections mesurées sont : mission 112/83 px, équipe 72/80 px, valeurs 88/112/96 px (les 112 px incluent le conteneur intérieur de 32 px de Figma), contact 80 px. L'interprétation des wrappers doit être conservée lors d'une comparaison propriété par propriété.
+## Responsive à 390 px
 
-Mise à jour confirmations : 71 assertions passent désormais. Les cartes utilisent les groupes de la maquette (médaillon, titre et texte, actions, prochaines étapes). Le message de simulation est placé sous la carte. « Centre d'aide » reste un libellé sans destination, aucun écran correspondant n'étant fourni.
+Pas de frame mobile correspondante identifiée : adaptation responsive vérifiée, fidélité à une maquette mobile non certifiée. Les cartes mesurent 358 px de large, padding 24 px.
 
-| Confirmation | Viewport | Propriété | Figma | DOM local |
-| --- | ---: | --- | ---: | ---: |
-| Profil | 1440 | Hauteur | 384 | 384.765625 |
-| Hôte | 1440 | Hauteur | 723 | 722.734375 |
-| Les deux | 1440 | Largeur | 600 | 600 |
-| Les deux | 1440 | Padding | 32 | 32 |
-| Les deux | 1440 | Fond du médaillon | #ffcc58 | rgb(255, 204, 88) |
-| Profil | 390 | Largeur / hauteur | Non défini | 358 / 368.765625 |
-| Hôte | 390 | Largeur / hauteur | Non défini | 358 / 822.3125 |
+| Carte | Hauteur mesurée |
+| --- | ---: |
+| Profil 1 | 839.1875 |
+| Profil 2 | 868.1875 |
+| Profil 3 | 613.1875 |
+| Hôte 1 | 951.1875 |
+| Hôte 2 | 830.1875 |
+| Hôte 3 | 991.078125 |
+| Confirmation profil | 368.765625 |
+| Confirmation hôte | 822.3125 |
 
-Ces hauteurs desktop passent la tolérance de 1 px. Les tests protègent maintenant largeur, hauteur et padding des confirmations. Les positions après le focus automatique ne sont pas comparées aux coordonnées de document Figma.
+## Limites et contrôles encore ouverts
 
-Valeurs en pixels CSS, sauf indication contraire. La tolérance géométrique demandée est de 1 px. Ces relevés ciblés ne remplacent pas une comparaison exhaustive de chaque propriété et état.
-
-| Page | Viewport | Composant / propriété | Figma | DOM local | Source probable | Gravité / état |
-| --- | ---: | --- | ---: | ---: | --- | --- |
-| Profil étape 3 | 1440 | Carte / largeur | 734 | 734 | scss/8_sections/_forms.scss | Résolu |
-| Profil étape 3 | 1440 | Carte / padding | 32 | 32 | scss/8_sections/_forms.scss | Résolu |
-| Profil étape 3 | 1440 | Carte / hauteur | 484 | 481.984375 | scss/8_sections/_forms.scss | Mineur, ouvert |
-| Profil étape 3 | 1440 | Carte / Y | 390.61 | 390.203125 | scss/8_sections/_forms.scss | Dans la tolérance |
-| Candidature étape 3 | 1440 | Carte / largeur | 736 | 736 | scss/8_sections/_forms.scss | Résolu après relecture du calque |
-| Profil étape 3 | 390 | Carte / largeur | Non défini | 358 | scss/8_sections/_forms.scss | Adaptation responsive |
-| Profil étape 3 | 390 | Carte / padding | Non défini | 24 | scss/8_sections/_forms.scss | Adaptation responsive |
-| Candidature étape 3 | 390 | Carte / largeur | Non défini | 358 | scss/8_sections/_forms.scss | Adaptation responsive |
-
-À compléter : géométrie détaillée de la candidature et des confirmations, audit exhaustif des couleurs et interlignes, états clavier/survol, nouvelle mesure sur Vercel. L'accès navigateur à la preview protégée avait été refusé ; les mesures actuelles sont exclusivement locales.
-
-## Écarts éditoriaux et fonctionnels explicites
-
-- FAQ rédigée à la demande du propriétaire ; les réponses absentes de Figma ne sont pas présentées comme des spécifications backend validées.
-- Vidéo non générée, non publiée. Weave nécessite une liaison du compte Figma. Scénario dans `video-proposal.md`.
-- SSO Google/Apple et mot de passe oublié ouvrent une explication de la limite de preview. Auth0 reste la solution prévue au raccordement.
-- Revenus, assurance incluse et délais de validation sont des promesses de la maquette qui nécessitent confirmation métier. L'étape hôte affiche un avertissement de démonstration et demande des données fictives.
-- Les emails de contact sont repris de la maquette ; leur délivrabilité n'a pas été vérifiée.
+- La preview Vercel protégée n'a pas été mesurée : permission navigateur précédemment refusée. Une réactivation a été demandée. Les relevés sont locaux.
+- Audit exhaustif des sous-composants, des couleurs, interlignes et états interactifs encore incomplet. Aucun audit externe d'accessibilité, test de charge ou test API.
+- L'avertissement de démonstration est placé sous la carte de vérification et sous les confirmations ; il ajoute de la hauteur à la page, volontairement documentée.
+- La vidéo n'est pas générée ni publiée. Weave nécessite une liaison Figma ; validation du résultat requise avant intégration. Voir `video-proposal.md`.
+- FAQ proposée à la demande du propriétaire. Promesses de revenus, assurance et délais reprises de la maquette à confirmer côté produit. Les emails de contact ne sont pas vérifiés.
+- Google/Apple et mot de passe oublié expliquent la limite de preview. Auth0 sera raccordé dans le périmètre d'intégration. Le centre d'aide reste sans destination faute d'écran.
