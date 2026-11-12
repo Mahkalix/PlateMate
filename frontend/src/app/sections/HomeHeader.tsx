@@ -2,10 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { HomeNavLinks } from "../components/HomeNavLinks";
 
 export function HomeHeader() {
+  const innerPage = window.location.hash.startsWith("#/");
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const header = useRef<HTMLElement>(null);
-  const login = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
     const update = () => setScrolled(window.scrollY > 0);
@@ -38,7 +38,14 @@ export function HomeHeader() {
             className="pm-logo"
             aria-label="PlateMate, accueil"
           >
-            <img src="/home/ColourWhite.webp" alt="PlateMate" />
+            <img
+              src={
+                innerPage
+                  ? "/ready/imgLogo11-about.png"
+                  : "/home/ColourWhite.webp"
+              }
+              alt="PlateMate"
+            />
           </a>
           <button
             className="pm-menu-toggle"
@@ -55,28 +62,12 @@ export function HomeHeader() {
           >
             <HomeNavLinks onNavigate={() => setOpen(false)} />
           </nav>
-          <button
-            className="pm-button pm-header__login"
-            onClick={() => login.current?.showModal()}
-          >
+          <a className="pm-button pm-header__login" href="#/connexion">
             <img src="/home/UserCircle.svg" alt="" />
             Se connecter
-          </button>
+          </a>
         </header>
       </div>
-      <dialog
-        aria-labelledby="home-login-title"
-        ref={login}
-        className="pm-dialog"
-      >
-        <h2 id="home-login-title">Se connecter</h2>
-        <p>La connexion sera disponible lors du raccordement au backend.</p>
-        <form method="dialog">
-          <button autoFocus className="pm-button pm-button--red">
-            Fermer
-          </button>
-        </form>
-      </dialog>
     </>
   );
 }

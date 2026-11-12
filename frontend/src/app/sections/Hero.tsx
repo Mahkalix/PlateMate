@@ -18,7 +18,7 @@ export function Hero() {
             Explorer les expériences{" "}
             <img src="/home/ArrowRightCircle.svg" alt="" />
           </Button>
-          <Button to="#hotes" variant="outline">
+          <Button to="#/devenir-hote" variant="outline">
             Devenez hôte
           </Button>
         </div>

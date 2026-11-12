@@ -12,7 +12,7 @@ export function HostInvitation() {
           <br />
           Gagnez.
         </h2>
-        <Button to="#fonctionnement" variant="yellow">
+        <Button to="#/devenir-hote" variant="yellow">
           En savoir plus <img src="/home/ArrowRightCircle.svg" alt="" />
         </Button>
       </div>

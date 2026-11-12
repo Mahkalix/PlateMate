@@ -5,6 +5,7 @@
   "scripts": {
     "start": "vite --host 0.0.0.0 --port 8080",
     "build": "tsc --noEmit && vite build",
+    "test:browser": "node scripts/test-ready.cjs",
     "preview": "vite preview --host 0.0.0.0 --port 8080",
     "format": "prettier --write \"scss/**/*.scss\" \"src/**/*.{ts,tsx}\" \"vite.config.ts\"",
     "format:check": "prettier --check \"scss/**/*.scss\" \"src/**/*.{ts,tsx}\" \"vite.config.ts\""
