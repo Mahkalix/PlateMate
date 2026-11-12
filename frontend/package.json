@@ -5,6 +5,7 @@
   "scripts": {
     "start": "vite --host 0.0.0.0 --port 8080",
     "build": "tsc --noEmit && vite build",
+    "test:browser": "node scripts/test-ready.cjs",
     "preview": "vite preview --host 0.0.0.0 --port 8080",
     "format": "prettier --write \"scss/**/*.scss\" \"src/**/*.{ts,tsx}\" \"vite.config.ts\"",
     "format:check": "prettier --check \"scss/**/*.scss\" \"src/**/*.{ts,tsx}\" \"vite.config.ts\""
@@ -19,8 +20,8 @@
     "vite": "^7.3.6"
   },
   "dependencies": {
+    "@fontsource-variable/dm-sans": "^5.3.0",
     "react": "^19.3.0",
-    "react-dom": "^19.3.0",
-    "react-router-dom": "^7.18.4"
+    "react-dom": "^19.3.0"
   }
 }
