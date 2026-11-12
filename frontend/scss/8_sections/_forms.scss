@@ -305,11 +305,62 @@
   }
   .pm-confirmation {
     width: min(100%, 60rem);
+    padding: 3.2rem;
+    border: 0.2rem solid #cbcdd1;
+    gap: 3.2rem;
+    box-shadow: 0 0.4rem 1rem rgb(0 0 0 / 8%);
     text-align: center;
     align-items: center;
-    > img {
+    &__icon {
       width: 8rem;
       height: 8rem;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--pm-yellow);
+      img {
+        width: 4rem;
+        height: 4rem;
+      }
+    }
+    &__heading {
+      width: min(100%, 43.8rem);
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      p {
+        font-size: 1.6rem;
+        line-height: 1.65;
+        font-weight: 500;
+      }
+    }
+    &__body {
+      width: min(100%, 43.8rem);
+      display: flex;
+      flex-direction: column;
+      gap: 2.4rem;
+      > p {
+        font-size: 1.4rem;
+        line-height: 1.4;
+      }
+    }
+    &__actions {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.6rem;
+      .pm-button {
+        width: min(100%, 30.2rem);
+        min-height: 4.2rem;
+        padding: 0.8rem 1.6rem;
+        border: 0;
+        font-size: 1.6rem;
+        font-weight: 500;
+        line-height: 1.65;
+      }
+      .pm-button--outline {
+        box-shadow: inset 0 0 0 0.2rem var(--pm-red);
+      }
     }
     p {
       margin: 0;
@@ -318,19 +369,66 @@
   .pm-next-steps {
     text-align: left;
     width: 100%;
+    background: var(--pm-teal);
+    color: white;
+    padding: 2.4rem;
+    border-radius: 1.2rem;
+    h3 {
+      font-size: 1.6rem;
+      line-height: 1.65;
+      font-weight: 600;
+      margin: 0;
+    }
     > div {
       display: flex;
-      gap: 1.6rem;
-      margin-top: 2.4rem;
+      gap: 1.2rem;
+      margin-top: 2rem;
+      align-items: center;
+      strong {
+        display: block;
+        font-size: 1.4rem;
+        line-height: 1;
+        font-weight: 500;
+        letter-spacing: -0.028rem;
+      }
+      p {
+        font-size: 1.2rem;
+        line-height: 1.4;
+        margin-top: 0.4rem;
+      }
     }
     > div > span {
-      flex: 0 0 3.2rem;
-      height: 3.2rem;
+      flex: 0 0 2.4rem;
+      height: 2.4rem;
       border-radius: 50%;
-      background: var(--pm-red);
+      border: 0.1rem solid var(--pm-card-secondary);
       color: white;
       text-align: center;
+      display: grid;
+      place-items: center;
+      font-size: 1.2rem;
+      font-weight: 700;
     }
+    > div:first-of-type > span {
+      background: var(--pm-card-secondary);
+      color: var(--pm-teal);
+    }
+  }
+  .pm-confirmation__help {
+    font-size: 1.2rem;
+    line-height: 1;
+    font-weight: 500;
+    span {
+      color: var(--pm-red);
+    }
+  }
+  .pm-wizard--host .pm-confirmation__actions .pm-button {
+    width: 100%;
+  }
+  .pm-confirmation-notice {
+    max-width: 60rem;
+    margin: 1.6rem auto 0;
+    text-align: center;
   }
 }
 @media (max-width: 980px) {

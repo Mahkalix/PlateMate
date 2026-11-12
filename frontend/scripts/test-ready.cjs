@@ -189,10 +189,34 @@ let c, ws;
       );
       assert(
         await ev(
-          'document.querySelector(".pm-confirmation").textContent.includes("aucune donnée")',
+          'document.querySelector(".pm-confirmation-notice").textContent.includes("aucune donnée")',
         ),
         label + " confirmation is explicitly simulated",
       );
+      measurements.push({
+        label: `${label}/confirmation`,
+        geometry: await ev(
+          `(()=>{const node=document.querySelector('.pm-confirmation'),r=node.getBoundingClientRect();return {rect:[r.x,r.y,r.width,r.height],padding:getComputedStyle(node).padding,icon:getComputedStyle(document.querySelector('.pm-confirmation__icon')).backgroundColor,overflow:document.documentElement.scrollWidth}})()`,
+        ),
+      });
+      assert(
+        await ev(`document.documentElement.scrollWidth === ${width}`),
+        label + " confirmation no overflow",
+      );
+      if (width === 1440) {
+        assert(
+          await ev(
+            `Math.abs(document.querySelector('.pm-confirmation').getBoundingClientRect().height - ${host ? 723 : 384}) <= 1`,
+          ),
+          label + " Figma confirmation height",
+        );
+        assert(
+          await ev(
+            `document.querySelector('.pm-confirmation').getBoundingClientRect().width === 600 && getComputedStyle(document.querySelector('.pm-confirmation')).padding === '32px'`,
+          ),
+          label + " Figma confirmation width and padding",
+        );
+      }
     }
   }
   for (const width of [1440, 390]) {

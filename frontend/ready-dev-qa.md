@@ -22,6 +22,20 @@ Chrome headless, DPR 1, polices chargées et images décodées. `npm run build` 
 
 ## Mesures et écarts encore ouverts
 
+Mise à jour confirmations : 71 assertions passent désormais. Les cartes utilisent les groupes de la maquette (médaillon, titre et texte, actions, prochaines étapes). Le message de simulation est placé sous la carte. « Centre d'aide » reste un libellé sans destination, aucun écran correspondant n'étant fourni.
+
+| Confirmation | Viewport | Propriété | Figma | DOM local |
+| --- | ---: | --- | ---: | ---: |
+| Profil | 1440 | Hauteur | 384 | 384.765625 |
+| Hôte | 1440 | Hauteur | 723 | 722.734375 |
+| Les deux | 1440 | Largeur | 600 | 600 |
+| Les deux | 1440 | Padding | 32 | 32 |
+| Les deux | 1440 | Fond du médaillon | #ffcc58 | rgb(255, 204, 88) |
+| Profil | 390 | Largeur / hauteur | Non défini | 358 / 368.765625 |
+| Hôte | 390 | Largeur / hauteur | Non défini | 358 / 822.3125 |
+
+Ces hauteurs desktop passent la tolérance de 1 px. Les tests protègent maintenant largeur, hauteur et padding des confirmations. Les positions après le focus automatique ne sont pas comparées aux coordonnées de document Figma.
+
 Valeurs en pixels CSS, sauf indication contraire. La tolérance géométrique demandée est de 1 px. Ces relevés ciblés ne remplacent pas une comparaison exhaustive de chaque propriété et état.
 
 | Page | Viewport | Composant / propriété | Figma | DOM local | Source probable | Gravité / état |

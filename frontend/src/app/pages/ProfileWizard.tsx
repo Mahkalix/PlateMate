@@ -380,66 +380,86 @@ export function ProfileWizard({ host = false }: { host?: boolean }) {
             </div>
           </form>
         ) : (
-          <section className="pm-form-card pm-confirmation">
-            <img src="/ready/29bf5.svg" alt="" />
-            <h2 ref={heading} tabIndex={-1}>
-              {host ? "Candidature envoyée !" : "Profil créé !"}
-            </h2>
-            <p>
-              {host
-                ? "Merci d'avoir soumis votre candidature pour devenir hôte PlateMate."
-                : "Merci d'avoir créé votre profil PlateMate."}
-            </p>
-            <p className="pm-preview-notice">
+          <>
+            <section className="pm-form-card pm-confirmation">
+              <span className="pm-confirmation__icon">
+                <img src="/ready/29bf5.svg" alt="" />
+              </span>
+              <div className="pm-confirmation__heading">
+                <h2 ref={heading} tabIndex={-1}>
+                  {host ? "Candidature envoyée !" : "Profil créé !"}
+                </h2>
+                <p>
+                  {host
+                    ? "Merci d'avoir soumis votre candidature pour devenir hôte PlateMate."
+                    : "Merci d'avoir créé votre profil PlateMate."}
+                </p>
+              </div>
+              <div className="pm-confirmation__body">
+                {host && (
+                  <>
+                    <p>
+                      Notre équipe va vérifier vos informations sous 24 à 48
+                      heures. Vous recevrez un email de confirmation dès que
+                      votre profil sera validé.
+                    </p>
+                    <div className="pm-next-steps">
+                      <h3>Prochaines étapes</h3>
+                      {[
+                        [
+                          "Vérification de votre profil",
+                          "Nous vérifions votre identité et vos informations",
+                        ],
+                        [
+                          "Validation et activation",
+                          "Vous recevrez un email avec vos accès hôte",
+                        ],
+                        [
+                          "Publiez votre première expérience",
+                          "Commencez à accueillir des voyageurs !",
+                        ],
+                      ].map(([title, description], i) => (
+                        <div key={title}>
+                          <span>{i + 1}</span>
+                          <div>
+                            <strong>{title}</strong>
+                            <p>{description}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+                <div className="pm-confirmation__actions">
+                  <a
+                    className="pm-button pm-button--red"
+                    href={host ? "#accueil" : "#tables"}
+                  >
+                    {host ? "Retour à l'accueil" : "Explorer les expériences"}
+                  </a>
+                  {!host && (
+                    <button
+                      className="pm-button pm-button--outline"
+                      type="button"
+                      onClick={() => setStep(1)}
+                    >
+                      Mon profil
+                    </button>
+                  )}
+                </div>
+              </div>
+              {host && (
+                <p className="pm-confirmation__help">
+                  Vous avez des questions ? Consultez notre{" "}
+                  <span>centre d'aide</span>
+                </p>
+              )}
+            </section>
+            <p className="pm-preview-notice pm-confirmation-notice">
               Aperçu de confirmation : aucune donnée n’a été envoyée ni
               enregistrée sur un serveur.
             </p>
-            {host && (
-              <>
-                <p>
-                  Notre équipe va vérifier vos informations sous 24 à 48 heures.
-                  Vous recevrez un email de confirmation dès que votre profil
-                  sera validé.
-                </p>
-                <div className="pm-next-steps">
-                  <h3>Prochaines étapes</h3>
-                  {[
-                    [
-                      "Vérification de votre profil",
-                      "Nous vérifions votre identité et vos informations",
-                    ],
-                    [
-                      "Validation et activation",
-                      "Vous recevrez un email avec vos accès hôte",
-                    ],
-                    [
-                      "Publiez votre première expérience",
-                      "Commencez à accueillir des voyageurs !",
-                    ],
-                  ].map(([title, description], i) => (
-                    <div key={title}>
-                      <span>{i + 1}</span>
-                      <div>
-                        <strong>{title}</strong>
-                        <p>{description}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
-            <a
-              className="pm-button pm-button--red"
-              href={host ? "#accueil" : "#tables"}
-            >
-              {host ? "Retour à l'accueil" : "Explorer les expériences"}
-            </a>
-            {!host && (
-              <button type="button" onClick={() => setStep(1)}>
-                Mon profil
-              </button>
-            )}
-          </section>
+          </>
         )}
       </main>
       <HomeFooter />
