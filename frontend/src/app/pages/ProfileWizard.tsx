@@ -19,6 +19,7 @@ export function ProfileWizard({ host = false }: { host?: boolean }) {
   const [step, setStep] = useState(1);
   const [values, setValues] = useState<FormValues>({});
   const [error, setError] = useState("");
+  const [identityName, setIdentityName] = useState("");
   const form = useRef<HTMLFormElement>(null);
   const heading = useRef<HTMLHeadingElement>(null);
   function collect() {
@@ -38,6 +39,7 @@ export function ProfileWizard({ host = false }: { host?: boolean }) {
   function move(next: number) {
     collect();
     setError("");
+    setIdentityName("");
     setStep(next);
     requestAnimationFrame(() => {
       heading.current?.focus();
@@ -269,8 +271,12 @@ export function ProfileWizard({ host = false }: { host?: boolean }) {
                       Pièce d'identité <span>*</span>
                     </label>
                     <label className="pm-upload" htmlFor="identity">
-                      <img src="/ready/9df3c.svg" alt="" />
-                      <strong>Téléchargez votre pièce d'identité</strong>
+                      <span className="pm-upload__icon">
+                        <img src="/ready/9df3c.svg" alt="" />
+                      </span>
+                      <strong>
+                        {identityName || "Téléchargez votre pièce d'identité"}
+                      </strong>
                       <small>
                         Carte d'identité, passeport ou permis de conduire
                       </small>
@@ -279,6 +285,9 @@ export function ProfileWizard({ host = false }: { host?: boolean }) {
                         name="identity"
                         type="file"
                         accept="image/*,application/pdf"
+                        onChange={(event) =>
+                          setIdentityName(event.target.files?.[0]?.name || "")
+                        }
                       />
                     </label>
                   </div>

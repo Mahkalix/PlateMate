@@ -22,6 +22,10 @@ Chrome headless, DPR 1, polices chargées et images décodées. `npm run build` 
 
 ## Mesures et écarts encore ouverts
 
+Mise à jour pièce d'identité : la zone d'import mesure désormais 152 px de haut à 1440 px, comme le composant Figma. Cercle rouge de 48 px et pictogramme de 24 px ; bordure pointillée de 2 px, padding vertical de 28 px et horizontal de 12 px. Le fichier choisi reste local et son nom est visible ; il n'est ni lu ni envoyé. Revenir en arrière réinitialise cette sélection. Un fichier PDF fictif est utilisé dans les tests.
+
+La suite compte désormais 81 assertions réussies, dont la hauteur d'import, le focus clavier visible, l'affichage du nom sélectionné et le refus d'avancer sans consentements. La carte de vérification hôte mesure 907.875 px de haut à 1440 px et 1071.96875 px à 390 px, avertissement de démonstration inclus. Sa conformité intégrale n'est pas déclarée. La couleur de fond du récapitulatif des frais est corrigée de #f2f2f2 à #f2f2f3 d'après Figma.
+
 Mise à jour pages publiques : 74 assertions réussies. Les séparateurs de FAQ ne prennent plus de place dans le flux et les boutons des pages internes utilisent les hauteurs de leur maquette. La navigation desktop interne est centrée indépendamment de la largeur du logo et du bouton de connexion.
 
 | Page | Viewport | Propriété | Figma | Avant | Après |

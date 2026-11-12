@@ -200,6 +200,38 @@ vite.on("error", (error) => {
         await ev(`document.documentElement.scrollWidth===${width}`),
         label + " step3 no overflow",
       );
+      if (host) {
+        if (width === 1440)
+          assert(
+            await ev(
+              "document.querySelector('.pm-upload').getBoundingClientRect().height === 152",
+            ),
+            "Figma upload area height",
+          );
+        await ev("document.querySelector('[name=identity]').focus()");
+        assert(
+          await ev(
+            "getComputedStyle(document.querySelector('.pm-upload')).outlineStyle === 'solid'",
+          ),
+          label + " upload keyboard focus visible",
+        );
+        await ev(
+          "(()=>{const selection = new DataTransfer();selection.items.add(new File(['fiction'], 'preview-fictive.pdf', {type:'application/pdf'}));const input = document.querySelector('[name=identity]');input.files=selection.files;input.dispatchEvent(new Event('change',{bubbles:true}));})()",
+        );
+        assert(
+          await ev(
+            "document.querySelector('.pm-upload strong').textContent === 'preview-fictive.pdf'",
+          ),
+          label + " selected document name visible",
+        );
+        await ev('document.querySelector("form.pm-form-card").requestSubmit()');
+        assert(
+          await ev(
+            '!!document.querySelector("[name=terms]:invalid") && !document.querySelector(".pm-confirmation")',
+          ),
+          label + " consents required",
+        );
+      }
       await ev(
         host
           ? "document.querySelector('[name=terms]').click();document.querySelector('[name=charter]').click();document.querySelector('form.pm-form-card').requestSubmit()"
