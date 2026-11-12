@@ -20,13 +20,28 @@ const vite = spawn(
   { cwd: path.resolve(__dirname, ".."), windowsHide: true, stdio: "ignore" },
 );
 let c, ws;
+let startupError;
+vite.on("error", (error) => {
+  startupError = error;
+});
 (async () => {
+  let ready = false;
   for (let i = 0; i < 80; i++) {
+    if (startupError) throw startupError;
+    if (vite.exitCode !== null)
+      throw Error("Vite preview did not start (check port 4197).");
     try {
-      if ((await fetch(url)).ok) break;
+      if ((await fetch(url)).ok) {
+        ready = true;
+        break;
+      }
     } catch {}
     await wait(100);
   }
+  if (!ready) throw Error("Local preview did not become ready.");
+  await wait(150);
+  if (vite.exitCode !== null)
+    throw Error("Port 4197 is already used by another server.");
   c = spawn(
     process.env.CHROME_PATH ||
       (process.platform === "win32"
@@ -42,8 +57,16 @@ let c, ws;
     ],
     { stdio: "ignore", windowsHide: true },
   );
+  c.on("error", (error) => {
+    startupError = error;
+  });
   const file = path.join(dir, "DevToolsActivePort");
-  for (let i = 0; i < 100 && !fs.existsSync(file); i++) await wait(100);
+  for (let i = 0; i < 100 && !fs.existsSync(file); i++) {
+    if (startupError) throw startupError;
+    await wait(100);
+  }
+  if (!fs.existsSync(file))
+    throw Error("Chrome did not start. Set CHROME_PATH to its executable.");
   const targets = await (
     await fetch(
       "http://127.0.0.1:" +
