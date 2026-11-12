@@ -22,6 +22,10 @@ Chrome headless, DPR 1, polices chargées et images décodées. `npm run build` 
 
 ## Mesures et écarts encore ouverts
 
+Dernière vérification des calques hôte : étape 1 = 734 × 654 px (`722:1472`), étape 2 = 736 × 554 px (`722:1625`), étape 3 = 736 × 872 px (`722:1718`). Les étapes 2 et 3 utilisent maintenant la largeur de 736 px, et non la largeur de l'étape 1. Les jours disponibles occupent deux rangées sur desktop et une colonne sur mobile. Le bloc frais respecte la hauteur Figma de 212.5 px à la tolérance de 1 px (test ajouté). La suite compte 83 assertions réussies.
+
+La carte de vérification mesure maintenant 736 × 906.375 px à 1440 px, padding 32 px ; sur mobile, 358 × 1070.46875 px, padding 24 px. L'avertissement ajouté à la preview contribue à la différence de hauteur : elle n'est pas déclarée résolue.
+
 Mise à jour pièce d'identité : la zone d'import mesure désormais 152 px de haut à 1440 px, comme le composant Figma. Cercle rouge de 48 px et pictogramme de 24 px ; bordure pointillée de 2 px, padding vertical de 28 px et horizontal de 12 px. Le fichier choisi reste local et son nom est visible ; il n'est ni lu ni envoyé. Revenir en arrière réinitialise cette sélection. Un fichier PDF fictif est utilisé dans les tests.
 
 La suite compte désormais 81 assertions réussies, dont la hauteur d'import, le focus clavier visible, l'affichage du nom sélectionné et le refus d'avancer sans consentements. La carte de vérification hôte mesure 907.875 px de haut à 1440 px et 1071.96875 px à 390 px, avertissement de démonstration inclus. Sa conformité intégrale n'est pas déclarée. La couleur de fond du récapitulatif des frais est corrigée de #f2f2f2 à #f2f2f3 d'après Figma.
@@ -62,7 +66,7 @@ Valeurs en pixels CSS, sauf indication contraire. La tolérance géométrique de
 | Profil étape 3 | 1440 | Carte / padding | 32 | 32 | scss/8_sections/_forms.scss | Résolu |
 | Profil étape 3 | 1440 | Carte / hauteur | 484 | 481.984375 | scss/8_sections/_forms.scss | Mineur, ouvert |
 | Profil étape 3 | 1440 | Carte / Y | 390.61 | 390.203125 | scss/8_sections/_forms.scss | Dans la tolérance |
-| Candidature étape 3 | 1440 | Carte / largeur | 734 | 734 | scss/8_sections/_forms.scss | Résolu |
+| Candidature étape 3 | 1440 | Carte / largeur | 736 | 736 | scss/8_sections/_forms.scss | Résolu après relecture du calque |
 | Profil étape 3 | 390 | Carte / largeur | Non défini | 358 | scss/8_sections/_forms.scss | Adaptation responsive |
 | Profil étape 3 | 390 | Carte / padding | Non défini | 24 | scss/8_sections/_forms.scss | Adaptation responsive |
 | Candidature étape 3 | 390 | Carte / largeur | Non défini | 358 | scss/8_sections/_forms.scss | Adaptation responsive |

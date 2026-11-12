@@ -201,6 +201,20 @@ vite.on("error", (error) => {
         label + " step3 no overflow",
       );
       if (host) {
+        if (width === 1440) {
+          assert(
+            await ev(
+              "document.querySelector('.pm-form-card').getBoundingClientRect().width === 736",
+            ),
+            "Figma host verification width",
+          );
+          assert(
+            await ev(
+              "Math.abs(document.querySelector('.pm-fees').getBoundingClientRect().height - 212.5) <= 1",
+            ),
+            "Figma fees summary height",
+          );
+        }
         if (width === 1440)
           assert(
             await ev(
