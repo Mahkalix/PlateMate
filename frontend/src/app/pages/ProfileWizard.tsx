@@ -54,7 +54,7 @@ export function ProfileWizard() {
         values.intolerances.length)
     ) {
       setError(
-        "Votre accord est n�cessaire pour enregistrer vos pr�f�rences alimentaires. Vous pouvez aussi retirer ces choix.",
+        "Votre accord est nécessaire pour enregistrer vos préférences alimentaires. Vous pouvez aussi retirer ces choix.",
       );
       return;
     }
@@ -68,7 +68,7 @@ export function ProfileWizard() {
       !values.motivations?.length
     ) {
       setError(
-        "Choisissez au moins un centre d'int�r�t, une exp�rience et une ambiance.",
+        "Choisissez au moins un centre d'intérét, une expérience et une ambiance.",
       );
       return;
     }
@@ -88,9 +88,9 @@ export function ProfileWizard() {
     }
   }
   const titles = [
-    "� propos de vous",
-    "Pr�f�rences culinaires",
-    "Vos pr�f�rences d'exp�rience",
+    "À propos de vous",
+    "Préférences culinaires",
+    "Vos préférences d'expérience",
   ];
   return (
     <div className="app pm-inner-page">
@@ -98,8 +98,8 @@ export function ProfileWizard() {
       <main
         className={`pm-wizard pm-connected-wizard${step === 4 ? " pm-wizard--confirmation" : ""}`}
       >
-        {step < 4 && <h1>Cr�ez votre profil</h1>}
-        <ol className="pm-stepper" aria-label="�tapes du profil">
+        {step < 4 && <h1>Créez votre profil</h1>}
+        <ol className="pm-stepper" aria-label="Étapes du profil">
           {[1, 2, 3, 4].map((n) => (
             <li
               key={n}
@@ -126,7 +126,7 @@ export function ProfileWizard() {
                 {titles[step - 1]}
               </h2>
               <p>
-                Aidez-nous � vous proposer les meilleures exp�riences culinaires
+                Aidez-nous à vous proposer les meilleures expériences culinaires
               </p>
             </header>
             <fieldset disabled={busy} className="pm-wizard-fields">
@@ -134,7 +134,7 @@ export function ProfileWizard() {
                 <>
                   <div className="pm-field-row">
                     <label className="pm-field">
-                      Pr�nom *
+                      Prénom *
                       <input
                         name="firstName"
                         autoComplete="given-name"
@@ -168,7 +168,7 @@ export function ProfileWizard() {
                       onChange={(e) => change("city", e.target.value)}
                     />
                   </label>
-                  {choices("languages", "Langues parl�es", true)}
+                  {choices("languages", "Langues parlées", true)}
                   <label className="pm-field">
                     Parlez-nous de vous
                     <textarea
@@ -176,7 +176,7 @@ export function ProfileWizard() {
                       maxLength={1000}
                       value={values.description}
                       onChange={(e) => change("description", e.target.value)}
-                      placeholder="Vos centres d'int�r�t, vos passions, ce qui vous attire dans les repas chez l'habitant."
+                      placeholder="Vos centres d'intérét, vos passions, ce qui vous attire dans les repas chez l'habitant."
                     />
                     <small>Optionnel</small>
                   </label>
@@ -184,28 +184,28 @@ export function ProfileWizard() {
               )}
               {step === 2 && (
                 <>
-                  {choices("diets", "R�gimes alimentaires (facultatif)")}
-                  {choices("cuisines", "Cuisines pr�f�r�es")}
+                  {choices("diets", "Régimes alimentaires (facultatif)")}
+                  {choices("cuisines", "Cuisines préférées")}
                   {choices("allergies", "Allergies alimentaires (facultatif)")}
-                  {choices("intolerances", "Intol�rances (facultatif)")}
+                  {choices("intolerances", "Intolérances (facultatif)")}
                   <label className="pm-consent">
                     <input
                       type="checkbox"
                       checked={values.consent}
                       onChange={(e) => change("consent", e.target.checked)}
                     />
-                    J'accepte l'enregistrement de mes pr�f�rences alimentaires
-                    pour la compatibilit� des repas. Mes allergies ne sont
-                    partag�es avec un h�te qu'avec mon accord lors de la
-                    r�servation.
+                    J'accepte l'enregistrement de mes préférences alimentaires
+                    pour la compatibilité des repas. Mes allergies ne sont
+                    partagées avec un hôte qu'avec mon accord lors de la
+                    réservation.
                   </label>
                 </>
               )}
               {step === 3 && (
                 <>
-                  {choices("motivations", "Vos pr�f�rences d'exp�rience", true)}
-                  {choices("affinities", "Vos centres d'int�r�t", true)}
-                  {choices("ambiences", "Type d'ambiance pr�f�r�e", true)}
+                  {choices("motivations", "Vos préférences d'expérience", true)}
+                  {choices("affinities", "Vos centres d'intérét", true)}
+                  {choices("ambiences", "Type d'ambiance préférée", true)}
                 </>
               )}
             </fieldset>
@@ -254,15 +254,15 @@ export function ProfileWizard() {
             </span>
             <div className="pm-confirmation__heading">
               <h2 ref={heading} tabIndex={-1}>
-                Profil cr�� !
+                Profil créé !
               </h2>
               <p>
-                Merci {values.firstName}, votre profil PlateMate est enregistr�.
+                Merci {values.firstName}, votre profil PlateMate est enregistré.
               </p>
             </div>
             <div className="pm-confirmation__actions">
               <a className="pm-button pm-button--red" href="#/explorer">
-                Explorer les exp�riences
+                Explorer les expériences
               </a>
               <a
                 className="pm-button pm-button--outline"
