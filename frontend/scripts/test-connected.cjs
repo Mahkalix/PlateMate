@@ -76,7 +76,7 @@ const backend = createServer(async (req, res) => {
   await ev(`document.querySelector('a[href="/auth/login"]').click()`);
   await until('!!document.querySelector("input[name=firstName]")');
   for (const [name, value] of Object.entries({firstName:'Alex',lastName:'Test',city:'Grenoble'})) {
-    await ev(`const input = document.querySelector('[name=${name}]'); Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(input,${JSON.stringify(value)}); input.dispatchEvent(new Event('input',{bubbles:true}));`);
+    await ev(`{ const input = document.querySelector('[name=${name}]'); Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(input,${JSON.stringify(value)}); input.dispatchEvent(new Event('input',{bubbles:true})); }`);
   }
   assert.equal(await ev('document.querySelector("[aria-controls=account-navigation]").textContent.trim()'), 'Alex');
   const choose = text => ev(`[...document.querySelectorAll('.pm-preference-choices button')].find(b => b.textContent === ${JSON.stringify(text)}).click()`);
@@ -97,7 +97,7 @@ const backend = createServer(async (req, res) => {
   assert.deepEqual(profile.languages, ['français']); assert.deepEqual(profile.affinities, ['randonnée']);
   await go('mon-profil/invite');
   await until('document.querySelector("[name=firstName]")?.value === "Alex"');
-  assert.equal(await ev('document.querySelector("[name=firstName]").disabled'), true);
+  assert.equal(await ev('document.querySelector("[name=firstName]").matches(":disabled")'), true);
   await ev('window.__reloadMarker = true'); await cmd('Page.reload');
   await until('!window.__reloadMarker && document.querySelector("[name=firstName]")?.value === "Alex"');
   assert.equal(await ev('document.querySelector("[aria-controls=account-navigation]").textContent.trim()'), 'Alex');
