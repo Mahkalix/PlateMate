@@ -126,7 +126,10 @@ export function HomeHeader({
                 }}
               >
                 <img src="/home/UserCircle.svg" alt="" />
-                {accountName || "Mon compte"}
+                {session.draftName ||
+                  session.profile?.firstName ||
+                  accountName ||
+                  "Mon compte"}
               </button>
             ) : (
               <a className="pm-button pm-header__login" href="#/connexion">
@@ -160,7 +163,7 @@ export function HomeHeader({
                     }
                   }}
                 >
-                  {loggingOut ? "Déconnexion…" : "Se déconnecter"}
+                  {loggingOut ? "D�connexion." : "Se d�connecter"}
                 </button>
                 {logoutError && (
                   <p className="pm-header__account-error" role="alert">
@@ -175,3 +178,4 @@ export function HomeHeader({
     </>
   );
 }
+
