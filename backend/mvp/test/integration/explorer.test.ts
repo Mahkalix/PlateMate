@@ -46,6 +46,16 @@ it("US06 US07 US08 US09 / Explorer : tri, filtres, pagination, confidentialité 
       ],
     );
   }
+  const publicPage = (await api.get("/public/explorer").expect(200)).body;
+  expect(publicPage.total).toBe(3);
+  expect(publicPage.items.every((item: { score: number }) => item.score === 0)).toBe(true);
+  for (const item of publicPage.items) {
+    expect(Object.keys(item).sort()).toEqual(["hostId", "contextId", "contextTitle", "kind", "ambience", "firstName", "city", "isVerified", "reviewCount", "averageRating", "completeness", "score"].sort());
+  }
+  expect(JSON.stringify(publicPage)).not.toContain("arachide");
+  expect((await api.get("/public/explorer?limit=1&offset=1").expect(200)).body.items).toHaveLength(1);
+  expect((await api.get("/public/explorer?language=inconnue").expect(200)).body.items).toEqual([]);
+  await api.get("/public/explorer?limit=0").expect(422);
   const get = (q: object) =>
     api.get("/explorer").set("Authorization", auth).query(q);
   const secondMeal = await pool.query(

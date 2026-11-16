@@ -51,6 +51,7 @@ export function authRoutes(db: pg.Pool) {
     .patch(profile.patch)
     .put(profile.save);
   const explorer = explorerController(new ExplorerRepository(db));
+  router.get("/public/explorer", explorer.list);
   router.get("/explorer", c.authenticated, explorer.list);
   router.get(
     "/profiles/:host/contexts/:context",

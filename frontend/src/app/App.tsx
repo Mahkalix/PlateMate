@@ -21,7 +21,8 @@ export function App() {
       !session.loading &&
       !session.error &&
       !session.profile &&
-      route !== "#/profil"
+      route !== "#/profil" &&
+      route !== "#/explorer"
     )
       window.location.hash = "#/profil";
   }, [session.user, session.loading, session.error, session.profile, route]);
@@ -44,7 +45,8 @@ export function App() {
     !session.loading &&
     !session.profile &&
     !session.error &&
-    route !== "#/profil"
+    route !== "#/profil" &&
+    route !== "#/explorer"
   )
     return null;
   if (route === "#/profil")
@@ -53,12 +55,7 @@ export function App() {
         <ProfileWizard />
       </RequireSession>
     );
-  if (route === "#/explorer")
-    return (
-      <RequireSession>
-        <ConnectedExplorer />
-      </RequireSession>
-    );
+  if (route === "#/explorer") return <ConnectedExplorer />;
   const experience = route.match(/^#\/experience\/([^/]+)\/([^/]+)$/);
   if (experience)
     return (

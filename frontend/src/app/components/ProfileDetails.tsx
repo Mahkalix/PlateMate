@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { api, json, errorMessage } from "../api";
 import { useSession } from "../Session";
 import { suggestions, type Profile } from "../profile";
@@ -14,6 +14,15 @@ function ProfileCard({
   save: () => Promise<void>;
 }) {
   const [editing, setEditing] = useState(false);
+  const fields = useRef<HTMLFieldSetElement>(null);
+  useEffect(() => {
+    if (editing)
+      fields.current
+        ?.querySelector<HTMLInputElement>(
+          "input:not([readonly]), textarea, button",
+        )
+        ?.focus();
+  }, [editing]);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -39,7 +48,11 @@ function ProfileCard({
           }
         }}
       >
-        <fieldset className="pm-profile__editable" disabled={!editing || busy}>
+        <fieldset
+          ref={fields}
+          className="pm-profile__editable"
+          disabled={!editing || busy}
+        >
           {children}
         </fieldset>
         <div className="pm-profile__actions">
@@ -53,7 +66,7 @@ function ProfileCard({
             type="button"
             className="pm-profile__edit"
             aria-label={`Modifier ${title}`}
-            disabled={busy}
+            disabled={busy || editing}
             onClick={() => {
               setEditing(true);
               setMessage("");
@@ -61,6 +74,7 @@ function ProfileCard({
             }}
           >
             <img src="/account/ce5a3.svg" alt="" />
+            Modifier
           </button>
           <button type="submit" disabled={!editing || busy}>
             {busy ? "Enregistrement." : "Enregistrer"}
@@ -185,6 +199,7 @@ export function ProfileDetails({
           <label>
             Email
             <input value={email} type="email" readOnly />
+            <small>L’adresse de connexion est gérée par Auth0.</small>
           </label>
           {field("birthDate", "Date de naissance", "date")}
         </div>

@@ -1,3 +1,4 @@
+import { ExperienceCards } from "../components/ExperienceCards";
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { api, errorMessage, json } from "../api";
 import { useSession } from "../Session";
@@ -431,55 +432,9 @@ function TableForm() {
 }
 
 export function ConnectedExplorer() {
-  const [offset, setOffset] = useState(0);
-  const state = useLoad<{
-    items: Card[];
-    total: number;
-    nextOffset: number | null;
-  }>(`/explorer?offset=${offset}`);
   return (
     <Shell title="Explorer les expériences">
-      {!state.data ? (
-        <LoadState error={state.error} retry={state.reload} />
-      ) : (
-        <>
-          {!state.data.items.length && (
-            <p>
-              Aucune expérience compatible pour le moment. Vérifiez que{" "}
-              <a href="#/mon-profil/invite">votre profil</a> est complété.
-            </p>
-          )}
-          <div className="pm-live__grid">
-            {state.data.items.map((card) => (
-              <article className="pm-form-card" key={card.contextId}>
-                <h2>{card.contextTitle}</h2>
-                <p>
-                  Chez {card.firstName} à {card.city}
-                </p>
-                <p>
-                  {card.kind} à {card.ambience}
-                </p>
-                <a
-                  className="pm-button"
-                  href={`#/experience/${card.hostId}/${card.contextId}`}
-                >
-                  Voir les disponibilités
-                </a>
-              </article>
-            ))}
-          </div>
-          {offset > 0 && (
-            <button onClick={() => setOffset(Math.max(0, offset - 20))}>
-              Précédent
-            </button>
-          )}
-          {state.data.nextOffset !== null && (
-            <button onClick={() => setOffset(state.data!.nextOffset!)}>
-              Suivant
-            </button>
-          )}
-        </>
-      )}
+      <ExperienceCards />
     </Shell>
   );
 }

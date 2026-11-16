@@ -24,6 +24,7 @@ const backend = createServer(async (req, res) => {
   if (route === '/auth/login') { loggedIn = true; res.writeHead(303, { Location: origin + '/#/mon-profil/invite', 'Set-Cookie': 'refresh=fixture; HttpOnly; SameSite=Strict; Path=/auth/refresh' }).end(); return; }
   if (route === '/auth/refresh') return send(loggedIn && req.headers.cookie?.includes('refresh=fixture') ? { accessToken: 'fixture-token' } : { error: 'unauthorized' }, loggedIn && req.headers.cookie?.includes('refresh=fixture') ? 200 : 401);
   if (failure) return send({ error: 'api_unavailable' }, 503);
+  if (route === '/public/explorer') return send({ items: [card], total: 1, nextOffset: null });
   if (req.headers.authorization !== 'Bearer fixture-token' || !loggedIn) return send({ error: 'unauthorized' }, 401);
   if (route === '/auth/logout') { loggedIn = false; res.writeHead(204).end(); return; }
   if (route === '/me') return send({ id: 'fixture-user', email: 'test@example.invalid' });
@@ -73,6 +74,9 @@ const backend = createServer(async (req, res) => {
   const ev = async expression => { const result = await cmd('Runtime.evaluate', { expression, awaitPromise: true, returnByValue: true }); if (result.exceptionDetails) throw Error(result.exceptionDetails.exception?.description); return result.result.value; };
   const until = async expression => { for (let i = 0; i < 100; i++) { if (await ev(expression)) return; await wait(50); } throw Error(`Condition failed: ${expression}`); };
   const go = hash => cmd('Page.navigate', { url: origin + '/#/' + hash });
+  await go('explorer');
+  await until('document.body.textContent.includes("Repas de test")');
+  assert.equal(loggedIn, false);
   await go('mon-profil/invite');
   await until('document.body.textContent.includes("Connectez-vous pour continuer")');
   await ev(`document.querySelector('a[href="/auth/login"]').click()`);
@@ -103,6 +107,13 @@ const backend = createServer(async (req, res) => {
   await ev('window.__reloadMarker = true'); await cmd('Page.reload');
   await until('!window.__reloadMarker && document.querySelector("[name=firstName]")?.value === "Alex"');
   assert.equal(await ev('document.querySelector("[aria-controls=account-navigation]").textContent.trim()'), 'Alex');
+  await ev('document.querySelector("[aria-label=\\\"Modifier Informations personnelles\\\"]").click()');
+  await until('document.activeElement?.name === "firstName"');
+  await ev(`{ const input = document.querySelector('[name=firstName]'); Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(input,'Max'); input.dispatchEvent(new Event('input',{bubbles:true})); }`);
+  await ev('document.querySelector("[name=firstName]").form.requestSubmit()');
+  await until('document.body.textContent.includes("Modifications enregistrées.")');
+  assert.equal(profile.firstName, 'Max');
+  await cmd('Page.reload'); await until('document.querySelector("[name=firstName]")?.value === "Max"');
   await go('mon-profil/hote'); await until('document.querySelectorAll("form").length === 4');
   await ev('document.querySelectorAll("form")[3].requestSubmit()');
   await until('!!document.querySelector("[name=tableLanguages]")');
@@ -139,3 +150,4 @@ const backend = createServer(async (req, res) => {
   assert.equal(loggedIn, false);
   console.log('PASS: protected route, cookie refresh, profile persistence, explorer, booking, private consent, cancellation, responsive layout, error recovery, logout (API fixture).');
 })().catch(error => { console.error(error); process.exitCode = 1; }).finally(() => { ws?.close(); browser?.kill(); web?.kill(); backend.closeAllConnections(); backend.close(); });
+

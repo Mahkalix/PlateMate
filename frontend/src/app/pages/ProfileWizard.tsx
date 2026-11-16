@@ -249,8 +249,21 @@ export function ProfileWizard() {
           </form>
         ) : (
           <section className="pm-form-card pm-confirmation">
-            <span className="pm-confirmation__icon">
-              <img src="/ready/29bf5.svg" alt="" />
+            <span
+              className="pm-confirmation__icon pm-confirmation__icon--animated"
+              aria-hidden="true"
+            >
+              <svg viewBox="0 0 32 32" width="32" height="32">
+                <path
+                  d="m8 16 5 5 11-12"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  pathLength="1"
+                />
+              </svg>
             </span>
             <div className="pm-confirmation__heading">
               <h2 ref={heading} tabIndex={-1}>

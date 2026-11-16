@@ -1,4 +1,4 @@
-import { Featured } from "../components/Featured";
+import { ExperienceCards } from "../components/ExperienceCards";
 
 export function FeaturedTables() {
   return (
@@ -8,11 +8,11 @@ export function FeaturedTables() {
           <p className="pm-eyebrow">Expériences à la une</p>
           <h2>Des tables qui ont du caractère.</h2>
         </div>
-        <a href="#cartes">
+        <a href="#/explorer">
           Découvrez <img src="/home/ArrowRightCircle1.svg" alt="" />
         </a>
       </div>
-      <Featured />
+      <ExperienceCards featured />
     </section>
   );
 }

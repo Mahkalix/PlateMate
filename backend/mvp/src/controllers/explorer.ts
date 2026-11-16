@@ -15,7 +15,7 @@ const query = z
 export function explorerController(repo: ExplorerRepository) {
   const list: RequestHandler = async (req, res) => {
     const filters = query.parse(req.query);
-    const ranked = await repo.candidates(res.locals.identity.user.id, filters);
+    const ranked = await repo.candidates(res.locals.identity?.user.id ?? null, filters);
     const end = filters.offset + filters.limit;
     res.json({
       items: ranked.slice(filters.offset, end),

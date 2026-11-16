@@ -118,3 +118,14 @@ export function errorMessage(error: unknown): string {
   }
   return "Connexion au serveur impossible. Vérifiez que l’API est démarrée.";
 }
+
+export async function publicApi<T>(path: string): Promise<T> {
+  if (!path.startsWith("/public/") || path.includes(".."))
+    throw new Error("Invalid public API path");
+  const response = await fetch(`/api${path}`, {
+    credentials: "omit",
+    cache: "no-store",
+  });
+  if (!response.ok) throw new ApiError(response.status, "request_failed");
+  return response.json();
+}
