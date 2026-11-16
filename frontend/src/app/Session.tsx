@@ -97,7 +97,7 @@ export function RequireSession({ children }: { children: ReactNode }) {
     return (
       <main className="pm-live">
         <p role="alert">{error}</p>
-        <button onClick={retry}>R�essayer</button>
+        <button onClick={retry}>Réessayer</button>
       </main>
     );
   if (!user)
@@ -107,7 +107,7 @@ export function RequireSession({ children }: { children: ReactNode }) {
         <a className="pm-button" href="/auth/login">
           Se connecter
         </a>
-        <a href="/auth/register">Cr�er un compte</a>
+        <a href="/auth/register">Créer un compte</a>
       </main>
     );
   return children;
