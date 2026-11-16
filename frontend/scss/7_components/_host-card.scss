@@ -51,6 +51,7 @@
     text-align: center;
   }
   &__title {
+    color: var(--pm-teal);
     top: 53.69%;
     display: grid;
     place-content: center;
@@ -119,6 +120,16 @@
       aspect-ratio: 89 / 105;
       object-fit: cover;
       display: block;
+    }
+  }
+  &--outline &__arrow {
+    width: 4rem;
+    left: calc(50% - 1.3rem);
+    background: transparent;
+    img {
+      width: 2.4rem;
+      height: 2.4rem;
+      transform: rotate(180deg);
     }
   }
   // Le PNG comprend déjà l’inclinaison du ruban.

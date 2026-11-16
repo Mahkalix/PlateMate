@@ -31,6 +31,7 @@ export function ExplorerPage() {
                 photo={photo}
                 portrait={portrait}
                 href="#/connexion"
+                variant="outline"
               />
             ))}
           </div>

@@ -3,6 +3,7 @@ type TableCardProps = {
   title: string;
   photo: string;
   portrait: string;
+  variant?: "filled" | "outline";
 } & (
   { href: string; onSelect?: never } | { href?: never; onSelect: () => void }
 );
@@ -14,6 +15,7 @@ export function TableCard({
   portrait,
   onSelect,
   href,
+  variant = "filled",
 }: TableCardProps) {
   const content = (
     <>
@@ -35,7 +37,12 @@ export function TableCard({
           </span>
         </span>
         <span className="pm-table-card__arrow">
-          <img src="/home/ArrowLeft.svg" alt="" />
+          <img
+            src={
+              variant === "outline" ? "/ready/54d67.svg" : "/home/ArrowLeft.svg"
+            }
+            alt=""
+          />
         </span>
       </span>
       <span className="pm-table-card__portrait">
@@ -46,13 +53,17 @@ export function TableCard({
   );
   const label = title + " avec " + host;
   return href ? (
-    <a href={href} className="pm-table-card" aria-label={label}>
+    <a
+      href={href}
+      className={`pm-table-card pm-table-card--${variant}`}
+      aria-label={label}
+    >
       {content}
     </a>
   ) : (
     <button
       type="button"
-      className="pm-table-card"
+      className={`pm-table-card pm-table-card--${variant}`}
       aria-label={label}
       onClick={onSelect}
     >
