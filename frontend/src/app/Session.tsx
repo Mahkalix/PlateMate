@@ -6,10 +6,15 @@ import {
   type ReactNode,
 } from "react";
 import { api, clearSession, errorMessage, refreshSession } from "./api";
+import type { Profile } from "./profile";
 
 type User = { id: string; email: string };
 const Context = createContext<{
   user: User | null;
+  profile: Profile | null;
+  setProfile: (profile: Profile) => void;
+  draftName: string;
+  setDraftName: (name: string) => void;
   loading: boolean;
   error: string;
   retry: () => void;
@@ -18,13 +23,19 @@ const Context = createContext<{
 export const useSession = () => useContext(Context);
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [draftName, setDraftName] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [attempt, retry] = useState(0);
   useEffect(() => {
     let active = true;
     const ended = () => {
-      if (active) setUser(null);
+      if (active) {
+        setUser(null);
+        setProfile(null);
+        setDraftName("");
+      }
     };
     window.addEventListener("session-ended", ended);
     setLoading(true);
@@ -32,7 +43,13 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     (async () => {
       try {
         const next = (await refreshSession()) ? await api<User>("/me") : null;
-        if (active) setUser(next);
+        const owner = next
+          ? await api<{ profile: Profile | null }>("/me/profile")
+          : null;
+        if (active) {
+          setUser(next);
+          setProfile(owner?.profile ?? null);
+        }
       } catch (e) {
         if (active) setError(errorMessage(e));
       } finally {
@@ -51,7 +68,17 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   }
   return (
     <Context.Provider
-      value={{ user, loading, error, retry: () => retry((n) => n + 1), logout }}
+      value={{
+        user,
+        profile,
+        setProfile,
+        draftName,
+        setDraftName,
+        loading,
+        error,
+        retry: () => retry((n) => n + 1),
+        logout,
+      }}
     >
       {children}
     </Context.Provider>
@@ -63,14 +90,14 @@ export function RequireSession({ children }: { children: ReactNode }) {
   if (loading)
     return (
       <main className="pm-live">
-        <p role="status">Chargement de votre session…</p>
+        <p role="status">Chargement de votre session.</p>
       </main>
     );
   if (error)
     return (
       <main className="pm-live">
         <p role="alert">{error}</p>
-        <button onClick={retry}>Réessayer</button>
+        <button onClick={retry}>R�essayer</button>
       </main>
     );
   if (!user)
@@ -80,8 +107,9 @@ export function RequireSession({ children }: { children: ReactNode }) {
         <a className="pm-button" href="/auth/login">
           Se connecter
         </a>
-        <a href="/auth/register">Créer un compte</a>
+        <a href="/auth/register">Cr�er un compte</a>
       </main>
     );
   return children;
 }
+
