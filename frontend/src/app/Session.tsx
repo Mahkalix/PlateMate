@@ -112,4 +112,3 @@ export function RequireSession({ children }: { children: ReactNode }) {
     );
   return children;
 }
-
