@@ -14,6 +14,74 @@ type Card = {
 };
 type Page = { items: Card[]; total: number; nextOffset: number | null };
 
+const discoveryTables = [
+  {
+    title: "Une soirée libanaise",
+    host: "Amina",
+    kind: "Cuisine libanaise",
+    ambience: "Conviviale",
+    photo: "BackgroundImage",
+  },
+  {
+    title: "Le bistrot à la maison",
+    host: "Jean-Marc",
+    kind: "Cuisine française",
+    ambience: "Calme et détendue",
+    photo: "BackgroundImage4",
+  },
+  {
+    title: "Burgers et jeux de société",
+    host: "Troy",
+    kind: "Cuisine américaine",
+    ambience: "Animée",
+    photo: "BackgroundImage3",
+  },
+  {
+    title: "Un dimanche à partager",
+    host: "Usain",
+    kind: "Cuisine familiale",
+    ambience: "Grande tablée",
+    photo: "BackgroundImage2",
+  },
+];
+
+function DiscoveryCards({ featured }: { featured: boolean }) {
+  return (
+    <div className="pm-suggestions" id={featured ? "cartes" : undefined}>
+      <p>
+        Un aperçu des moments à partager autour d’une table. Connectez-vous pour
+        découvrir les repas disponibles et vos suggestions personnalisées.
+      </p>
+      <p>Exemples de tables, présentés à titre d’inspiration.</p>
+      <div className="pm-suggestions__grid">
+        {discoveryTables.map((table) => (
+          <article className="pm-suggestion" key={table.title}>
+            <img
+              src={`/home/${table.photo}.webp`}
+              alt=""
+              loading="lazy"
+              width="400"
+              height="240"
+              style={{ width: "100%", height: "20rem", objectFit: "cover" }}
+            />
+            <div className="pm-suggestion__body">
+              <p className="pm-eyebrow">Table découverte · Exemple</p>
+              <h3>{table.title}</h3>
+              <p>Chez {table.host}</p>
+              <p>
+                {table.kind} · {table.ambience}
+              </p>
+              <a className="pm-button pm-button--red" href="#/connexion">
+                Découvrir PlateMate
+              </a>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function ExperienceCards({ featured = false }: { featured?: boolean }) {
   const { user, profile, loading } = useSession();
   const [offset, setOffset] = useState(0);
@@ -45,6 +113,8 @@ export function ExperienceCards({ featured = false }: { featured?: boolean }) {
     setOffset(0);
   }, [user?.id, profile]);
   const current = state.key === key ? state : null;
+  if (!user && !current?.data?.items.length)
+    return <DiscoveryCards featured={featured} />;
   return (
     <div className="pm-suggestions" id={featured ? "cartes" : undefined}>
       <p>
