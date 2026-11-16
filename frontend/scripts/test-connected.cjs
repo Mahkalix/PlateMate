@@ -103,6 +103,12 @@ const backend = createServer(async (req, res) => {
   for (const width of [1440,390]) { await cmd('Emulation.setDeviceMetricsOverride', { width,height:900,deviceScaleFactor:1,mobile:false }); assert.equal(await ev('document.documentElement.scrollWidth'), width); }
   failure = true; await go('explorer'); await until('!!document.querySelector("[role=alert]")');
   failure = false; await ev('[...document.querySelectorAll("button")].find(b=>b.textContent==="Réessayer").click()'); await until('document.body.textContent.includes("Repas de test")');
+  assert.equal(await ev('document.querySelector("#account-navigation").hidden'), true);
+  await ev('document.querySelector("[aria-controls=account-navigation]").click()');
+  assert.equal(await ev('document.querySelector("#account-navigation").hidden'), false);
+  await ev('document.dispatchEvent(new KeyboardEvent("keydown", {key:"Escape",bubbles:true}))');
+  assert.equal(await ev('document.querySelector("#account-navigation").hidden'), true);
+  await ev('document.querySelector("[aria-controls=account-navigation]").click()');
   await ev('[...document.querySelectorAll("button")].find(b=>b.textContent==="Se déconnecter").click()');
   await until('!!document.querySelector("a[href=\"/auth/login\"]")');
   await go('mes-repas/invite'); await until('document.body.textContent.includes("Connectez-vous pour continuer")');

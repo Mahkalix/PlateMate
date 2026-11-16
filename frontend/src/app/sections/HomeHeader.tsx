@@ -16,8 +16,36 @@ export function HomeHeader({
   const [loggingOut, setLoggingOut] = useState(false);
   const signedIn = Boolean(session.user);
   const [open, setOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const account = useRef<HTMLDivElement>(null);
+  const accountButton = useRef<HTMLButtonElement>(null);
   const [scrolled, setScrolled] = useState(false);
   const header = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const close = () => {
+      setAccountOpen(false);
+      setOpen(false);
+    };
+    const outside = (event: PointerEvent) => {
+      if (!account.current?.contains(event.target as Node))
+        setAccountOpen(false);
+    };
+    const escape = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && accountOpen) {
+        setAccountOpen(false);
+        accountButton.current?.focus();
+      }
+    };
+    window.addEventListener("hashchange", close);
+    document.addEventListener("pointerdown", outside);
+    document.addEventListener("keydown", escape);
+    return () => {
+      window.removeEventListener("hashchange", close);
+      document.removeEventListener("pointerdown", outside);
+      document.removeEventListener("keydown", escape);
+    };
+  }, [accountOpen]);
 
   useEffect(() => {
     const update = () => setScrolled(window.scrollY > 0);
@@ -63,7 +91,10 @@ export function HomeHeader({
             className="pm-menu-toggle"
             aria-controls="home-nav"
             aria-expanded={open}
-            onClick={() => setOpen(!open)}
+            onClick={() => {
+              setOpen(!open);
+              setAccountOpen(false);
+            }}
           >
             {open ? "Fermer" : "Menu"}
           </button>
@@ -74,39 +105,69 @@ export function HomeHeader({
           >
             <HomeNavLinks onNavigate={() => setOpen(false)} />
           </nav>
-          <div className="pm-header__account">
-            <a
-              className="pm-button pm-header__login"
-              href={signedIn ? `#/mon-profil/${accountRole}` : "#/connexion"}
-            >
-              <img src="/home/UserCircle.svg" alt="" />
-              {signedIn ? "Mon compte" : "Se connecter"}
-            </a>
-            {signedIn && (
+          <div
+            className="pm-header__account"
+            ref={account}
+            onBlur={(event) => {
+              if (!event.currentTarget.contains(event.relatedTarget as Node))
+                setAccountOpen(false);
+            }}
+          >
+            {signedIn ? (
               <button
                 type="button"
-                className="pm-header__logout"
-                disabled={loggingOut}
-                aria-busy={loggingOut}
-                onClick={async () => {
-                  setLoggingOut(true);
-                  setLogoutError("");
-                  try {
-                    await session.logout();
-                  } catch (e) {
-                    setLogoutError(errorMessage(e));
-                  } finally {
-                    setLoggingOut(false);
-                  }
+                ref={accountButton}
+                className="pm-button pm-header__login"
+                aria-expanded={accountOpen}
+                aria-controls="account-navigation"
+                onClick={() => {
+                  setAccountOpen(!accountOpen);
+                  setOpen(false);
                 }}
               >
-                {loggingOut ? "Déconnexion…" : "Se déconnecter"}
+                <img src="/home/UserCircle.svg" alt="" />
+                {accountName || "Mon compte"}
               </button>
+            ) : (
+              <a className="pm-button pm-header__login" href="#/connexion">
+                <img src="/home/UserCircle.svg" alt="" />
+                Se connecter
+              </a>
             )}
-            {logoutError && (
-              <p className="pm-header__account-error" role="alert">
-                {logoutError}
-              </p>
+            {signedIn && (
+              <nav
+                id="account-navigation"
+                className="pm-header__account-panel"
+                aria-label="Espace personnel"
+                hidden={!accountOpen}
+              >
+                <a href={`#/mon-profil/${accountRole}`}>Mon profil</a>
+                <a href={`#/mes-repas/${accountRole}`}>Mes repas</a>
+                <button
+                  type="button"
+                  className="pm-header__logout"
+                  disabled={loggingOut}
+                  aria-busy={loggingOut}
+                  onClick={async () => {
+                    setLoggingOut(true);
+                    setLogoutError("");
+                    try {
+                      await session.logout();
+                    } catch (e) {
+                      setLogoutError(errorMessage(e));
+                    } finally {
+                      setLoggingOut(false);
+                    }
+                  }}
+                >
+                  {loggingOut ? "Déconnexion…" : "Se déconnecter"}
+                </button>
+                {logoutError && (
+                  <p className="pm-header__account-error" role="alert">
+                    {logoutError}
+                  </p>
+                )}
+              </nav>
             )}
           </div>
         </header>

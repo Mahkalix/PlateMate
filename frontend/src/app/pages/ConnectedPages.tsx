@@ -127,18 +127,49 @@ function useLoad<T>(path: string) {
 }
 
 function Shell({ title, children }: { title: string; children: ReactNode }) {
+  const route = window.location.hash;
+  const accountPage =
+    /^#\/(mon-profil|mes-repas|profil|candidature)(\/|$)/.test(route);
+  const role =
+    route.includes("/hote") || route === "#/candidature" ? "hote" : "invite";
+  const meals = route.startsWith("#/mes-repas");
   return (
     <div className="app pm-inner-page">
-      <HomeHeader />
+      <HomeHeader accountRole={role} />
       <main className="pm-live">
         <h1>{title}</h1>
-        <nav className="pm-live__nav" aria-label="Mon compte">
-          <a href="#/mon-profil/invite">Mon profil</a>
-          <a href="#/explorer">Explorer</a>
-          <a href="#/mes-repas/invite">Mes repas invités</a>
-          <a href="#/mes-repas/hote">Mes repas hôte</a>
-          <a href="#/mon-profil/hote">Ma table</a>
-        </nav>
+        {accountPage && (
+          <>
+            <nav className="pm-account__tabs" aria-label="Mon compte">
+              <a
+                href={`#/mon-profil/${role}`}
+                aria-current={!meals ? "page" : undefined}
+              >
+                Profil
+              </a>
+              <a
+                href={`#/mes-repas/${role}`}
+                aria-current={meals ? "page" : undefined}
+              >
+                Mes repas
+              </a>
+            </nav>
+            <nav className="pm-live__nav" aria-label="Choisir mon espace">
+              <a
+                href={`#/${meals ? "mes-repas" : "mon-profil"}/invite`}
+                aria-current={role === "invite" ? "true" : undefined}
+              >
+                Espace invité
+              </a>
+              <a
+                href={`#/${meals ? "mes-repas" : "mon-profil"}/hote`}
+                aria-current={role === "hote" ? "true" : undefined}
+              >
+                Espace hôte
+              </a>
+            </nav>
+          </>
+        )}
         {children}
       </main>
       <HomeFooter />

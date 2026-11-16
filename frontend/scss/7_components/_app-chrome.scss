@@ -22,57 +22,60 @@
     gap: 1.2rem;
     flex-shrink: 0;
   }
-  &__logout {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 4.4rem;
-    padding: 1rem 1.6rem;
-    border: 1px solid var(--pm-red);
-    border-radius: 999px;
+  &__account-panel {
+    position: absolute;
+    top: calc(100% + 1rem);
+    right: 0;
+    width: min(24rem, calc(100vw - 3.2rem));
+    padding: 0.8rem;
+    border: 1px solid rgb(15 9 9 / 12%);
+    border-radius: 1.6rem;
     background: var(--pm-cream);
-    color: var(--pm-red);
-    font: inherit;
-    font-size: 1.4rem;
-    font-weight: 700;
-    white-space: nowrap;
-    cursor: pointer;
-    &:hover:not(:disabled) {
-      background: var(--pm-yellow);
+    color: #0f0909;
+    box-shadow: 0 8px 24px rgb(0 0 0 / 15%);
+    &[hidden] {
+      display: none;
     }
-    &:focus-visible {
-      outline: 2px solid currentColor;
-      outline-offset: 4px;
+    a,
+    button {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      min-height: 4.4rem;
+      padding: 1rem 1.2rem;
+      border: 0;
+      border-radius: 0.8rem;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      font-size: 1.6rem;
+      text-align: left;
+      text-decoration: none;
+      cursor: pointer;
+      &:hover {
+        background: var(--pm-yellow);
+      }
     }
-    &:disabled {
-      opacity: 0.7;
-      cursor: wait;
+    .pm-header__logout {
+      margin-top: 0.4rem;
+      border-top: 1px solid rgb(15 9 9 / 12%);
+      border-radius: 0;
+      color: var(--pm-red);
+      &:disabled {
+        opacity: 0.7;
+        cursor: wait;
+      }
     }
   }
   &__account-error {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    width: min(30rem, calc(100vw - 3.2rem));
-    margin-top: 1rem;
-    padding: 1.2rem;
-    border-radius: 0.8rem;
-    background: var(--pm-cream);
+    padding: 1rem;
     color: var(--pm-red);
     font-size: 1.4rem;
-    box-shadow: 0 4px 16px rgb(0 0 0 / 15%);
   }
 }
-@media (max-width: 1180px) {
-  .pm-header__account {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.8rem;
-    margin-left: auto;
-    .pm-header__login {
-      margin-left: 0;
-    }
-  }
+.app .pm-header__account-panel :is(a, button):focus-visible {
+  outline: 2px solid var(--pm-red);
+  outline-offset: -2px;
 }
 .pm-sticky-nav {
   position: sticky;
