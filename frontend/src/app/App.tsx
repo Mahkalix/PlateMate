@@ -93,4 +93,3 @@ export function App() {
   if (route === "#/connexion") return <ConnectedLogin />;
   return <HomePage />;
 }
-
