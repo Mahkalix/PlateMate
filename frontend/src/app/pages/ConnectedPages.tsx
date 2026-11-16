@@ -3,26 +3,9 @@ import { api, errorMessage, json } from "../api";
 import { useSession } from "../Session";
 import { HomeHeader } from "../sections/HomeHeader";
 import { HomeFooter } from "../sections/HomeFooter";
+import { ProfileDetails } from "../components/ProfileDetails";
+import type { Profile } from "../profile";
 
-type Profile = {
-  firstName: string;
-  lastName: string;
-  city: string;
-  neighborhood?: string;
-  phone?: string;
-  birthDate?: string;
-  description?: string;
-  motivations?: string[];
-  languages: string[];
-  affinities: string[];
-  publicInterests: string[];
-  ambiences: string[];
-  diets: string[];
-  allergies: string[];
-  intolerances: string[];
-  cuisines: string[];
-  consent: boolean;
-};
 type Summary = {
   isHost: boolean;
   email: string;
@@ -98,10 +81,10 @@ const date = (value: string) =>
   });
 const statusLabel: Record<string, string> = {
   pending: "En attente",
-  accepted: "Acceptée",
-  declined: "Refusée",
-  cancelled: "Annulée",
-  completed: "Terminée",
+  accepted: "Accept�e",
+  declined: "Refus�e",
+  cancelled: "Annul�e",
+  completed: "Termin�e",
 };
 
 function useLoad<T>(path: string) {
@@ -135,6 +118,8 @@ function Shell({
   children: ReactNode;
   name?: string;
 }) {
+  const session = useSession();
+  name = session.draftName || session.profile?.firstName || name;
   const route = window.location.hash;
   const accountPage =
     /^#\/(mon-profil|mes-repas|profil|candidature)(\/|$)/.test(route);
@@ -149,7 +134,7 @@ function Shell({
       <main
         className={
           accountPage
-            ? `pm-live pm-account ${meals ? "pm-history" : "pm-profile"}`
+            ? `pm-account ${meals ? "pm-live pm-history" : "pm-profile"}`
             : "pm-live"
         }
       >
@@ -178,13 +163,13 @@ function Shell({
                 href={`#/${meals ? "mes-repas" : "mon-profil"}/invite`}
                 aria-current={role === "invite" ? "true" : undefined}
               >
-                Espace invité
+                Espace invit�
               </a>
               <a
                 href={`#/${meals ? "mes-repas" : "mon-profil"}/hote`}
                 aria-current={role === "hote" ? "true" : undefined}
               >
-                Espace hôte
+                Espace h�te
               </a>
             </nav>
           </>
@@ -202,10 +187,10 @@ function LoadState({ error, retry }: { error: string; retry: () => void }) {
   return error ? (
     <div>
       <p role="alert">{error}</p>
-      <button onClick={retry}>Réessayer</button>
+      <button onClick={retry}>R�essayer</button>
     </div>
   ) : (
-    <p role="status">Chargement…</p>
+    <p role="status">Chargement.</p>
   );
 }
 function Field({
@@ -239,7 +224,7 @@ function Field({
 function ActionForm({
   children,
   submit,
-  success = "Enregistré.",
+  success = "Enregistr�.",
   after,
   disabled = false,
 }: {
@@ -274,7 +259,7 @@ function ActionForm({
       <fieldset disabled={busy || disabled}>
         {children}
         <button className="pm-button" type="submit">
-          {busy ? "Envoi…" : "Valider"}
+          {busy ? "Envoi." : "Valider"}
         </button>
       </fieldset>
       {error && <p role="alert">{error}</p>}
@@ -284,201 +269,75 @@ function ActionForm({
 }
 
 export function ConnectedProfile({ host = false }: { host?: boolean }) {
-  const profile = useLoad<{ profile: Profile | null }>("/me/profile");
+  const session = useSession();
   const summary = useLoad<Summary>("/me/account-summary");
-  if (!profile.data || !summary.data)
+  const p = session.profile;
+  if (!p || !summary.data)
     return (
       <Shell title="Mon profil">
-        <LoadState
-          error={profile.error || summary.error}
-          retry={() => {
-            profile.reload();
-            summary.reload();
-          }}
-        />
+        <LoadState error={summary.error} retry={summary.reload} />
       </Shell>
     );
-  const p = profile.data.profile;
   return (
-    <Shell title={host ? "Mon profil hôte" : "Mon profil"} name={p?.firstName}>
+    <Shell title="Mon profil" name={p.firstName}>
       <div className="pm-profile__stats">
         <div>
           <strong>{summary.data.hostsMet}</strong>
-          <p>Hôtes rencontrés</p>
+          <span>H�tes rencontr�s</span>
         </div>
         <div>
           <strong>{summary.data.mealsHosted}</strong>
-          <p>Repas accueillis</p>
+          <span>Repas accueillis</span>
         </div>
         <div>
           <strong>{summary.data.guestsMet}</strong>
-          <p>Invités rencontrés</p>
+          <span>Invit�s rencontr�s</span>
         </div>
       </div>
       <div className="pm-profile__columns">
         <aside className="pm-profile__sidebar">
           <section className="pm-profile__aside-card">
-            <h3>Ce que voient les hôtes</h3>
+            <h3>Ce que voient les {host ? "invit�s" : "h�tes"}</h3>
             <p>
-              Votre nom complet, votre numéro de téléphone et votre date de
-              naissance restent privés.
+              Votre profil public aide les autres membres � mieux vous
+              conna�tre.
             </p>
-            <p>
-              Le partage des allergies demande votre accord pour chaque
-              réservation.
-            </p>
+            <ul>
+              {[
+                "Pr�nom et initiale",
+                "Pr�sentation et int�r�ts publics",
+                "Jamais : coordonn�es et adresse exacte",
+              ].map((label, i) => (
+                <li key={label}>
+                  <span className={i === 2 ? "is-private" : ""}>
+                    <img
+                      src={
+                        i === 2 ? "/account/c514b.svg" : "/account/af22f.svg"
+                      }
+                      alt=""
+                    />
+                  </span>
+                  {label}
+                </li>
+              ))}
+            </ul>
           </section>
         </aside>
         <div className="pm-profile__details">
-          <ActionForm
-            key={JSON.stringify(p)}
-            success="Profil enregistré sur le serveur."
-            submit={async (data) => {
-              const next: Profile = {
-                firstName: String(data.get("firstName")),
-                lastName: String(data.get("lastName")),
-                city: String(data.get("city")),
-                description: String(data.get("description") || ""),
-                languages: tags(data.get("languages")),
-                affinities: tags(data.get("affinities")),
-                publicInterests: tags(data.get("publicInterests")),
-                ambiences: tags(data.get("ambiences")),
-                diets: tags(data.get("diets")),
-                allergies: tags(data.get("allergies")),
-                intolerances: tags(data.get("intolerances")),
-                cuisines: tags(data.get("cuisines")),
-                consent: data.get("consent") === "on",
-                ...(p?.motivations ? { motivations: p.motivations } : {}),
-              };
-              for (const key of [
-                "neighborhood",
-                "phone",
-                "birthDate",
-              ] as const) {
-                const value = String(data.get(key) || "").trim();
-                if (value) next[key] = value;
-              }
-              if (
-                next.publicInterests.some((i) => !next.affinities.includes(i))
-              )
-                throw new Error("public_interests");
-              if (
-                !next.consent &&
-                (next.diets.length ||
-                  next.allergies.length ||
-                  next.intolerances.length)
-              )
-                throw new Error("consent_required");
-              await api("/me/profile", json("PUT", next));
-            }}
-          >
-            <h2>Informations personnelles</h2>
-            <p className="pm-profile__privacy">
-              Vos coordonnées restent privées.
-            </p>
-            <div className="pm-profile__fields">
-              <label className="pm-field">
-                Email
-                <input type="email" value={summary.data.email} readOnly />
-              </label>
-              <Field
-                name="firstName"
-                label="Prénom"
-                value={p?.firstName}
-                required
-              />
-              <Field
-                name="lastName"
-                label="Nom (privé)"
-                value={p?.lastName}
-                required
-              />
-              <Field name="city" label="Ville" value={p?.city} required />
-              <Field
-                name="neighborhood"
-                label="Quartier"
-                value={p?.neighborhood}
-              />
-              <Field
-                name="phone"
-                label="Téléphone (privé)"
-                value={p?.phone}
-                type="tel"
-                maxLength={25}
-              />
-              <Field
-                name="birthDate"
-                label="Date de naissance (privée)"
-                value={p?.birthDate}
-                type="date"
-              />
-            </div>
-            <h2>À propos de moi</h2>
-            <label className="pm-field">
-              Ma présentation
-              <textarea
-                name="description"
-                defaultValue={p?.description || ""}
-                maxLength={1000}
-              />
-            </label>
-            <h2>Mes préférences</h2>
-            <p>
-              Séparez les valeurs par des virgules. Les centres d’intérêt
-              publics doivent faire partie de vos affinités.
-            </p>
-            {(
-              [
-                ["languages", "Langues", true],
-                ["affinities", "Affinités", true],
-                ["publicInterests", "Centres d’intérêt publics", false],
-                ["ambiences", "Ambiances", true],
-                ["cuisines", "Cuisines", false],
-                ["diets", "Régimes alimentaires (privés)", false],
-                ["allergies", "Allergies (privées)", false],
-                ["intolerances", "Intolérances (privées)", false],
-              ] as const
-            ).map(([key, label, required]) => (
-              <Field
-                key={key}
-                name={key}
-                label={label}
-                value={p?.[key].join(", ")}
-                required={required}
-                maxLength={1944}
-              />
-            ))}
-            <label>
-              <input
-                name="consent"
-                type="checkbox"
-                defaultChecked={p?.consent || false}
-              />{" "}
-              J’accepte le traitement de mes préférences alimentaires pour la
-              compatibilité des repas. Le partage d’allergies avec un hôte
-              nécessite un accord séparé pour chaque réservation.
-            </label>
-            <p>
-              Pour retirer cet accord, videz les champs régimes, allergies et
-              intolérances, puis enregistrez.
-            </p>
-          </ActionForm>
+          <ProfileDetails profile={p} email={summary.data.email} />
           {host &&
             (summary.data.isHost ? (
               <TableForm />
             ) : (
               <ActionForm
-                success="Profil hôte créé."
-                after={() => {
-                  profile.reload();
-                  summary.reload();
-                }}
+                success="Profil h�te cr��."
+                after={summary.reload}
                 submit={() => api("/me/host", json("POST", {}))}
               >
-                <h2>Devenir hôte</h2>
+                <h2>Devenir h�te</h2>
                 <p>
-                  Enregistrez d’abord votre profil ci-dessus, puis activez votre
-                  espace hôte.
+                  Votre profil est pr�t. Activez votre espace h�te pour proposer
+                  une table.
                 </p>
               </ActionForm>
             ))}
@@ -517,17 +376,17 @@ function TableForm() {
     >
       <h2>Ma table</h2>
       <p>
-        Votre adresse est réservée aux invités dont la réservation est acceptée.
+        Votre adresse est r�serv�e aux invit�s dont la r�servation est accept�e.
       </p>
       <Field
         name="specialties"
-        label="Spécialités (virgules)"
+        label="Sp�cialit�s (virgules)"
         value={t.specialties?.join(", ")}
         maxLength={1944}
       />
       <Field
         name="supportedDiets"
-        label="Régimes proposés (virgules)"
+        label="R�gimes propos�s (virgules)"
         value={t.supportedDiets?.join(", ")}
         maxLength={1944}
       />
@@ -540,13 +399,13 @@ function TableForm() {
       />
       <Field
         name="additionalInformation"
-        label="Informations complémentaires"
+        label="Informations compl�mentaires"
         value={t.additionalInformation}
         maxLength={1000}
       />
       <Field
         name="street"
-        label="Rue (laisser vide pour retirer l’adresse)"
+        label="Rue (laisser vide pour retirer l'adresse)"
         value={t.address?.street}
         maxLength={200}
       />
@@ -563,7 +422,7 @@ function TableForm() {
       />
       <Field
         name="instructions"
-        label="Instructions d’accès"
+        label="Instructions d'acc�s"
         value={t.address?.instructions}
         maxLength={500}
       />
@@ -579,15 +438,15 @@ export function ConnectedExplorer() {
     nextOffset: number | null;
   }>(`/explorer?offset=${offset}`);
   return (
-    <Shell title="Explorer les expériences">
+    <Shell title="Explorer les exp�riences">
       {!state.data ? (
         <LoadState error={state.error} retry={state.reload} />
       ) : (
         <>
           {!state.data.items.length && (
             <p>
-              Aucune expérience compatible pour le moment. Vérifiez que{" "}
-              <a href="#/mon-profil/invite">votre profil</a> est complété.
+              Aucune exp�rience compatible pour le moment. V�rifiez que{" "}
+              <a href="#/mon-profil/invite">votre profil</a> est compl�t�.
             </p>
           )}
           <div className="pm-live__grid">
@@ -595,23 +454,23 @@ export function ConnectedExplorer() {
               <article className="pm-form-card" key={card.contextId}>
                 <h2>{card.contextTitle}</h2>
                 <p>
-                  Chez {card.firstName} · {card.city}
+                  Chez {card.firstName} � {card.city}
                 </p>
                 <p>
-                  {card.kind} · {card.ambience}
+                  {card.kind} � {card.ambience}
                 </p>
                 <a
                   className="pm-button"
                   href={`#/experience/${card.hostId}/${card.contextId}`}
                 >
-                  Voir les disponibilités
+                  Voir les disponibilit�s
                 </a>
               </article>
             ))}
           </div>
           {offset > 0 && (
             <button onClick={() => setOffset(Math.max(0, offset - 20))}>
-              Précédent
+              Pr�c�dent
             </button>
           )}
           {state.data.nextOffset !== null && (
@@ -636,13 +495,13 @@ export function Experience({
     `/profiles/${encodeURIComponent(hostId)}/contexts/${encodeURIComponent(contextId)}`,
   );
   return (
-    <Shell title={state.data?.contextTitle || "Expérience"}>
+    <Shell title={state.data?.contextTitle || "Exp�rience"}>
       {!state.data ? (
         <LoadState error={state.error} retry={state.reload} />
       ) : (
         <>
           <p>
-            Chez {state.data.firstName} · {state.data.city}
+            Chez {state.data.firstName} � {state.data.city}
           </p>
           <p>{state.data.description}</p>
           <p>
@@ -652,12 +511,12 @@ export function Experience({
               { style: "currency", currency: "EUR" },
             )}
           </p>
-          {!state.data.slots?.length && <p>Aucun créneau disponible.</p>}
+          {!state.data.slots?.length && <p>Aucun cr�neau disponible.</p>}
           {state.data.slots?.map((slot) => (
             <ActionForm
               key={slot.id}
               disabled={slot.remainingPlaces < 1}
-              success="Demande envoyée à l’hôte. Retrouvez-la dans Mes repas."
+              success="Demande envoy�e � l'h�te. Retrouvez-la dans Mes repas."
               submit={(data) =>
                 api(
                   "/bookings",
@@ -682,7 +541,7 @@ export function Experience({
                   disabled={slot.remainingPlaces < 1}
                 />
               </label>
-              {slot.remainingPlaces < 1 && <p>Ce créneau est complet.</p>}
+              {slot.remainingPlaces < 1 && <p>Ce cr�neau est complet.</p>}
             </ActionForm>
           ))}
           <a href="#/mes-repas/invite">Voir mes demandes</a>
@@ -705,14 +564,14 @@ export function ConnectedMeals({ host = false }: { host?: boolean }) {
     bookings.reload();
   };
   return (
-    <Shell title={host ? "Les repas que j’accueille" : "Mes repas invités"}>
+    <Shell title={host ? "Les repas que j'accueille" : "Mes repas invit�s"}>
       {!state.data || !bookings.data ? (
         <LoadState error={state.error || bookings.error} retry={reload} />
       ) : (
         <>
           {host && !state.data.isHost && (
             <p>
-              <a href="#/mon-profil/hote">Activer mon profil hôte</a>
+              <a href="#/mon-profil/hote">Activer mon profil h�te</a>
             </p>
           )}
           {host && state.data.isHost && <PublishMeal after={reload} />}
@@ -724,8 +583,8 @@ export function ConnectedMeals({ host = false }: { host?: boolean }) {
               <section className="pm-form-card">
                 <h3>
                   {host
-                    ? "Vous n’avez pas encore accueilli de repas"
-                    : "Vous n’avez pas encore réservé de repas"}
+                    ? "Vous n'avez pas encore accueilli de repas"
+                    : "Vous n'avez pas encore r�serv� de repas"}
                 </h3>
                 {!host && (
                   <a className="pm-button" href="#/explorer">
@@ -737,9 +596,9 @@ export function ConnectedMeals({ host = false }: { host?: boolean }) {
           <div className="pm-meals__sections">
             {(
               [
-                ["upcoming", "À venir"],
-                ["past", "Repas passés"],
-                ["cancelled", "Annulés ou refusés"],
+                ["upcoming", "� venir"],
+                ["past", "Repas pass�s"],
+                ["cancelled", "Annul�s ou refus�s"],
               ] as const
             ).map(([section, title]) => (
               <section className="pm-meals__section" key={section}>
@@ -760,7 +619,7 @@ export function ConnectedMeals({ host = false }: { host?: boolean }) {
                         {host && (
                           <p>
                             {meal.confirmedPlaces}/{meal.capacity} places
-                            confirmées · {meal.pendingRequests} demandes
+                            confirm�es � {meal.pendingRequests} demandes
                           </p>
                         )}
                         {meal.address && (
@@ -821,7 +680,7 @@ export function ConnectedMeals({ host = false }: { host?: boolean }) {
           </div>
           {offset > 0 && (
             <button onClick={() => setOffset(Math.max(0, offset - 50))}>
-              Repas précédents
+              Repas pr�c�dents
             </button>
           )}
           {Object.values(state.data.sections).flat().length === 50 && (
@@ -830,7 +689,7 @@ export function ConnectedMeals({ host = false }: { host?: boolean }) {
             </button>
           )}
           <section>
-            <h2>{host ? "Gérer les demandes" : "Mes réservations"}</h2>
+            <h2>{host ? "G�rer les demandes" : "Mes r�servations"}</h2>
             {bookings.data.items.map((booking) => (
               <BookingActions
                 key={booking.id}
@@ -871,7 +730,7 @@ function BookingActions({
     <article className="pm-form-card">
       <h3>{b.contextTitle}</h3>
       <p>
-        {b.counterpartName} · {b.partySize} personnes · {statusLabel[b.status]}
+        {b.counterpartName} � {b.partySize} personnes � {statusLabel[b.status]}
       </p>
       {actions.length > 0 && (
         <ActionForm
@@ -894,7 +753,7 @@ function BookingActions({
                         accepted: "Accepter",
                         declined: "Refuser",
                         cancelled: "Annuler",
-                        completed: "Marquer terminé",
+                        completed: "Marquer termin�",
                       } as Record<string, string>
                     )[status]
                   }
@@ -911,13 +770,13 @@ function BookingActions({
         b.amountCents > 0 && (
           <ActionForm
             after={after}
-            success="Paiement enregistré."
+            success="Paiement enregistr�."
             submit={() =>
               api(`/bookings/${b.id}/payment-intent`, { method: "POST" })
             }
           >
             <p>
-              Régler{" "}
+              R�gler{" "}
               {(b.amountCents / 100).toLocaleString("fr-FR", {
                 style: "currency",
                 currency: "EUR",
@@ -952,8 +811,8 @@ function AllergyConsent({ bookingId }: { bookingId: string }) {
           name="share"
           defaultChecked={!!state.data.consent}
         />{" "}
-        Partager mes allergies avec l’hôte de ce repas une fois la réservation
-        acceptée
+        Partager mes allergies avec l'h�te de ce repas une fois la r�servation
+        accept�e
       </label>
     </ActionForm>
   );
@@ -967,18 +826,18 @@ function SharedAllergies({ bookingId }: { bookingId: string }) {
   return (
     <p>
       {state.data.allergies
-        ? `Allergies partagées : ${state.data.allergies.join(", ") || "aucune renseignée"}`
-        : "Aucun partage d’allergies autorisé."}
+        ? `Allergies partag�es : ${state.data.allergies.join(", ") || "aucune renseign�e"}`
+        : "Aucun partage d'allergies autoris�."}
     </p>
   );
 }
 function PublishMeal({ after }: { after: () => void }) {
   return (
     <details>
-      <summary>Créer un repas</summary>
+      <summary>Cr�er un repas</summary>
       <ActionForm
         after={after}
-        success="Repas publié."
+        success="Repas publi�."
         submit={(data) =>
           api(
             "/me/contexts",
@@ -1014,15 +873,15 @@ function PublishMeal({ after }: { after: () => void }) {
           maxLength={1944}
           required
         />
-        <Field name="themes" label="Thèmes (virgules)" maxLength={1944} />
+        <Field name="themes" label="Th�mes (virgules)" maxLength={1944} />
         <Field
           name="supportedDiets"
-          label="Régimes proposés (virgules)"
+          label="R�gimes propos�s (virgules)"
           maxLength={1944}
         />
         <Field
           name="safeFor"
-          label="Allergènes et intolérances que vous pouvez exclure (virgules)"
+          label="Allerg�nes et intol�rances que vous pouvez exclure (virgules)"
           maxLength={1944}
         />
         <label>
@@ -1041,7 +900,7 @@ function PublishMeal({ after }: { after: () => void }) {
           />
         </label>
         <label>
-          Participation par personne (€)
+          Participation par personne (?)
           <input
             name="contribution"
             type="number"
@@ -1065,11 +924,11 @@ export function ConnectedLogin() {
       <main className="pm-login">
         <header>
           <h1>Hello !</h1>
-          <p>Connectez-vous pour retrouver vos hôtes préférés</p>
+          <p>Connectez-vous pour retrouver vos h�tes pr�f�r�s</p>
         </header>
         <section className="pm-form-card" aria-label="Connexion">
           {loading ? (
-            <p role="status">Chargement…</p>
+            <p role="status">Chargement.</p>
           ) : user ? (
             <a className="pm-button" href="#/mon-profil/invite">
               Ouvrir mon profil
@@ -1080,7 +939,7 @@ export function ConnectedLogin() {
                 <div>
                   <p role="alert">{error}</p>
                   <button className="pm-button" type="button" onClick={retry}>
-                    Réessayer
+                    R�essayer
                   </button>
                 </div>
               )}
@@ -1090,11 +949,11 @@ export function ConnectedLogin() {
                 </a>
               </div>
               <p className="pm-login__register">
-                Pas encore de compte ? <a href="/auth/register">S’inscrire</a>
+                Pas encore de compte ? <a href="/auth/register">S'inscrire</a>
               </p>
               <p>
-                La connexion et la réinitialisation du mot de passe se font sur
-                la page sécurisée Auth0.
+                La connexion et la r�initialisation du mot de passe se font sur
+                la page s�curis�e Auth0.
               </p>
             </>
           )}
@@ -1104,3 +963,4 @@ export function ConnectedLogin() {
     </div>
   );
 }
+
