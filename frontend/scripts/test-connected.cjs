@@ -128,6 +128,7 @@ const backend = createServer(async (req, res) => {
     await until('document.querySelectorAll(".pm-discovery-cards .pm-table-card").length === 4');
     assert.equal(await ev('document.body.textContent.includes("Des suggestions classées")'), false);
     assert.equal(await ev('document.querySelectorAll(".pm-discovery-cards .pm-table-card__meal").length'), 4);
+    await ev('[...document.querySelectorAll(".pm-discovery-cards img")].forEach(image => { image.loading = "eager"; })');
     await until('[...document.querySelectorAll(".pm-discovery-cards img")].every(image => image.complete && image.naturalWidth > 0)');
     assert.equal(await ev('[...document.querySelectorAll(".pm-discovery-cards .pm-table-card")].every(card => Math.abs(card.getBoundingClientRect().height / card.getBoundingClientRect().width - 427 / 296) < 0.01)'), true);
   }
