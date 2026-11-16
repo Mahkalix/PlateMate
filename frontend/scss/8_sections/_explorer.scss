@@ -1,0 +1,106 @@
+.pm-explorer {
+  --explorer-gutter: clamp(1.6rem, 5.14vw, 7.4rem);
+
+  &__heading {
+    padding: 4.8rem var(--explorer-gutter) 2.4rem;
+    color: var(--pm-cream);
+    background: var(--pm-teal);
+
+    h1 {
+      margin: 0 0 1.2rem;
+      font:
+        900 clamp(2.8rem, 4vw, 4.6rem)/1.2 "BBB ReadMe",
+        serif;
+      letter-spacing: -0.025em;
+      text-transform: uppercase;
+    }
+
+    p {
+      margin: 0;
+      font-size: 2rem;
+      font-weight: 500;
+    }
+  }
+
+  &__banner {
+    display: block;
+    padding: 0.7rem var(--explorer-gutter);
+    color: var(--pm-yellow);
+    background: var(--pm-red);
+    text-align: center;
+    font-size: clamp(1.4rem, 2vw, 2rem);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  &__content {
+    display: grid;
+    gap: 3.2rem;
+    padding: 5.6rem var(--explorer-gutter) 8rem;
+  }
+
+  &__cards {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 29.6rem));
+    justify-content: space-between;
+    gap: clamp(1.2rem, 2.4vw, 3.6rem);
+  }
+
+  &__cards .pm-table-card__arrow {
+    background: transparent;
+  }
+
+  &__locked {
+    position: relative;
+    display: grid;
+    align-items: center;
+    height: 16.2rem;
+    overflow: hidden;
+
+    .pm-explorer__cards {
+      position: absolute;
+      inset: 0;
+      opacity: 0.27;
+      filter: blur(9.6px);
+      pointer-events: none;
+    }
+
+    img {
+      width: 100%;
+      height: 16.2rem;
+      border: 1rem solid var(--pm-teal);
+      object-fit: cover;
+      object-position: top;
+    }
+  }
+
+  &__lock {
+    position: relative;
+    justify-self: center;
+    width: 4.5rem;
+    height: 3.5rem;
+    margin-top: 1.2rem;
+    border: 0.5rem solid var(--pm-ink);
+    border-radius: 1rem;
+
+    &::before {
+      content: "";
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      width: 2.4rem;
+      height: 2rem;
+      transform: translateX(-50%);
+      border: 0.5rem solid var(--pm-ink);
+      border-bottom: 0;
+      border-radius: 2rem 2rem 0 0;
+    }
+  }
+
+  @media (max-width: 760px) {
+    &__cards {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+}

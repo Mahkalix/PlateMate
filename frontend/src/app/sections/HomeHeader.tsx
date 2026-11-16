@@ -1,7 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { HomeNavLinks } from "../components/HomeNavLinks";
 
-export function HomeHeader() {
+export function HomeHeader({
+  accountName,
+  accountRole = "invite",
+}: {
+  accountName?: string;
+  accountRole?: "hote" | "invite";
+}) {
   const innerPage = window.location.hash.startsWith("#/");
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -62,9 +68,12 @@ export function HomeHeader() {
           >
             <HomeNavLinks onNavigate={() => setOpen(false)} />
           </nav>
-          <a className="pm-button pm-header__login" href="#/connexion">
+          <a
+            className="pm-button pm-header__login"
+            href={accountName ? `#/mon-profil/${accountRole}` : "#/connexion"}
+          >
             <img src="/home/UserCircle.svg" alt="" />
-            Se connecter
+            {accountName || "Se connecter"}
           </a>
         </header>
       </div>

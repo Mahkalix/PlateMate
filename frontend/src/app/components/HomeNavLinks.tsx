@@ -1,6 +1,6 @@
 const nav = [
   ["Accueil", "#accueil"],
-  ["Explorer", "#tables"],
+  ["Explorer", "#/explorer"],
   ["Devenir hôte", "#/devenir-hote"],
   ["À propos", "#/a-propos"],
 ];

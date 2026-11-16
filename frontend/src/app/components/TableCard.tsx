@@ -3,8 +3,9 @@ type TableCardProps = {
   title: string;
   photo: string;
   portrait: string;
-  onSelect: () => void;
-};
+} & (
+  { href: string; onSelect?: never } | { href?: never; onSelect: () => void }
+);
 
 export function TableCard({
   host,
@@ -12,14 +13,10 @@ export function TableCard({
   photo,
   portrait,
   onSelect,
+  href,
 }: TableCardProps) {
-  return (
-    <button
-      type="button"
-      className="pm-table-card"
-      aria-label={title + " avec " + host}
-      onClick={onSelect}
-    >
+  const content = (
+    <>
       <span className="pm-table-card__frame">
         <img
           className="pm-table-card__meal"
@@ -45,6 +42,21 @@ export function TableCard({
         <img src={"/home/" + portrait + ".webp"} alt="" />
         {host}
       </span>
+    </>
+  );
+  const label = title + " avec " + host;
+  return href ? (
+    <a href={href} className="pm-table-card" aria-label={label}>
+      {content}
+    </a>
+  ) : (
+    <button
+      type="button"
+      className="pm-table-card"
+      aria-label={label}
+      onClick={onSelect}
+    >
+      {content}
     </button>
   );
 }

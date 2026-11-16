@@ -453,7 +453,7 @@ export function ProfileWizard({ host = false }: { host?: boolean }) {
                 <div className="pm-confirmation__actions">
                   <a
                     className="pm-button pm-button--red"
-                    href={host ? "#accueil" : "#tables"}
+                    href={host ? "#accueil" : "#/explorer"}
                   >
                     {host ? "Retour à l'accueil" : "Explorer les expériences"}
                   </a>

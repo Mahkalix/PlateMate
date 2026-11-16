@@ -14,7 +14,7 @@ export function Hero() {
           découvrez de nouvelles saveurs et repartez avec une belle histoire.
         </p>
         <div className="pm-hero__actions">
-          <Button to="#tables" variant="yellow">
+          <Button to="#/explorer" variant="yellow">
             Explorer les expériences{" "}
             <img src="/home/ArrowRightCircle.svg" alt="" />
           </Button>

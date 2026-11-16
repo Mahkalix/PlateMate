@@ -419,15 +419,75 @@ vite.on("error", (error) => {
         await ev('document.querySelector("dialog").close()');
       }
       await ev(
-        `document.querySelector('.pm-header a[href="#tables"]').click()`,
+        `document.querySelector('.pm-header a[href="#/explorer"]').click()`,
       );
       await wait(150);
       assert(
         await ev(
-          '!!document.querySelector("#tables") && window.location.hash === "#tables"',
+          'document.querySelectorAll(".pm-explorer .pm-table-card").length === 4 && window.location.hash === "#/explorer"',
         ),
-        `${width}/${route} returns to homepage tables`,
+        `${width}/${route} opens Explorer`,
       );
+    }
+  }
+  for (const width of [1440, 390]) {
+    await cmd("Emulation.setDeviceMetricsOverride", { width, height: 900, deviceScaleFactor: 1, mobile: false });
+    await cmd("Page.navigate", { url: `${url}/#/mes-repas/invite/vide` });
+    for (let i = 0; i < 100 && !(await ev('!!document.querySelector(".pm-meals__sections")')); i++) await wait(50);
+    await ev("document.fonts.ready");
+    await ev("Promise.all([...document.images].map(image => image.decode()))");
+    assert(await ev('getComputedStyle(document.documentElement).fontSize === "10px"'), `${width} account rem base`);
+    assert(await ev('document.querySelectorAll(".pm-meals__empty").length === 3'), `${width} guest has three empty histories`);
+    assert(await ev(`document.documentElement.scrollWidth === ${width}`), `${width} guest meals fits viewport`);
+    assert(await ev('document.querySelector(".pm-meals__empty a").getAttribute("href") === "#/explorer"'), `${width} empty meals leads to Explorer`);
+    await ev('document.querySelector(".pm-account__role a:last-child").click()');
+    await wait(100);
+    await ev("Promise.all([...document.images].map(image => image.decode()))");
+    assert(await ev('document.querySelector(".pm-meals__empty h2").textContent === "Devenez hôte"'), `${width} host toggle explains missing host profile`);
+    assert(await ev('document.querySelector(".pm-meals__empty a").getAttribute("href") === "#/devenir-hote"'), `${width} host empty state leads to host journey`);
+    assert(await ev(`document.documentElement.scrollWidth === ${width}`), `${width} host meals fits viewport`);
+  }
+  for (const width of [1440, 390]) {
+    await cmd("Emulation.setDeviceMetricsOverride", { width, height: 900, deviceScaleFactor: 1, mobile: false });
+    for (const role of ["hote", "invite"]) {
+      await cmd("Page.navigate", { url: `${url}/#/mon-profil/${role}` });
+      for (let i = 0; i < 100 && !(await ev('!!document.querySelector(".pm-profile__card")')); i++) await wait(50);
+      await ev("document.fonts.ready");
+      await ev("Promise.all([...document.images].map(image => image.decode()))");
+      assert(await ev(`document.documentElement.scrollWidth === ${width}`), `${width}/${role} account profile fits viewport`);
+      assert(await ev('document.querySelectorAll(".pm-profile__card").length === 3'), `${width}/${role} three profile sections`);
+      assert(await ev('document.querySelector(".pm-profile__card input").readOnly'), `${width}/${role} personal data starts read-only`);
+      await ev('document.querySelector(".pm-profile__edit").click()');
+      await wait(50);
+      assert(await ev('!document.querySelector(".pm-profile__card input").readOnly'), `${width}/${role} edit unlocks personal fields`);
+      await ev('document.querySelector(".pm-profile__card").requestSubmit()');
+      await wait(50);
+      assert(await ev('document.querySelector(".pm-profile__card input").readOnly && document.querySelector(".pm-profile__message").textContent.includes("Aucun envoi")'), `${width}/${role} saving locks fields and states local-only persistence`);
+      await ev('document.querySelectorAll(".pm-profile__edit")[1].click()');
+      await wait(50);
+      await ev('document.querySelector(".pm-profile__choices [aria-pressed=true]").click()');
+      await wait(50);
+      await ev('document.querySelectorAll(".pm-profile__card")[1].requestSubmit()');
+      await wait(50);
+      assert(await ev('document.querySelectorAll(".pm-profile__card")[1].textContent.includes("Choisissez au moins trois")'), `${width}/${role} rejects fewer than three interests`);
+    }
+  }
+  for (const width of [1440, 390]) {
+    await cmd("Emulation.setDeviceMetricsOverride", { width, height: 900, deviceScaleFactor: 1, mobile: false });
+    for (const route of ["mes-repas/hote", "mes-repas/invite"]) {
+      await cmd("Page.navigate", { url: `${url}/#/${route}` });
+      const selector = ".pm-history";
+      for (let i = 0; i < 100 && !(await ev(`!!document.querySelector('${selector}')`)); i++) await wait(50);
+      await ev("document.fonts.ready");
+      await ev("Promise.all([...document.images].map(image => image.decode()))");
+      assert(await ev(`document.documentElement.scrollWidth === ${width}`), `${width}/${route} fits viewport`);
+      assert(await ev('getComputedStyle(document.documentElement).fontSize === "10px"'), `${width}/${route} rem base`);
+      {
+        assert(await ev('document.querySelectorAll(".pm-history__row").length >= 3'), `${width}/${route} shows meal history`);
+        await ev('document.querySelector(".pm-history__link").click()');
+        assert(await ev('document.querySelector("dialog[open]").textContent.includes("aucun message")'), `${width}/${route} action does not claim an API mutation`);
+        await ev('document.querySelector("dialog[open]").close()');
+      }
     }
   }
   console.log(JSON.stringify({ passed: checks.length, measurements }));

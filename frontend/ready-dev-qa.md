@@ -6,6 +6,7 @@ PR #6, branche `feat/homepage-ready`. Aucun merge ni changement backend. Référ
 
 | Écran | Frame | Route | Statut |
 | --- | --- | --- | --- |
+| Explorer | 371:725 | /#/explorer | Implémenté, catalogue de démonstration avec invitation à se connecter |
 | À propos | 516:2247 | /#/a-propos | Implémenté, audit détaillé partiel |
 | Devenir hôte | 448:984 | /#/devenir-hote | Partiel (vidéo à valider) |
 | Connexion | 516:2813 | /#/connexion | Partiel (preview sans Auth0) |
@@ -14,7 +15,7 @@ PR #6, branche `feat/homepage-ready`. Aucun merge ni changement backend. Référ
 | Candidature 1, 2, 3 | 722:1467, 722:1620, 722:1713 | /#/candidature | Implémenté, interactions locales |
 | Confirmation candidature | 722:1782 | /#/candidature | Implémenté, confirmation simulée |
 
-Explorer, portefeuille, messagerie et réservations n'ont pas de frame Ready for dev retenue ici. La maquette n'a pas été modifiée.
+Six écrans supplémentaires : profils hôte (769:5506) et invité (778:2253), Mes repas invité (793:2402, 942:5355), Mes repas hôte (815:2783, 942:5537). Après-repas hôte 986:6642 exclu : le propriétaire confirme que cet écran n’est pas Ready for dev. Le cadre 986:6967 contient la création de repas, également hors périmètre.
 
 ## Vérifications réelles
 
@@ -68,6 +69,36 @@ Pas de frame mobile correspondante identifiée : adaptation responsive vérifié
 | Confirmation hôte | 822.3125 |
 
 ## Limites et contrôles encore ouverts
+
+### Six écrans supplémentaires (travail local en cours)
+
+| Écran | Figma | Route |
+| --- | --- | --- |
+| Profil hôte | 769:5506 | /#/mon-profil/hote |
+| Profil invité | 778:2253 | /#/mon-profil/invite |
+| Repas invité remplis | 793:2402 | /#/mes-repas/invite |
+| Repas invité vides | 942:5355 | /#/mes-repas/invite/vide |
+| Repas hôte remplis | 815:2783 | /#/mes-repas/hote |
+| Repas hôte vides | 942:5537 | /#/mes-repas/hote/vide |
+
+Après retrait de l’après-repas et corrections de géométrie : build réussi, 159 assertions réussies. Les contrôles à 1440 et 390 px, DPR 1, couvrent les états vides, les liens vers Explorer et Devenir hôte, la bascule invité/hôte, les trois sections de profil, le verrouillage des champs et leur édition, le minimum de trois intérêts, les historiques et les messages honnêtes des actions sans API. Les mesures détaillées de conformité Figma restent en cours ; ces assertions ne constituent pas un audit visuel complet.
+
+Mesures locales après chargement des polices et décodage des images (desktop 1440 px). Base html 10 px, body 16 px, pas de débordement horizontal à 1440 ou 390 px. Les hauteurs des cartes suivantes sont dans la tolérance de 1 px ; leurs positions et tous les styles descendants ne sont pas encore certifiés.
+
+| Composant | Figma largeur × hauteur | DOM largeur × hauteur |
+| --- | --- | --- |
+| Statistiques des profils | 1320 × 140 | 1320 × 139.984375 |
+| Informations personnelles (hôte et invité) | 932 × 335 | 932 × 334.390625 |
+| À propos du profil hôte | 932 × 562 | 932 × 561.171875 |
+| À propos du profil invité | 932 × 558 | 932 × 557.578125 |
+| Ma table | 932 × 338 | 932 × 338.390625 |
+| Préférences invité | 932 × 326 | 932 × 326.390625 |
+| Carte vide avec action | 1320 × 228 | 1320 × 228.78125 |
+| Carte vide sans action | 1320 × 174 | 1320 × 174.390625 |
+
+Corrections : fond des statistiques sur le token `Surface/card-secondary` #ffe1a2, colonnes de 185 px espacées de 64 px, padding vertical 20 px ; actions et mention privée sur la même ligne ; titre des historiques 36 px ; sous-titre de confidentialité au-dessus de la carte ; liens Profil et Mes repas reliés aux écrans correspondants. Les cartes utilisent un padding CSS de 23 px plus une bordure de 1 px pour retrouver l’offset intérieur Figma de 24 px.
+
+Points ouverts : le libellé de la statistique « 4 » du profil invité vaut « ??? » dans Figma (précision demandée). La mention de transmission des allergies à la réservation contredit l'ancien arbitrage de confidentialité ; aucun transfert n'est implémenté. Les interactions restent locales, sans authentification, envoi de message, avis, annulation ou versement réel. Les pages ne sont pas encore publiées dans la PR à ce stade.
 
 - La preview Vercel protégée n'a pas été mesurée : permission navigateur précédemment refusée. Une réactivation a été demandée. Les relevés sont locaux.
 - Audit exhaustif des sous-composants, des couleurs, interlignes et états interactifs encore incomplet. Aucun audit externe d'accessibilité, test de charge ou test API.
