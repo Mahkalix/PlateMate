@@ -126,7 +126,15 @@ function useLoad<T>(path: string) {
   return { data, error, reload: () => setVersion((n) => n + 1) };
 }
 
-function Shell({ title, children, name }: { title: string; children: ReactNode; name?: string }) {
+function Shell({
+  title,
+  children,
+  name,
+}: {
+  title: string;
+  children: ReactNode;
+  name?: string;
+}) {
   const route = window.location.hash;
   const accountPage =
     /^#\/(mon-profil|mes-repas|profil|candidature)(\/|$)/.test(route);
@@ -134,28 +142,36 @@ function Shell({ title, children, name }: { title: string; children: ReactNode; 
     route.includes("/hote") || route === "#/candidature" ? "hote" : "invite";
   const meals = route.startsWith("#/mes-repas");
   return (
-    <div className={`app pm-inner-page${accountPage ? " pm-account-page" : ""}`}>
+    <div
+      className={`app pm-inner-page${accountPage ? " pm-account-page" : ""}`}
+    >
       <HomeHeader accountRole={role} accountName={name} />
-      <main className={accountPage ? `pm-live pm-account ${meals ? "pm-history" : "pm-profile"}` : "pm-live"}>
+      <main
+        className={
+          accountPage
+            ? `pm-live pm-account ${meals ? "pm-history" : "pm-profile"}`
+            : "pm-live"
+        }
+      >
         {!accountPage && <h1>{title}</h1>}
         {accountPage && (
           <>
             <div className="pm-account__heading">
               <h1>{name ? `Bonjour ${name}` : "Mon compte"}</h1>
               <nav className="pm-account__tabs" aria-label="Mon compte">
-              <a
-                href={`#/mon-profil/${role}`}
-                aria-current={!meals ? "page" : undefined}
-              >
-                Profil
-              </a>
-              <a
-                href={`#/mes-repas/${role}`}
-                aria-current={meals ? "page" : undefined}
-              >
-                Mes repas
-              </a>
-            </nav>
+                <a
+                  href={`#/mon-profil/${role}`}
+                  aria-current={!meals ? "page" : undefined}
+                >
+                  Profil
+                </a>
+                <a
+                  href={`#/mes-repas/${role}`}
+                  aria-current={meals ? "page" : undefined}
+                >
+                  Mes repas
+                </a>
+              </nav>
             </div>
             <nav className="pm-account__role" aria-label="Choisir mon espace">
               <a
@@ -173,7 +189,9 @@ function Shell({ title, children, name }: { title: string; children: ReactNode; 
             </nav>
           </>
         )}
-        {accountPage && <h2 className={meals ? undefined : "pm-profile__title"}>{title}</h2>}
+        {accountPage && (
+          <h2 className={meals ? undefined : "pm-profile__title"}>{title}</h2>
+        )}
         {children}
       </main>
       <HomeFooter />
@@ -284,151 +302,186 @@ export function ConnectedProfile({ host = false }: { host?: boolean }) {
   return (
     <Shell title={host ? "Mon profil hôte" : "Mon profil"} name={p?.firstName}>
       <div className="pm-profile__stats">
-        <div><strong>{summary.data.hostsMet}</strong><p>Hôtes rencontrés</p></div>
-        <div><strong>{summary.data.mealsHosted}</strong><p>Repas accueillis</p></div>
-        <div><strong>{summary.data.guestsMet}</strong><p>Invités rencontrés</p></div>
+        <div>
+          <strong>{summary.data.hostsMet}</strong>
+          <p>Hôtes rencontrés</p>
+        </div>
+        <div>
+          <strong>{summary.data.mealsHosted}</strong>
+          <p>Repas accueillis</p>
+        </div>
+        <div>
+          <strong>{summary.data.guestsMet}</strong>
+          <p>Invités rencontrés</p>
+        </div>
       </div>
       <div className="pm-profile__columns">
         <aside className="pm-profile__sidebar">
           <section className="pm-profile__aside-card">
             <h3>Ce que voient les hôtes</h3>
-            <p>Votre nom complet, votre numéro de téléphone et votre date de naissance restent privés.</p>
-            <p>Le partage des allergies demande votre accord pour chaque réservation.</p>
+            <p>
+              Votre nom complet, votre numéro de téléphone et votre date de
+              naissance restent privés.
+            </p>
+            <p>
+              Le partage des allergies demande votre accord pour chaque
+              réservation.
+            </p>
           </section>
         </aside>
         <div className="pm-profile__details">
-      <ActionForm
-        key={JSON.stringify(p)}
-        success="Profil enregistré sur le serveur."
-        submit={async (data) => {
-          const next: Profile = {
-            firstName: String(data.get("firstName")),
-            lastName: String(data.get("lastName")),
-            city: String(data.get("city")),
-            description: String(data.get("description") || ""),
-            languages: tags(data.get("languages")),
-            affinities: tags(data.get("affinities")),
-            publicInterests: tags(data.get("publicInterests")),
-            ambiences: tags(data.get("ambiences")),
-            diets: tags(data.get("diets")),
-            allergies: tags(data.get("allergies")),
-            intolerances: tags(data.get("intolerances")),
-            cuisines: tags(data.get("cuisines")),
-            consent: data.get("consent") === "on",
-            ...(p?.motivations ? { motivations: p.motivations } : {}),
-          };
-          for (const key of ["neighborhood", "phone", "birthDate"] as const) {
-            const value = String(data.get(key) || "").trim();
-            if (value) next[key] = value;
-          }
-          if (next.publicInterests.some((i) => !next.affinities.includes(i)))
-            throw new Error("public_interests");
-          if (
-            !next.consent &&
-            (next.diets.length ||
-              next.allergies.length ||
-              next.intolerances.length)
-          )
-            throw new Error("consent_required");
-          await api("/me/profile", json("PUT", next));
-        }}
-      >
-        <h2>Informations personnelles</h2>
-        <p className="pm-profile__privacy">Vos coordonnées restent privées.</p>
-        <div className="pm-profile__fields">
-        <label className="pm-field">Email<input type="email" value={summary.data.email} readOnly /></label>
-        <Field name="firstName" label="Prénom" value={p?.firstName} required />
-        <Field
-          name="lastName"
-          label="Nom (privé)"
-          value={p?.lastName}
-          required
-        />
-        <Field name="city" label="Ville" value={p?.city} required />
-        <Field name="neighborhood" label="Quartier" value={p?.neighborhood} />
-        <Field
-          name="phone"
-          label="Téléphone (privé)"
-          value={p?.phone}
-          type="tel"
-          maxLength={25}
-        />
-        <Field
-          name="birthDate"
-          label="Date de naissance (privée)"
-          value={p?.birthDate}
-          type="date"
-        />
-        </div>
-        <h2>À propos de moi</h2>
-        <label className="pm-field">
-          Ma présentation
-          <textarea
-            name="description"
-            defaultValue={p?.description || ""}
-            maxLength={1000}
-          />
-        </label>
-        <h2>Mes préférences</h2>
-        <p>
-          Séparez les valeurs par des virgules. Les centres d’intérêt publics
-          doivent faire partie de vos affinités.
-        </p>
-        {(
-          [
-            ["languages", "Langues", true],
-            ["affinities", "Affinités", true],
-            ["publicInterests", "Centres d’intérêt publics", false],
-            ["ambiences", "Ambiances", true],
-            ["cuisines", "Cuisines", false],
-            ["diets", "Régimes alimentaires (privés)", false],
-            ["allergies", "Allergies (privées)", false],
-            ["intolerances", "Intolérances (privées)", false],
-          ] as const
-        ).map(([key, label, required]) => (
-          <Field
-            key={key}
-            name={key}
-            label={label}
-            value={p?.[key].join(", ")}
-            required={required}
-            maxLength={1944}
-          />
-        ))}
-        <label>
-          <input
-            name="consent"
-            type="checkbox"
-            defaultChecked={p?.consent || false}
-          />{" "}
-          J’accepte le traitement de mes préférences alimentaires pour la
-          compatibilité des repas. Le partage d’allergies avec un hôte nécessite
-          un accord séparé pour chaque réservation.
-        </label>
-        <p>
-          Pour retirer cet accord, videz les champs régimes, allergies et
-          intolérances, puis enregistrez.
-        </p>
-      </ActionForm>
-      {host &&
-        (summary.data.isHost ? (
-          <TableForm />
-        ) : (
           <ActionForm
-            success="Profil hôte créé."
-            after={() => {
-              profile.reload();
-              summary.reload();
+            key={JSON.stringify(p)}
+            success="Profil enregistré sur le serveur."
+            submit={async (data) => {
+              const next: Profile = {
+                firstName: String(data.get("firstName")),
+                lastName: String(data.get("lastName")),
+                city: String(data.get("city")),
+                description: String(data.get("description") || ""),
+                languages: tags(data.get("languages")),
+                affinities: tags(data.get("affinities")),
+                publicInterests: tags(data.get("publicInterests")),
+                ambiences: tags(data.get("ambiences")),
+                diets: tags(data.get("diets")),
+                allergies: tags(data.get("allergies")),
+                intolerances: tags(data.get("intolerances")),
+                cuisines: tags(data.get("cuisines")),
+                consent: data.get("consent") === "on",
+                ...(p?.motivations ? { motivations: p.motivations } : {}),
+              };
+              for (const key of [
+                "neighborhood",
+                "phone",
+                "birthDate",
+              ] as const) {
+                const value = String(data.get(key) || "").trim();
+                if (value) next[key] = value;
+              }
+              if (
+                next.publicInterests.some((i) => !next.affinities.includes(i))
+              )
+                throw new Error("public_interests");
+              if (
+                !next.consent &&
+                (next.diets.length ||
+                  next.allergies.length ||
+                  next.intolerances.length)
+              )
+                throw new Error("consent_required");
+              await api("/me/profile", json("PUT", next));
             }}
-            submit={() => api("/me/host", json("POST", {}))}
           >
-            <h2>Devenir hôte</h2>
+            <h2>Informations personnelles</h2>
+            <p className="pm-profile__privacy">
+              Vos coordonnées restent privées.
+            </p>
+            <div className="pm-profile__fields">
+              <label className="pm-field">
+                Email
+                <input type="email" value={summary.data.email} readOnly />
+              </label>
+              <Field
+                name="firstName"
+                label="Prénom"
+                value={p?.firstName}
+                required
+              />
+              <Field
+                name="lastName"
+                label="Nom (privé)"
+                value={p?.lastName}
+                required
+              />
+              <Field name="city" label="Ville" value={p?.city} required />
+              <Field
+                name="neighborhood"
+                label="Quartier"
+                value={p?.neighborhood}
+              />
+              <Field
+                name="phone"
+                label="Téléphone (privé)"
+                value={p?.phone}
+                type="tel"
+                maxLength={25}
+              />
+              <Field
+                name="birthDate"
+                label="Date de naissance (privée)"
+                value={p?.birthDate}
+                type="date"
+              />
+            </div>
+            <h2>À propos de moi</h2>
+            <label className="pm-field">
+              Ma présentation
+              <textarea
+                name="description"
+                defaultValue={p?.description || ""}
+                maxLength={1000}
+              />
+            </label>
+            <h2>Mes préférences</h2>
             <p>
-              Enregistrez d’abord votre profil ci-dessus, puis activez votre
-              espace hôte.
+              Séparez les valeurs par des virgules. Les centres d’intérêt
+              publics doivent faire partie de vos affinités.
+            </p>
+            {(
+              [
+                ["languages", "Langues", true],
+                ["affinities", "Affinités", true],
+                ["publicInterests", "Centres d’intérêt publics", false],
+                ["ambiences", "Ambiances", true],
+                ["cuisines", "Cuisines", false],
+                ["diets", "Régimes alimentaires (privés)", false],
+                ["allergies", "Allergies (privées)", false],
+                ["intolerances", "Intolérances (privées)", false],
+              ] as const
+            ).map(([key, label, required]) => (
+              <Field
+                key={key}
+                name={key}
+                label={label}
+                value={p?.[key].join(", ")}
+                required={required}
+                maxLength={1944}
+              />
+            ))}
+            <label>
+              <input
+                name="consent"
+                type="checkbox"
+                defaultChecked={p?.consent || false}
+              />{" "}
+              J’accepte le traitement de mes préférences alimentaires pour la
+              compatibilité des repas. Le partage d’allergies avec un hôte
+              nécessite un accord séparé pour chaque réservation.
+            </label>
+            <p>
+              Pour retirer cet accord, videz les champs régimes, allergies et
+              intolérances, puis enregistrez.
             </p>
           </ActionForm>
-        ))}
+          {host &&
+            (summary.data.isHost ? (
+              <TableForm />
+            ) : (
+              <ActionForm
+                success="Profil hôte créé."
+                after={() => {
+                  profile.reload();
+                  summary.reload();
+                }}
+                submit={() => api("/me/host", json("POST", {}))}
+              >
+                <h2>Devenir hôte</h2>
+                <p>
+                  Enregistrez d’abord votre profil ci-dessus, puis activez votre
+                  espace hôte.
+                </p>
+              </ActionForm>
+            ))}
         </div>
       </div>
     </Shell>
@@ -556,7 +609,6 @@ export function ConnectedExplorer() {
               </article>
             ))}
           </div>
-          </div>
           {offset > 0 && (
             <button onClick={() => setOffset(Math.max(0, offset - 20))}>
               Précédent
@@ -664,92 +716,109 @@ export function ConnectedMeals({ host = false }: { host?: boolean }) {
             </p>
           )}
           {host && state.data.isHost && <PublishMeal after={reload} />}
-          {offset === 0 && Object.values(state.data.sections).every((items) => !items.length) && !bookings.data.items.length && (
-            <section className="pm-form-card">
-              <h3>{host ? "Vous n’avez pas encore accueilli de repas" : "Vous n’avez pas encore réservé de repas"}</h3>
-              {!host && <a className="pm-button" href="#/explorer">Explorer les repas</a>}
-            </section>
-          )}
+          {offset === 0 &&
+            Object.values(state.data.sections).every(
+              (items) => !items.length,
+            ) &&
+            !bookings.data.items.length && (
+              <section className="pm-form-card">
+                <h3>
+                  {host
+                    ? "Vous n’avez pas encore accueilli de repas"
+                    : "Vous n’avez pas encore réservé de repas"}
+                </h3>
+                {!host && (
+                  <a className="pm-button" href="#/explorer">
+                    Explorer les repas
+                  </a>
+                )}
+              </section>
+            )}
           <div className="pm-meals__sections">
-          {(
-            [
-              ["upcoming", "À venir"],
-              ["past", "Repas passés"],
-              ["cancelled", "Annulés ou refusés"],
-            ] as const
-          ).map(([section, title]) => (
-            <section className="pm-meals__section" key={section}>
-              <h2>{title}</h2>
-              {!state.data!.sections[section].length && (
-                <p>Aucun repas dans cette rubrique.</p>
-              )}
-              <div className="pm-history__list">
-              {state.data!.sections[section].map((meal) => (
-                <article className="pm-history__row" key={meal.id || meal.slotId}>
-                  <div>
-                  <h3>{meal.title}</h3>
-                  <p>{date(meal.startsAt)}</p>
-                  {meal.status && <p>{statusLabel[meal.status]}</p>}
-                  {host && (
-                    <p>
-                      {meal.confirmedPlaces}/{meal.capacity} places confirmées ·{" "}
-                      {meal.pendingRequests} demandes
-                    </p>
-                  )}
-                  {meal.address && (
-                    <p>
-                      Adresse : {meal.address.street}, {meal.address.postalCode}{" "}
-                      {meal.address.city}. {meal.address.instructions}
-                    </p>
-                  )}
-                  {!host &&
-                    meal.id &&
-                    ["pending", "accepted"].includes(meal.status || "") && (
-                      <AllergyConsent bookingId={meal.id} />
-                    )}
-                  {!host &&
-                    meal.id &&
-                    meal.status === "completed" &&
-                    (meal.myRating ? (
-                      <p>Votre note : {meal.myRating}/5</p>
-                    ) : (
-                      <ActionForm
-                        after={reload}
-                        submit={(data) =>
-                          api(
-                            `/bookings/${meal.id}/review`,
-                            json("POST", {
-                              rating: Number(data.get("rating")),
-                              comment: String(data.get("comment")),
-                            }),
-                          )
-                        }
-                      >
-                        <h3>Votre avis</h3>
-                        <label>
-                          Note sur 5
-                          <input
-                            name="rating"
-                            type="number"
-                            min={1}
-                            max={5}
-                            required
-                          />
-                        </label>
-                        <Field
-                          name="comment"
-                          label="Commentaire"
-                          maxLength={1000}
-                          required
-                        />
-                      </ActionForm>
-                    ))}
-                  </div>
-                </article>
-              ))}
-              </div>
-            </section>
-          ))}
+            {(
+              [
+                ["upcoming", "À venir"],
+                ["past", "Repas passés"],
+                ["cancelled", "Annulés ou refusés"],
+              ] as const
+            ).map(([section, title]) => (
+              <section className="pm-meals__section" key={section}>
+                <h2>{title}</h2>
+                {!state.data!.sections[section].length && (
+                  <p>Aucun repas dans cette rubrique.</p>
+                )}
+                <div className="pm-history__list">
+                  {state.data!.sections[section].map((meal) => (
+                    <article
+                      className="pm-history__row"
+                      key={meal.id || meal.slotId}
+                    >
+                      <div>
+                        <h3>{meal.title}</h3>
+                        <p>{date(meal.startsAt)}</p>
+                        {meal.status && <p>{statusLabel[meal.status]}</p>}
+                        {host && (
+                          <p>
+                            {meal.confirmedPlaces}/{meal.capacity} places
+                            confirmées · {meal.pendingRequests} demandes
+                          </p>
+                        )}
+                        {meal.address && (
+                          <p>
+                            Adresse : {meal.address.street},{" "}
+                            {meal.address.postalCode} {meal.address.city}.{" "}
+                            {meal.address.instructions}
+                          </p>
+                        )}
+                        {!host &&
+                          meal.id &&
+                          ["pending", "accepted"].includes(
+                            meal.status || "",
+                          ) && <AllergyConsent bookingId={meal.id} />}
+                        {!host &&
+                          meal.id &&
+                          meal.status === "completed" &&
+                          (meal.myRating ? (
+                            <p>Votre note : {meal.myRating}/5</p>
+                          ) : (
+                            <ActionForm
+                              after={reload}
+                              submit={(data) =>
+                                api(
+                                  `/bookings/${meal.id}/review`,
+                                  json("POST", {
+                                    rating: Number(data.get("rating")),
+                                    comment: String(data.get("comment")),
+                                  }),
+                                )
+                              }
+                            >
+                              <h3>Votre avis</h3>
+                              <label>
+                                Note sur 5
+                                <input
+                                  name="rating"
+                                  type="number"
+                                  min={1}
+                                  max={5}
+                                  required
+                                />
+                              </label>
+                              <Field
+                                name="comment"
+                                label="Commentaire"
+                                maxLength={1000}
+                                required
+                              />
+                            </ActionForm>
+                          ))}
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
           {offset > 0 && (
             <button onClick={() => setOffset(Math.max(0, offset - 50))}>
               Repas précédents
@@ -979,59 +1048,3 @@ function PublishMeal({ after }: { after: () => void }) {
             min={0}
             max={1000}
             step="0.01"
-            defaultValue={0}
-            required
-          />
-        </label>
-      </ActionForm>
-    </details>
-  );
-}
-
-export function ConnectedLogin() {
-  const { user, error, retry, loading } = useSession();
-  return (
-    <div className="app pm-inner-page">
-      <HomeHeader />
-      <main className="pm-login">
-        <header>
-          <h1>Hello !</h1>
-          <p>Connectez-vous pour retrouver vos hôtes préférés</p>
-        </header>
-        <section className="pm-form-card" aria-label="Connexion">
-          {loading ? (
-            <p role="status">Chargement…</p>
-          ) : user ? (
-            <a className="pm-button" href="#/mon-profil/invite">
-              Ouvrir mon profil
-            </a>
-          ) : (
-            <>
-              {error && (
-                <div>
-                  <p role="alert">{error}</p>
-                  <button className="pm-button" type="button" onClick={retry}>
-                    Réessayer
-                  </button>
-                </div>
-              )}
-              <div className="pm-login__actions">
-                <a className="pm-button" href="/auth/login">
-                  Se connecter
-                </a>
-              </div>
-              <p className="pm-login__register">
-                Pas encore de compte ? <a href="/auth/register">S’inscrire</a>
-              </p>
-              <p>
-                La connexion et la réinitialisation du mot de passe se font sur
-                la page sécurisée Auth0.
-              </p>
-            </>
-          )}
-        </section>
-      </main>
-      <HomeFooter />
-    </div>
-  );
-}
