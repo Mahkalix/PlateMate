@@ -9,6 +9,8 @@ const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 const origin = 'http://127.0.0.1:4197';
 let profile = null, loggedIn = false, booking = null, shared = false, failure = false;
 let emptyCatalogue = false;
+let paginatedCatalogue = false;
+let explorerDate;
 let isHost = false, table = {}, published = null;
 let browser, web, ws;
 const hostId = '11111111-1111-4111-8111-111111111111';
@@ -34,7 +36,18 @@ const backend = createServer(async (req, res) => {
   if (route === '/me/host') { isHost = true; return send({ hostId }, 201); }
   if (route === '/me/table') { if (req.method === 'PUT') table = body; return send({ table }); }
   if (route === '/me/contexts') { published = { slotId, title: body.title, startsAt: body.slots[0].startsAt, capacity: body.slots[0].capacity, confirmedPlaces: 0, pendingRequests: 0 }; return send({ id: contextId }, 201); }
-  if (route === '/explorer') return send({ items: profile && !emptyCatalogue ? [card] : [], total: profile && !emptyCatalogue ? 1 : 0, nextOffset: null });
+  if (route === '/explorer') {
+    explorerDate = url.searchParams.get('date');
+    if (paginatedCatalogue) {
+      const firstPage = url.searchParams.get('offset') === '0';
+      return send({
+        items: [firstPage ? card : { ...card, contextTitle: 'Repas page suivante' }],
+        total: 9,
+        nextOffset: firstPage ? 8 : null,
+      });
+    }
+    return send({ items: profile && !emptyCatalogue ? [card] : [], total: profile && !emptyCatalogue ? 1 : 0, nextOffset: null });
+  }
   if (route === `/profiles/${hostId}/contexts/${contextId}`) return send(card);
   if (route === '/bookings' && req.method === 'POST') { assert.equal(body.slotId, slotId); booking = { id: bookingId, slotId, status: 'pending', partySize: body.partySize, title: card.contextTitle, contextTitle: card.contextTitle, counterpartName: 'Camille', startsAt }; return send(booking, 201); }
   if (route === `/bookings/${bookingId}/status`) { booking.status = body.status; return send(booking); }
@@ -159,6 +172,24 @@ const backend = createServer(async (req, res) => {
   await go('explorer');
   await until('document.querySelectorAll(".pm-discovery-cards .pm-table-card").length === 8');
   assert.equal(await ev('!!document.querySelector(".pm-explorer__search")'), true);
+  assert.equal(await ev('document.querySelector(".pm-explorer__date-placeholder").textContent.trim()'), 'jj/mm/aaaa');
+  for (const width of [1440, 390]) {
+    await cmd('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: false });
+    assert.equal(await ev('(() => { const row = document.querySelector(".pm-explorer__cuisines"); return row.scrollWidth > row.clientWidth; })()'), width === 390);
+  }
+  await ev('document.querySelector(\'[aria-label="Catégories suivantes"]\').click()');
+  await until('document.querySelector(".pm-explorer__cuisines").scrollLeft > 100');
+  await ev('document.querySelector(\'[aria-label="Catégories précédentes"]\').click()');
+  await until('document.querySelector(".pm-explorer__cuisines").scrollLeft <= 1');
+  await ev(`{
+    const input = document.querySelector('[name="date"]');
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(input, '2099-01-02');
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.form.requestSubmit();
+  }`);
+  await until('document.body.textContent.includes("Aucun repas ne correspond")');
+  assert.equal(explorerDate, '2099-01-02');
+  assert.equal(await ev('!!document.querySelector(".pm-explorer__date-placeholder")'), false);
   await ev('[...document.querySelectorAll(".pm-explorer__categories img")].forEach(i=>i.loading="eager")');
   await until('[...document.querySelectorAll(".pm-explorer__categories img")].every(i=>i.complete && i.naturalWidth>0)');
   await ev('document.querySelector(".pm-cuisine").click()');
@@ -166,6 +197,7 @@ const backend = createServer(async (req, res) => {
   await ev('document.querySelector(".pm-explorer__filter-toggle").click()');
   await ev('document.querySelector("[type=reset]").click()');
   await until('document.querySelectorAll(".pm-discovery-cards .pm-table-card").length === 8');
+  assert.equal(await ev('document.querySelector("[name=date]").value'), '');
   emptyCatalogue = false;
   await go('mon-profil/hote'); await until('document.querySelectorAll("form").length === 4');
   await ev('document.querySelectorAll("form")[3].requestSubmit()');
@@ -178,6 +210,15 @@ const backend = createServer(async (req, res) => {
   await until('document.body.textContent.includes("Repas publié")');
   assert.equal(published.title, 'Repas publié');
   await go('explorer'); await until('document.body.textContent.includes("Repas de test")');
+  paginatedCatalogue = true;
+  await ev('location.reload()');
+  await until('!!document.querySelector(".pm-explorer__pagination .pm-button")');
+  await ev('document.querySelector(".pm-explorer__pagination .pm-button").click()');
+  await until('document.body.textContent.includes("Repas page suivante")');
+  assert.equal(await ev('!!document.querySelector(".pm-explorer__pagination .pm-button")'), false);
+  await ev('document.querySelector(".pm-explorer__pagination button").click()');
+  await until('document.body.textContent.includes("Repas de test")');
+  paginatedCatalogue = false;
   await ev(`document.querySelector('a[href^="#/experience/"]').click()`);
   await until('!!document.querySelector("[name=partySize]")');
   await ev('document.querySelector("form").requestSubmit()');

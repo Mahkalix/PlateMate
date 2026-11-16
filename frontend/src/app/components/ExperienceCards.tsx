@@ -223,15 +223,22 @@ export function ExperienceCards({
             ))}
           </div>
           {!featured && (
-            <nav aria-label="Pages des tables">
+            <nav
+              className="pm-explorer__pagination"
+              aria-label="Pages des tables"
+            >
               {offset > 0 && (
                 <button onClick={() => setOffset(Math.max(0, offset - 8))}>
                   Précédent
                 </button>
               )}
               {current.data?.nextOffset != null && (
-                <button onClick={() => setOffset(current.data!.nextOffset!)}>
-                  Suivant
+                <button
+                  className="pm-button pm-button--red"
+                  type="button"
+                  onClick={() => setOffset(current.data!.nextOffset!)}
+                >
+                  Voir plus <span aria-hidden="true">+</span>
                 </button>
               )}
             </nav>

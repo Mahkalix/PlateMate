@@ -15,6 +15,7 @@ const cuisines = [
 export function ExplorerPage() {
   const { user } = useSession();
   const [filters, setFilters] = useState("");
+  const [date, setDate] = useState("");
   const [cuisine, setCuisine] = useState("");
   const [expanded, setExpanded] = useState(false);
   const slider = useRef<HTMLDivElement>(null);
@@ -54,7 +55,22 @@ export function ExplorerPage() {
                   <img src="/explorer/25efc.svg" alt="" />
                   Date
                 </span>
-                <input name="date" type="date" />
+                <span className="pm-explorer__date">
+                  <input
+                    name="date"
+                    type="date"
+                    value={date}
+                    onChange={(event) => setDate(event.target.value)}
+                  />
+                  {!date && (
+                    <span
+                      className="pm-explorer__date-placeholder"
+                      aria-hidden="true"
+                    >
+                      jj/mm/aaaa
+                    </span>
+                  )}
+                </span>
               </label>
               <label>
                 <span>
@@ -88,6 +104,7 @@ export function ExplorerPage() {
                 <button
                   type="reset"
                   onClick={() => {
+                    setDate("");
                     setCuisine("");
                     setFilters("");
                   }}
