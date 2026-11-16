@@ -963,4 +963,3 @@ export function ConnectedLogin() {
     </div>
   );
 }
-
