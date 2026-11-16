@@ -1,107 +1,110 @@
-import { useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { HomeHeader } from "../sections/HomeHeader";
 import { HomeFooter } from "../sections/HomeFooter";
-import {
-  Choices,
-  TextField,
-  type FormValues,
-} from "../components/ProfileFields";
+import { PreferenceChoices } from "../components/PreferenceChoices";
+import { useSession } from "../Session";
+import { api, json, errorMessage } from "../api";
+import { emptyProfile, suggestions, type Profile } from "../profile";
 
-const languages = [
-  "Français",
-  "Arabe",
-  "Anglais",
-  "Allemand",
-  "Espagnol",
-  "Italien",
-];
-export function ProfileWizard({ host = false }: { host?: boolean }) {
+export function ProfileWizard() {
+  const session = useSession();
+  const [values, setValues] = useState<Profile>(
+    () => session.profile ?? { ...emptyProfile },
+  );
   const [step, setStep] = useState(1);
-  const [values, setValues] = useState<FormValues>({});
+  const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [identityName, setIdentityName] = useState("");
-  const form = useRef<HTMLFormElement>(null);
   const heading = useRef<HTMLHeadingElement>(null);
-  function collect() {
-    const data = new FormData(form.current!);
-    const next = { ...values };
-    for (const element of form.current!.querySelectorAll<HTMLInputElement>(
-      "input[name],textarea[name]",
-    )) {
-      if (element.type === "file") continue;
-      next[element.name] =
-        element.type === "checkbox"
-          ? data.getAll(element.name).map(String)
-          : String(data.get(element.name) || "");
-    }
-    setValues(next);
+  useEffect(() => {
+    heading.current?.focus();
+  }, [step]);
+  useEffect(() => () => session.setDraftName(""), [session.setDraftName]);
+  function change<K extends keyof Profile>(key: K, value: Profile[K]) {
+    setValues((v) => ({ ...v, [key]: value }));
+    if (key === "firstName") session.setDraftName(String(value).trim());
   }
-  function move(next: number) {
-    collect();
-    setError("");
-    setIdentityName("");
-    setStep(next);
-    requestAnimationFrame(() => {
-      heading.current?.focus();
-      heading.current?.scrollIntoView({ block: "center" });
-    });
+  function choices(
+    key: keyof typeof suggestions,
+    label: string,
+    required = false,
+  ) {
+    return (
+      <PreferenceChoices
+        label={label}
+        options={suggestions[key]}
+        value={values[key] ?? []}
+        onChange={(value) => change(key, value)}
+        required={required}
+      />
+    );
   }
-  function submit(event: FormEvent) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    for (const group of form.current!.querySelectorAll<HTMLFieldSetElement>(
-      "[data-required-group]",
-    )) {
-      if (!group.querySelector("input:checked")) {
-        setError(
-          `Choisissez au moins une option pour « ${group.querySelector("legend")?.textContent?.replace(" *", "")} ».`,
-        );
-        group.querySelector<HTMLInputElement>("input")?.focus();
-        return;
-      }
+    if (busy) return;
+    setError("");
+    if (step === 1 && !values.languages.length) {
+      setError("Choisissez au moins une langue.");
+      return;
     }
-    move(step + 1);
-  }
-  const titles = host
-    ? [
-        "Parlez-nous de vous",
-        "Informations pratiques",
-        "Vérification et paiement",
-      ]
-    : [
-        "À propos de vous",
-        "Préférences culinaires",
-        "Vos préférences d'expérience",
-      ];
-  const subtitles = host
-    ? [
-        "Ces informations aideront les voyageurs à mieux vous connaître",
-        "Définissez vos disponibilités et tarifs",
-        "Dernière étape pour activer votre profil d'hôte",
-      ]
-    : Array(3).fill(
-        "Aidez-nous à vous proposer les meilleures expériences culinaires",
+    if (
+      step === 2 &&
+      !values.consent &&
+      (values.diets.length ||
+        values.allergies.length ||
+        values.intolerances.length)
+    ) {
+      setError(
+        "Votre accord est n�cessaire pour enregistrer vos pr�f�rences alimentaires. Vous pouvez aussi retirer ces choix.",
       );
+      return;
+    }
+    if (step < 3) {
+      setStep(step + 1);
+      return;
+    }
+    if (
+      !values.affinities.length ||
+      !values.ambiences.length ||
+      !values.motivations?.length
+    ) {
+      setError(
+        "Choisissez au moins un centre d'int�r�t, une exp�rience et une ambiance.",
+      );
+      return;
+    }
+    setBusy(true);
+    try {
+      const saved = await api<{ profile: Profile }>(
+        "/me/profile",
+        json("PUT", values),
+      );
+      session.setProfile(saved.profile);
+      session.setDraftName("");
+      setStep(4);
+    } catch (e) {
+      setError(errorMessage(e));
+    } finally {
+      setBusy(false);
+    }
+  }
+  const titles = [
+    "� propos de vous",
+    "Pr�f�rences culinaires",
+    "Vos pr�f�rences d'exp�rience",
+  ];
   return (
     <div className="app pm-inner-page">
       <HomeHeader />
       <main
-        className={`pm-wizard${host ? " pm-wizard--host" : ""}${step === 4 ? " pm-wizard--confirmation" : ""}`}
+        className={`pm-wizard pm-connected-wizard${step === 4 ? " pm-wizard--confirmation" : ""}`}
       >
-        {host ? (
-          <nav className="pm-breadcrumb" aria-label="Fil d’Ariane">
-            <a href="#/devenir-hote">Devenir Hôte</a>
-            <span>/</span>
-            <span>Postuler</span>
-          </nav>
-        ) : step < 4 ? (
-          <h1>Créez votre profil</h1>
-        ) : null}
-        <ol className="pm-stepper" aria-label="Étapes du profil">
+        {step < 4 && <h1>Cr�ez votre profil</h1>}
+        <ol className="pm-stepper" aria-label="�tapes du profil">
           {[1, 2, 3, 4].map((n) => (
             <li
               key={n}
-              aria-current={step === n ? "step" : undefined}
               className={step >= n ? "is-complete" : ""}
+              aria-current={step === n ? "step" : undefined}
             >
               <span>
                 {n === 4 ? (
@@ -113,376 +116,166 @@ export function ProfileWizard({ host = false }: { host?: boolean }) {
             </li>
           ))}
         </ol>
-        {step <= 3 ? (
-          <>
-            <form
-              ref={form}
-              onSubmit={submit}
-              className={`pm-form-card pm-form-card--step-${step}`}
-              key={step}
-            >
-              <header>
-                <h2 ref={heading} tabIndex={-1}>
-                  {titles[step - 1]}
-                </h2>
-                <p>{subtitles[step - 1]}</p>
-              </header>
+        {step < 4 ? (
+          <form
+            className={`pm-form-card pm-form-card--step-${step}`}
+            onSubmit={submit}
+          >
+            <header>
+              <h2 ref={heading} tabIndex={-1}>
+                {titles[step - 1]}
+              </h2>
+              <p>
+                Aidez-nous � vous proposer les meilleures exp�riences culinaires
+              </p>
+            </header>
+            <fieldset disabled={busy} className="pm-wizard-fields">
               {step === 1 && (
                 <>
                   <div className="pm-field-row">
-                    <TextField
-                      name="firstName"
-                      label="Prénom"
-                      values={values}
-                      required
-                      placeholder="Ex. Fatima"
-                    />
-                    <TextField
-                      name="lastName"
-                      label="Nom"
-                      values={values}
-                      required
-                      placeholder="Ex. Kali"
-                    />
+                    <label className="pm-field">
+                      Pr�nom *
+                      <input
+                        name="firstName"
+                        autoComplete="given-name"
+                        required
+                        maxLength={80}
+                        value={values.firstName}
+                        onChange={(e) => change("firstName", e.target.value)}
+                      />
+                    </label>
+                    <label className="pm-field">
+                      Nom *
+                      <input
+                        name="lastName"
+                        autoComplete="family-name"
+                        required
+                        maxLength={80}
+                        value={values.lastName}
+                        onChange={(e) => change("lastName", e.target.value)}
+                      />
+                    </label>
                   </div>
-                  {host && (
-                    <TextField
+                  <label className="pm-field">
+                    Ville *
+                    <input
                       name="city"
-                      label="Ville"
-                      values={values}
-                      required
+                      autoComplete="address-level2"
                       placeholder="Ex. Grenoble"
+                      required
+                      maxLength={80}
+                      value={values.city}
+                      onChange={(e) => change("city", e.target.value)}
                     />
-                  )}
-                  <Choices
-                    name="languages"
-                    label="Langues parlées"
-                    options={languages}
-                    values={values}
-                    other
-                  />
-                  <TextField
-                    name="bio"
-                    label={host ? "Présentez-vous" : "Parlez-nous de vous"}
-                    values={values}
-                    required={host}
-                    multiline
-                    minLength={host ? 100 : undefined}
-                    hint={host ? "Minimum 100 caractères" : "(Optionnel)"}
-                    placeholder={
-                      host
-                        ? "Parlez de votre passion pour la cuisine, votre histoire, ce qui vous motive à partager votre table..."
-                        : "Qu'est-ce qui vous attire dans les repas chez l'habitant ? Vos centres d'intérêt, vos passions..."
-                    }
-                  />
+                  </label>
+                  {choices("languages", "Langues parl�es", true)}
+                  <label className="pm-field">
+                    Parlez-nous de vous
+                    <textarea
+                      name="description"
+                      maxLength={1000}
+                      value={values.description}
+                      onChange={(e) => change("description", e.target.value)}
+                      placeholder="Vos centres d'int�r�t, vos passions, ce qui vous attire dans les repas chez l'habitant."
+                    />
+                    <small>Optionnel</small>
+                  </label>
                 </>
               )}
-              {step === 2 &&
-                (host ? (
-                  <>
-                    <div className="pm-field-row">
-                      <TextField
-                        name="capacity"
-                        label="Capacité maximale"
-                        type="number"
-                        min={1}
-                        values={values}
-                        required
-                        placeholder="Ex. 3"
-                      />
-                      <TextField
-                        name="price"
-                        label="Prix par personne (moyenne)"
-                        type="number"
-                        step={0.01}
-                        min={0}
-                        values={values}
-                        required
-                        placeholder="€"
-                      />
-                    </div>
-                    <Choices
-                      name="days"
-                      label="Jours disponibles"
-                      options={[
-                        "Lundi",
-                        "Mardi",
-                        "Mercredi",
-                        "Jeudi",
-                        "Vendredi",
-                        "Samedi",
-                        "Dimanche",
-                      ]}
-                      values={values}
+              {step === 2 && (
+                <>
+                  {choices("diets", "R�gimes alimentaires (facultatif)")}
+                  {choices("cuisines", "Cuisines pr�f�r�es")}
+                  {choices("allergies", "Allergies alimentaires (facultatif)")}
+                  {choices("intolerances", "Intol�rances (facultatif)")}
+                  <label className="pm-consent">
+                    <input
+                      type="checkbox"
+                      checked={values.consent}
+                      onChange={(e) => change("consent", e.target.checked)}
                     />
-                    <TextField
-                      name="details"
-                      label="Informations supplémentaires"
-                      values={values}
-                      multiline
-                      placeholder="Accès, parking, informations importantes pour les voyageurs..."
-                    />
-                  </>
-                ) : (
-                  <>
-                    <Choices
-                      name="diet"
-                      label="Préférences culinaires"
-                      options={[
-                        "Végétarien",
-                        "Végan",
-                        "Sans gluten",
-                        "Sans lactose",
-                        "Halal",
-                        "Casher",
-                      ]}
-                      values={values}
-                      other
-                    />
-                    <Choices
-                      name="cuisines"
-                      label="Cuisine préférées"
-                      options={[
-                        "Française",
-                        "Italienne",
-                        "Marocaine",
-                        "Japonaise",
-                        "Indienne",
-                        "Mexicaine",
-                        "Libanaise",
-                      ]}
-                      values={values}
-                      other
-                    />
-                    <TextField
-                      name="allergies"
-                      label="Allergies alimentaires"
-                      values={values}
-                      placeholder="Listez vos allergies ou intolérances alimentaires..."
-                      hint="(Optionnel)"
-                    />
-                  </>
-                ))}
-              {step === 3 &&
-                (host ? (
-                  <>
-                    <div className="pm-field">
-                      <label htmlFor="identity">
-                        Pièce d'identité <span>*</span>
-                      </label>
-                      <label className="pm-upload" htmlFor="identity">
-                        <span className="pm-upload__icon">
-                          <img src="/ready/9df3c.svg" alt="" />
-                        </span>
-                        <strong>
-                          {identityName || "Téléchargez votre pièce d'identité"}
-                        </strong>
-                        <small>
-                          Carte d'identité, passeport ou permis de conduire
-                        </small>
-                        <input
-                          id="identity"
-                          name="identity"
-                          type="file"
-                          accept="image/*,application/pdf"
-                          onChange={(event) =>
-                            setIdentityName(event.target.files?.[0]?.name || "")
-                          }
-                        />
-                      </label>
-                    </div>
-                    <TextField
-                      name="iban"
-                      label="Coordonnées bancaires"
-                      values={values}
-                      placeholder="IBAN"
-                      hint="Pour recevoir vos paiements (sécurisé via Stripe)"
-                    />
-                    <div className="pm-fees">
-                      <h3>Récapitulatif des frais</h3>
-                      <dl>
-                        <div>
-                          <dt>Commission PlateMate</dt>
-                          <dd>15%</dd>
-                        </div>
-                        <div>
-                          <dt>Frais de transaction</dt>
-                          <dd>Inclus</dd>
-                        </div>
-                        <div>
-                          <dt>Assurance responsabilité civile</dt>
-                          <dd>Incluse</dd>
-                        </div>
-                      </dl>
-                      <small>
-                        Exemple: pour un repas à 25€/personne avec 4 invités,
-                        vous recevez <span>85€</span>
-                      </small>
-                    </div>
-                    <div className="pm-consents">
-                      <label>
-                        <input type="checkbox" required name="terms" />
-                        J'accepte les conditions d'utilisation et la politique
-                        de confidentialité *
-                      </label>
-                      <label>
-                        <input type="checkbox" required name="charter" />
-                        J'accepte la charte de l'hôte et m'engage à respecter
-                        les règles de sécurité et d'hygiène *
-                      </label>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <Choices
-                      name="experiences"
-                      label="Vos préférences d'expérience"
-                      options={[
-                        "Découvrir de nouvelles cultures",
-                        "Rencontrer des locaux",
-                        "Manger de la vraie cuisine familiale",
-                        "Partager des histoires et expériences",
-                        "Apprendre à cuisiner de nouveaux plats",
-                        "Voyager autrement",
-                      ]}
-                      values={values}
-                    />
-                    <Choices
-                      name="atmospheres"
-                      label="Type d'ambiance préférée"
-                      options={[
-                        "Intime (2-4 personnes)",
-                        "Conviviale (5-8 personnes)",
-                        "Calme et détendue",
-                        "Animée et dynamique",
-                      ]}
-                      values={values}
-                    />
-                  </>
-                ))}
-              {error && (
-                <p role="alert" className="pm-form-error">
-                  {error}
-                </p>
+                    J'accepte l'enregistrement de mes pr�f�rences alimentaires
+                    pour la compatibilit� des repas. Mes allergies ne sont
+                    partag�es avec un h�te qu'avec mon accord lors de la
+                    r�servation.
+                  </label>
+                </>
               )}
-              <div className="pm-form-action-group">
-                <div className="pm-form-actions">
-                  {step === 1 ? (
-                    <a href={host ? "#/devenir-hote" : "#/connexion"}>
-                      <img src="/ready/b64e3.svg" alt="" />
-                      Retour
-                    </a>
-                  ) : (
-                    <button type="button" onClick={() => move(step - 1)}>
-                      <img src="/ready/b64e3.svg" alt="" />
-                      Retour
-                    </button>
-                  )}
-                  <button className="pm-button pm-button--red" type="submit">
-                    {step === 3 ? "Confirmer" : "Continuer"}
-                    <img src="/ready/5b5e3.svg" alt="" />
-                  </button>
-                </div>
-                {host && step === 3 && (
-                  <p className="pm-verification-delay">
-                    Votre profil sera vérifié sous 24-48h. Vous recevrez un
-                    email de confirmation.
-                  </p>
-                )}
-              </div>
-            </form>
-            {host && step === 3 && (
-              <p className="pm-preview-notice pm-confirmation-notice">
-                Démonstration : aucun document ni paiement n’est envoyé.
-                Utilisez uniquement des données fictives. L’assurance et le
-                délai affichés dans la maquette restent à confirmer.
+              {step === 3 && (
+                <>
+                  {choices("motivations", "Vos pr�f�rences d'exp�rience", true)}
+                  {choices("affinities", "Vos centres d'int�r�t", true)}
+                  {choices("ambiences", "Type d'ambiance pr�f�r�e", true)}
+                </>
+              )}
+            </fieldset>
+            {error && (
+              <p role="alert" className="pm-form-error">
+                {error}
               </p>
             )}
-          </>
-        ) : (
-          <>
-            <section className="pm-form-card pm-confirmation">
-              <span className="pm-confirmation__icon">
-                <img src="/ready/29bf5.svg" alt="" />
-              </span>
-              <div className="pm-confirmation__heading">
-                <h2 ref={heading} tabIndex={-1}>
-                  {host ? "Candidature envoyée !" : "Profil créé !"}
-                </h2>
-                <p>
-                  {host
-                    ? "Merci d'avoir soumis votre candidature pour devenir hôte PlateMate."
-                    : "Merci d'avoir créé votre profil PlateMate."}
-                </p>
-              </div>
-              <div className="pm-confirmation__body">
-                {host && (
-                  <>
-                    <p>
-                      Notre équipe va vérifier vos informations sous 24 à 48
-                      heures. Vous recevrez un email de confirmation dès que
-                      votre profil sera validé.
-                    </p>
-                    <div className="pm-next-steps">
-                      <h3>Prochaines étapes</h3>
-                      {[
-                        [
-                          "Vérification de votre profil",
-                          "Nous vérifions votre identité et vos informations",
-                        ],
-                        [
-                          "Validation et activation",
-                          "Vous recevrez un email avec vos accès hôte",
-                        ],
-                        [
-                          "Publiez votre première expérience",
-                          "Commencez à accueillir des voyageurs !",
-                        ],
-                      ].map(([title, description], i) => (
-                        <div key={title}>
-                          <span>{i + 1}</span>
-                          <div>
-                            <strong>{title}</strong>
-                            <p>{description}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                )}
-                <div className="pm-confirmation__actions">
-                  <a
-                    className="pm-button pm-button--red"
-                    href={host ? "#accueil" : "#/explorer"}
-                  >
-                    {host ? "Retour à l'accueil" : "Explorer les expériences"}
-                  </a>
-                  {!host && (
-                    <button
-                      className="pm-button pm-button--outline"
-                      type="button"
-                      onClick={() => setStep(1)}
-                    >
-                      Mon profil
-                    </button>
-                  )}
-                </div>
-              </div>
-              {host && (
-                <p className="pm-confirmation__help">
-                  Vous avez des questions ? Consultez notre{" "}
-                  <span>centre d'aide</span>
-                </p>
+            <div className="pm-form-actions">
+              {step > 1 ? (
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => {
+                    setError("");
+                    setStep(step - 1);
+                  }}
+                >
+                  <img src="/ready/b64e3.svg" alt="" />
+                  Retour
+                </button>
+              ) : (
+                <a href="#accueil">
+                  <img src="/ready/b64e3.svg" alt="" />
+                  Retour
+                </a>
               )}
-            </section>
-            <p className="pm-preview-notice pm-confirmation-notice">
-              Aperçu de confirmation : aucune donnée n’a été envoyée ni
-              enregistrée sur un serveur.
-            </p>
-          </>
+              <button
+                type="submit"
+                className="pm-button pm-button--red"
+                disabled={busy}
+              >
+                {busy
+                  ? "Enregistrement."
+                  : step === 3
+                    ? "Confirmer"
+                    : "Continuer"}
+                <img src="/ready/5b5e3.svg" alt="" />
+              </button>
+            </div>
+          </form>
+        ) : (
+          <section className="pm-form-card pm-confirmation">
+            <span className="pm-confirmation__icon">
+              <img src="/ready/29bf5.svg" alt="" />
+            </span>
+            <div className="pm-confirmation__heading">
+              <h2 ref={heading} tabIndex={-1}>
+                Profil cr�� !
+              </h2>
+              <p>
+                Merci {values.firstName}, votre profil PlateMate est enregistr�.
+              </p>
+            </div>
+            <div className="pm-confirmation__actions">
+              <a className="pm-button pm-button--red" href="#/explorer">
+                Explorer les exp�riences
+              </a>
+              <a
+                className="pm-button pm-button--outline"
+                href="#/mon-profil/invite"
+              >
+                Mon profil
+              </a>
+            </div>
+          </section>
         )}
       </main>
       <HomeFooter />
     </div>
   );
 }
+
