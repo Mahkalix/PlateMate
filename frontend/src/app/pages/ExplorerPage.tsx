@@ -5,7 +5,7 @@ import { HomeHeader } from "../sections/HomeHeader";
 import { HomeFooter } from "../sections/HomeFooter";
 
 const cuisines = [
-  ["Fran�ais", "fran�aise", "d7552"],
+  ["Français", "française", "d7552"],
   ["Asiatique", "asiatique", "b34b8"],
   ["Italien", "italienne", "e5554"],
   ["Japonais", "japonaise", "ceee7"],
@@ -31,8 +31,8 @@ export function ExplorerPage() {
       <HomeHeader />
       <main className="pm-explorer">
         <header className="pm-explorer__heading">
-          <h1>Explorer les exp�riences</h1>
-          <p>Voir les exp�riences disponibles pr�s de chez vous</p>
+          <h1>Explorer les expériences</h1>
+          <p>Voir les expériences disponibles près de chez vous</p>
         </header>
         {!user && (
           <a className="pm-explorer__banner" href="#/connexion">
@@ -47,7 +47,7 @@ export function ExplorerPage() {
                   <img src="/explorer/e14bc.svg" alt="" />
                   Adresse
                 </span>
-                <input name="city" placeholder="O� ?" maxLength={80} />
+                <input name="city" placeholder="Où ?" maxLength={80} />
               </label>
               <label>
                 <span>
@@ -63,7 +63,7 @@ export function ExplorerPage() {
                 </span>
                 <input
                   name="cuisine"
-                  placeholder="Pays, cuisine."
+                  placeholder="Pays, cuisine…"
                   maxLength={80}
                   value={cuisine}
                   onChange={(e) => setCuisine(e.target.value)}
@@ -74,16 +74,16 @@ export function ExplorerPage() {
               </button>
               <div className="pm-explorer__filter-panel" hidden={!expanded}>
                 <label>
-                  R�gime alimentaire
+                  Régime alimentaire
                   <select name="diet">
                     <option value="">Tous</option>
-                    <option value="vegetarian">V�g�tarien</option>
-                    <option value="vegan">V�g�talien</option>
+                    <option value="vegetarian">Végétarien</option>
+                    <option value="vegan">Végétalien</option>
                   </select>
                 </label>
                 <label>
                   Langue
-                  <input name="language" placeholder="fr, en." maxLength={80} />
+                  <input name="language" placeholder="fr, en…" maxLength={80} />
                 </label>
                 <button
                   type="reset"
@@ -92,7 +92,7 @@ export function ExplorerPage() {
                     setFilters("");
                   }}
                 >
-                  R�initialiser
+                  Réinitialiser
                 </button>
               </div>
             </form>
@@ -100,11 +100,11 @@ export function ExplorerPage() {
               className="pm-explorer__categories"
               aria-labelledby="cuisines-title"
             >
-              <h2 id="cuisines-title">Qu'est-ce qui vous fait envie ?</h2>
+              <h2 id="cuisines-title">Qu’est-ce qui vous fait envie ?</h2>
               <div className="pm-explorer__slider">
                 <button
                   type="button"
-                  aria-label="Cat�gories pr�c�dentes"
+                  aria-label="Catégories précédentes"
                   onClick={() =>
                     slider.current?.scrollBy({ left: -376, behavior: "smooth" })
                   }
@@ -135,7 +135,7 @@ export function ExplorerPage() {
                 </div>
                 <button
                   type="button"
-                  aria-label="Cat�gories suivantes"
+                  aria-label="Catégories suivantes"
                   onClick={() =>
                     slider.current?.scrollBy({ left: 376, behavior: "smooth" })
                   }

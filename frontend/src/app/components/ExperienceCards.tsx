@@ -28,16 +28,16 @@ const discoveryTables = [
   {
     title: "La French Touch",
     host: "Jean-Marc",
-    kind: "Cuisine fran�aise",
-    ambience: "Calme et d�tendue",
+    kind: "Cuisine française",
+    ambience: "Calme et détendue",
     photo: "BackgroundImage4",
     portrait: "Image28",
   },
   {
     title: "American Night",
     host: "Troy",
-    kind: "Cuisine am�ricaine",
-    ambience: "Anim�e",
+    kind: "Cuisine américaine",
+    ambience: "Animée",
     photo: "BackgroundImage3",
     portrait: "Image27",
   },
@@ -45,7 +45,7 @@ const discoveryTables = [
     title: "La French Touch",
     host: "Usain",
     kind: "Cuisine familiale",
-    ambience: "Grande tabl�e",
+    ambience: "Grande tablée",
     photo: "BackgroundImage2",
     portrait: "Image26",
   },
@@ -83,7 +83,7 @@ function DiscoveryCards({
         <a
           className="pm-explorer__locked"
           href="#/connexion"
-          aria-label="Se connecter pour d�couvrir plus d'exp�riences"
+          aria-label="Se connecter pour découvrir plus d’expériences"
         >
           <span className="pm-explorer__cards" aria-hidden="true">
             {[0, 2, 1, 3].map((index) => (
@@ -98,7 +98,7 @@ function DiscoveryCards({
         </a>
       )}
       <p className="pm-explorer__notice">
-        Exemples de tables, pr�sent�s � titre d'inspiration. Aucun repas
+        Exemples de tables, présentés à titre d’inspiration. Aucun repas
         disponible pour le moment.
       </p>
     </div>
@@ -152,7 +152,7 @@ export function ExperienceCards({
   if (filters && current?.data?.items.length === 0)
     return (
       <p role="status">
-        Aucun repas ne correspond � ces filtres. Essayez une autre recherche.
+        Aucun repas ne correspond à ces filtres. Essayez une autre recherche.
       </p>
     );
   if (
@@ -166,19 +166,19 @@ export function ExperienceCards({
     <div className="pm-suggestions" id={featured ? "cartes" : undefined}>
       <p>
         {hasSuggestions
-          ? "Des suggestions class�es selon vos langues, vos centres d'int�r�t et vos pr�f�rences alimentaires."
+          ? "Des suggestions classées selon vos langues, vos centres d’intérêt et vos préférences alimentaires."
           : user
-            ? "D�couvrez les tables et les prochains repas."
-            : "D�couvrez les tables. Connectez-vous pour r�server."}
+            ? "Découvrez les tables et les prochains repas."
+            : "Découvrez les tables. Connectez-vous pour réserver."}
       </p>
       {!personalized && <a href="#/connexion">Se connecter</a>}
       {loading || !current ? (
-        <p role="status">Chargement des tables.</p>
+        <p role="status">Chargement des tables…</p>
       ) : current.error ? (
         <div role="alert">
           <p>{current.error}</p>
           <button type="button" onClick={() => setAttempt((n) => n + 1)}>
-            R�essayer
+            Réessayer
           </button>
         </div>
       ) : (
@@ -186,7 +186,7 @@ export function ExperienceCards({
           {!current.data?.items.length && (
             <p>
               Aucune table {personalized ? "compatible avec votre profil " : ""}
-              pour le moment. Revenez bient�t d�couvrir les prochains repas.
+              pour le moment. Revenez bientôt découvrir les prochains repas.
             </p>
           )}
           <div className="pm-suggestions__grid">
@@ -194,18 +194,18 @@ export function ExperienceCards({
               <article className="pm-suggestion" key={card.contextId}>
                 <div className="pm-suggestion__cover" aria-hidden="true">
                   <span>{card.firstName.slice(0, 1)}</span>
-                  <span>� table !</span>
+                  <span>À table !</span>
                 </div>
                 <div className="pm-suggestion__body">
                   <p className="pm-eyebrow">{card.city}</p>
                   <h3>{card.contextTitle}</h3>
                   <p>Chez {card.firstName}</p>
                   <p>
-                    {card.kind} � {card.ambience}
+                    {card.kind} · {card.ambience}
                   </p>
                   {personalized && card.score > 0 && (
                     <p className="pm-suggestion__match">
-                      Des affinit�s avec votre profil
+                      Des affinités avec votre profil
                     </p>
                   )}
                   <a
@@ -216,7 +216,7 @@ export function ExperienceCards({
                         : "#/connexion"
                     }
                   >
-                    {user ? "D�couvrir ce repas" : "Se connecter pour r�server"}
+                    {user ? "Découvrir ce repas" : "Se connecter pour réserver"}
                   </a>
                 </div>
               </article>
@@ -226,7 +226,7 @@ export function ExperienceCards({
             <nav aria-label="Pages des tables">
               {offset > 0 && (
                 <button onClick={() => setOffset(Math.max(0, offset - 8))}>
-                  Pr�c�dent
+                  Précédent
                 </button>
               )}
               {current.data?.nextOffset != null && (

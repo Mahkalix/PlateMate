@@ -82,10 +82,10 @@ const date = (value: string) =>
   });
 const statusLabel: Record<string, string> = {
   pending: "En attente",
-  accepted: "Accept�e",
-  declined: "Refus�e",
-  cancelled: "Annul�e",
-  completed: "Termin�e",
+  accepted: "Acceptée",
+  declined: "Refusée",
+  cancelled: "Annulée",
+  completed: "Terminée",
 };
 
 function useLoad<T>(path: string) {
@@ -164,13 +164,13 @@ function Shell({
                 href={`#/${meals ? "mes-repas" : "mon-profil"}/invite`}
                 aria-current={role === "invite" ? "true" : undefined}
               >
-                Espace invit�
+                Espace invité
               </a>
               <a
                 href={`#/${meals ? "mes-repas" : "mon-profil"}/hote`}
                 aria-current={role === "hote" ? "true" : undefined}
               >
-                Espace h�te
+                Espace hôte
               </a>
             </nav>
           </>
@@ -188,7 +188,7 @@ function LoadState({ error, retry }: { error: string; retry: () => void }) {
   return error ? (
     <div>
       <p role="alert">{error}</p>
-      <button onClick={retry}>R�essayer</button>
+      <button onClick={retry}>Réessayer</button>
     </div>
   ) : (
     <p role="status">Chargement.</p>
@@ -225,7 +225,7 @@ function Field({
 function ActionForm({
   children,
   submit,
-  success = "Enregistr�.",
+  success = "Enregistré.",
   after,
   disabled = false,
 }: {
@@ -284,7 +284,7 @@ export function ConnectedProfile({ host = false }: { host?: boolean }) {
       <div className="pm-profile__stats">
         <div>
           <strong>{summary.data.hostsMet}</strong>
-          <span>H�tes rencontr�s</span>
+          <span>Hôtes rencontrés</span>
         </div>
         <div>
           <strong>{summary.data.mealsHosted}</strong>
@@ -292,22 +292,22 @@ export function ConnectedProfile({ host = false }: { host?: boolean }) {
         </div>
         <div>
           <strong>{summary.data.guestsMet}</strong>
-          <span>Invit�s rencontr�s</span>
+          <span>Invités rencontrés</span>
         </div>
       </div>
       <div className="pm-profile__columns">
         <aside className="pm-profile__sidebar">
           <section className="pm-profile__aside-card">
-            <h3>Ce que voient les {host ? "invit�s" : "h�tes"}</h3>
+            <h3>Ce que voient les {host ? "invités" : "hôtes"}</h3>
             <p>
-              Votre profil public aide les autres membres � mieux vous
-              conna�tre.
+              Votre profil public aide les autres membres à mieux vous
+              connaître.
             </p>
             <ul>
               {[
-                "Pr�nom et initiale",
-                "Pr�sentation et int�r�ts publics",
-                "Jamais : coordonn�es et adresse exacte",
+                "Prénom et initiale",
+                "Présentation et intérêts publics",
+                "Jamais : coordonnées et adresse exacte",
               ].map((label, i) => (
                 <li key={label}>
                   <span className={i === 2 ? "is-private" : ""}>
@@ -331,13 +331,13 @@ export function ConnectedProfile({ host = false }: { host?: boolean }) {
               <TableForm />
             ) : (
               <ActionForm
-                success="Profil h�te cr��."
+                success="Profil hôte créé."
                 after={summary.reload}
                 submit={() => api("/me/host", json("POST", {}))}
               >
-                <h2>Devenir h�te</h2>
+                <h2>Devenir hôte</h2>
                 <p>
-                  Votre profil est pr�t. Activez votre espace h�te pour proposer
+                  Votre profil est prêt. Activez votre espace hôte pour proposer
                   une table.
                 </p>
               </ActionForm>
@@ -377,17 +377,17 @@ function TableForm() {
     >
       <h2>Ma table</h2>
       <p>
-        Votre adresse est r�serv�e aux invit�s dont la r�servation est accept�e.
+        Votre adresse est réservée aux invités dont la réservation est acceptée.
       </p>
       <Field
         name="specialties"
-        label="Sp�cialit�s (virgules)"
+        label="Spécialités (virgules)"
         value={t.specialties?.join(", ")}
         maxLength={1944}
       />
       <Field
         name="supportedDiets"
-        label="R�gimes propos�s (virgules)"
+        label="Régimes proposés (virgules)"
         value={t.supportedDiets?.join(", ")}
         maxLength={1944}
       />
@@ -400,7 +400,7 @@ function TableForm() {
       />
       <Field
         name="additionalInformation"
-        label="Informations compl�mentaires"
+        label="Informations complémentaires"
         value={t.additionalInformation}
         maxLength={1000}
       />
@@ -423,7 +423,7 @@ function TableForm() {
       />
       <Field
         name="instructions"
-        label="Instructions d'acc�s"
+        label="Instructions d'accès"
         value={t.address?.instructions}
         maxLength={500}
       />
@@ -446,13 +446,13 @@ export function Experience({
     `/profiles/${encodeURIComponent(hostId)}/contexts/${encodeURIComponent(contextId)}`,
   );
   return (
-    <Shell title={state.data?.contextTitle || "Exp�rience"}>
+    <Shell title={state.data?.contextTitle || "Expérience"}>
       {!state.data ? (
         <LoadState error={state.error} retry={state.reload} />
       ) : (
         <>
           <p>
-            Chez {state.data.firstName} � {state.data.city}
+            Chez {state.data.firstName} à {state.data.city}
           </p>
           <p>{state.data.description}</p>
           <p>
@@ -462,12 +462,12 @@ export function Experience({
               { style: "currency", currency: "EUR" },
             )}
           </p>
-          {!state.data.slots?.length && <p>Aucun cr�neau disponible.</p>}
+          {!state.data.slots?.length && <p>Aucun créneau disponible.</p>}
           {state.data.slots?.map((slot) => (
             <ActionForm
               key={slot.id}
               disabled={slot.remainingPlaces < 1}
-              success="Demande envoy�e � l'h�te. Retrouvez-la dans Mes repas."
+              success="Demande envoyée à l'hôte. Retrouvez-la dans Mes repas."
               submit={(data) =>
                 api(
                   "/bookings",
@@ -492,7 +492,7 @@ export function Experience({
                   disabled={slot.remainingPlaces < 1}
                 />
               </label>
-              {slot.remainingPlaces < 1 && <p>Ce cr�neau est complet.</p>}
+              {slot.remainingPlaces < 1 && <p>Ce créneau est complet.</p>}
             </ActionForm>
           ))}
           <a href="#/mes-repas/invite">Voir mes demandes</a>
@@ -515,14 +515,14 @@ export function ConnectedMeals({ host = false }: { host?: boolean }) {
     bookings.reload();
   };
   return (
-    <Shell title={host ? "Les repas que j'accueille" : "Mes repas invit�s"}>
+    <Shell title={host ? "Les repas que j'accueille" : "Mes repas invités"}>
       {!state.data || !bookings.data ? (
         <LoadState error={state.error || bookings.error} retry={reload} />
       ) : (
         <>
           {host && !state.data.isHost && (
             <p>
-              <a href="#/mon-profil/hote">Activer mon profil h�te</a>
+              <a href="#/mon-profil/hote">Activer mon profil hôte</a>
             </p>
           )}
           {host && state.data.isHost && <PublishMeal after={reload} />}
@@ -535,7 +535,7 @@ export function ConnectedMeals({ host = false }: { host?: boolean }) {
                 <h3>
                   {host
                     ? "Vous n'avez pas encore accueilli de repas"
-                    : "Vous n'avez pas encore r�serv� de repas"}
+                    : "Vous n'avez pas encore réservé de repas"}
                 </h3>
                 {!host && (
                   <a className="pm-button" href="#/explorer">
@@ -547,9 +547,9 @@ export function ConnectedMeals({ host = false }: { host?: boolean }) {
           <div className="pm-meals__sections">
             {(
               [
-                ["upcoming", "� venir"],
-                ["past", "Repas pass�s"],
-                ["cancelled", "Annul�s ou refus�s"],
+                ["upcoming", "À venir"],
+                ["past", "Repas passés"],
+                ["cancelled", "Annulés ou refusés"],
               ] as const
             ).map(([section, title]) => (
               <section className="pm-meals__section" key={section}>
@@ -570,7 +570,7 @@ export function ConnectedMeals({ host = false }: { host?: boolean }) {
                         {host && (
                           <p>
                             {meal.confirmedPlaces}/{meal.capacity} places
-                            confirm�es � {meal.pendingRequests} demandes
+                            confirmées à {meal.pendingRequests} demandes
                           </p>
                         )}
                         {meal.address && (
@@ -631,7 +631,7 @@ export function ConnectedMeals({ host = false }: { host?: boolean }) {
           </div>
           {offset > 0 && (
             <button onClick={() => setOffset(Math.max(0, offset - 50))}>
-              Repas pr�c�dents
+              Repas précédents
             </button>
           )}
           {Object.values(state.data.sections).flat().length === 50 && (
@@ -640,7 +640,7 @@ export function ConnectedMeals({ host = false }: { host?: boolean }) {
             </button>
           )}
           <section>
-            <h2>{host ? "G�rer les demandes" : "Mes r�servations"}</h2>
+            <h2>{host ? "Gérer les demandes" : "Mes réservations"}</h2>
             {bookings.data.items.map((booking) => (
               <BookingActions
                 key={booking.id}
@@ -681,7 +681,7 @@ function BookingActions({
     <article className="pm-form-card">
       <h3>{b.contextTitle}</h3>
       <p>
-        {b.counterpartName} � {b.partySize} personnes � {statusLabel[b.status]}
+        {b.counterpartName} à {b.partySize} personnes à {statusLabel[b.status]}
       </p>
       {actions.length > 0 && (
         <ActionForm
@@ -704,7 +704,7 @@ function BookingActions({
                         accepted: "Accepter",
                         declined: "Refuser",
                         cancelled: "Annuler",
-                        completed: "Marquer termin�",
+                        completed: "Marquer terminé",
                       } as Record<string, string>
                     )[status]
                   }
@@ -721,13 +721,13 @@ function BookingActions({
         b.amountCents > 0 && (
           <ActionForm
             after={after}
-            success="Paiement enregistr�."
+            success="Paiement enregistré."
             submit={() =>
               api(`/bookings/${b.id}/payment-intent`, { method: "POST" })
             }
           >
             <p>
-              R�gler{" "}
+              Régler{" "}
               {(b.amountCents / 100).toLocaleString("fr-FR", {
                 style: "currency",
                 currency: "EUR",
@@ -762,8 +762,8 @@ function AllergyConsent({ bookingId }: { bookingId: string }) {
           name="share"
           defaultChecked={!!state.data.consent}
         />{" "}
-        Partager mes allergies avec l'h�te de ce repas une fois la r�servation
-        accept�e
+        Partager mes allergies avec l'hôte de ce repas une fois la réservation
+        acceptée
       </label>
     </ActionForm>
   );
@@ -777,18 +777,18 @@ function SharedAllergies({ bookingId }: { bookingId: string }) {
   return (
     <p>
       {state.data.allergies
-        ? `Allergies partag�es : ${state.data.allergies.join(", ") || "aucune renseign�e"}`
-        : "Aucun partage d'allergies autoris�."}
+        ? `Allergies partagées : ${state.data.allergies.join(", ") || "aucune renseignée"}`
+        : "Aucun partage d'allergies autorisé."}
     </p>
   );
 }
 function PublishMeal({ after }: { after: () => void }) {
   return (
     <details>
-      <summary>Cr�er un repas</summary>
+      <summary>Créer un repas</summary>
       <ActionForm
         after={after}
-        success="Repas publi�."
+        success="Repas publié."
         submit={(data) =>
           api(
             "/me/contexts",
@@ -824,15 +824,15 @@ function PublishMeal({ after }: { after: () => void }) {
           maxLength={1944}
           required
         />
-        <Field name="themes" label="Th�mes (virgules)" maxLength={1944} />
+        <Field name="themes" label="Thèmes (virgules)" maxLength={1944} />
         <Field
           name="supportedDiets"
-          label="R�gimes propos�s (virgules)"
+          label="Régimes proposés (virgules)"
           maxLength={1944}
         />
         <Field
           name="safeFor"
-          label="Allerg�nes et intol�rances que vous pouvez exclure (virgules)"
+          label="Allergènes et intolérances que vous pouvez exclure (virgules)"
           maxLength={1944}
         />
         <label>
@@ -875,7 +875,7 @@ export function ConnectedLogin() {
       <main className="pm-login">
         <header>
           <h1>Hello !</h1>
-          <p>Connectez-vous pour retrouver vos h�tes pr�f�r�s</p>
+          <p>Connectez-vous pour retrouver vos hôtes préférés</p>
         </header>
         <section className="pm-form-card" aria-label="Connexion">
           {loading ? (
@@ -890,7 +890,7 @@ export function ConnectedLogin() {
                 <div>
                   <p role="alert">{error}</p>
                   <button className="pm-button" type="button" onClick={retry}>
-                    R�essayer
+                    Réessayer
                   </button>
                 </div>
               )}
@@ -903,8 +903,8 @@ export function ConnectedLogin() {
                 Pas encore de compte ? <a href="/auth/register">S'inscrire</a>
               </p>
               <p>
-                La connexion et la r�initialisation du mot de passe se font sur
-                la page s�curis�e Auth0.
+                La connexion et la réinitialisation du mot de passe se font sur
+                la page sécurisée Auth0.
               </p>
             </>
           )}
