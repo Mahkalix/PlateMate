@@ -65,7 +65,8 @@ vite.on("error", (error) => {
     startupError = error;
   });
   const file = path.join(dir, "DevToolsActivePort");
-  for (let i = 0; i < 100 && !fs.existsSync(file); i++) {
+  const chromeDeadline = Date.now() + 60000;
+  while (!fs.existsSync(file) && Date.now() < chromeDeadline) {
     if (startupError) throw startupError;
     if (c.exitCode !== null || c.signalCode !== null)
       throw Error(`Chrome exited (${c.exitCode ?? c.signalCode}): ${chromeError}`);
