@@ -28,6 +28,12 @@ jobs:
       - run: npm ci --prefix frontend
       - run: npm run format:check --prefix frontend
       - run: npm run build --prefix frontend
+      - uses: browser-actions/setup-chrome@v2
+        id: chrome
+        with:
+          chrome-version: stable
       - run: npm run test:browser --prefix frontend
+        env:
+          CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
       - run: docker compose config --quiet
       - run: docker build ./frontend
