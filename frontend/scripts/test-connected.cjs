@@ -78,9 +78,13 @@ const backend = createServer(async (req, res) => {
   await go('explorer');
   await until('document.body.textContent.includes("Repas de test")');
   assert.equal(loggedIn, false);
+  assert.equal(await ev('document.querySelector(".pm-header__login").getAttribute("href")'), '/auth/login');
+  assert.equal(await ev('document.querySelector(".pm-explorer__banner").getAttribute("href")'), '/auth/login');
   await go('mon-profil/invite');
   await until('document.body.textContent.includes("Connectez-vous pour continuer")');
-  await ev(`document.querySelector('a[href="/auth/login"]').click()`);
+  await go('explorer');
+  await until('!!document.querySelector(".pm-explorer__banner")');
+  await ev('document.querySelector(".pm-explorer__banner").click()');
   await until('!!document.querySelector("input[name=firstName]")');
   for (const [name, value] of Object.entries({firstName:'Alex',lastName:'Test',city:'Grenoble'})) {
     await ev(`{ const input = document.querySelector('[name=${name}]'); Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(input,${JSON.stringify(value)}); input.dispatchEvent(new Event('input',{bubbles:true})); }`);

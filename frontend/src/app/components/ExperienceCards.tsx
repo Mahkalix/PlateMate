@@ -73,7 +73,7 @@ function DiscoveryCards({
                 photo={table.photo}
                 portrait={table.portrait}
                 variant={featured ? "filled" : "outline"}
-                href={signedIn ? "#/devenir-hote" : "#/connexion"}
+                href={signedIn ? "#/devenir-hote" : "/auth/login"}
               />
             );
           },
@@ -82,7 +82,7 @@ function DiscoveryCards({
       {!signedIn && (
         <a
           className="pm-explorer__locked"
-          href="#/connexion"
+          href="/auth/login"
           aria-label="Se connecter pour découvrir plus d’expériences"
         >
           <span className="pm-explorer__cards" aria-hidden="true">
@@ -171,7 +171,7 @@ export function ExperienceCards({
             ? "Découvrez les tables et les prochains repas."
             : "Découvrez les tables. Connectez-vous pour réserver."}
       </p>
-      {!personalized && <a href="#/connexion">Se connecter</a>}
+      {!personalized && <a href="/auth/login">Se connecter</a>}
       {loading || !current ? (
         <p role="status">Chargement des tables…</p>
       ) : current.error ? (
@@ -213,7 +213,7 @@ export function ExperienceCards({
                     href={
                       user
                         ? `#/experience/${card.hostId}/${card.contextId}`
-                        : "#/connexion"
+                        : "/auth/login"
                     }
                   >
                     {user ? "Découvrir ce repas" : "Se connecter pour réserver"}
