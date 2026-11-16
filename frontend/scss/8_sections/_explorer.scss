@@ -51,6 +51,218 @@
     gap: clamp(1.2rem, 2.4vw, 3.6rem);
   }
 
+  &__tools {
+    padding: 5.2rem var(--explorer-gutter) 0;
+  }
+  &__search {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.6rem;
+    max-width: 92rem;
+    margin: 0 auto 4.4rem;
+    padding: 1.2rem;
+    border-radius: 4rem;
+    background: white;
+    box-shadow: 0 4px 20px #0000001a;
+    label {
+      flex: 1;
+      min-width: 12rem;
+      padding-left: 2rem;
+      font-size: 1.4rem;
+    }
+    label span {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-weight: 700;
+    }
+    input,
+    select {
+      width: 100%;
+      min-width: 0;
+      padding: 0.6rem 0;
+      border: 0;
+      background: transparent;
+      font: inherit;
+      font-size: 1.6rem;
+    }
+    img {
+      width: 2.4rem;
+      height: 2.4rem;
+    }
+    .pm-button {
+      display: flex;
+      gap: 0.8rem;
+      background: var(--pm-yellow);
+      border-color: var(--pm-yellow);
+      color: var(--pm-ink);
+    }
+  }
+  &__filter-panel:not([hidden]) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.6rem;
+    flex-basis: 100%;
+    padding: 1.6rem;
+  }
+  &__categories h2 {
+    margin: 0 0 1.6rem;
+    font:
+      900 2.8rem/1.2 "BBB ReadMe",
+      serif;
+    text-transform: uppercase;
+  }
+  &__slider {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+  }
+  &__slider > button {
+    flex: 0 0 6.8rem;
+    height: 6.8rem;
+    display: grid;
+    place-items: center;
+    border: 1px solid #93969f;
+    border-radius: 50%;
+    background: transparent;
+  }
+  &__slider > button:last-child {
+    background: var(--pm-yellow);
+    border-color: var(--pm-yellow);
+  }
+  &__slider > button img {
+    width: 3.9rem;
+    height: 3.9rem;
+  }
+  &__cuisines {
+    display: flex;
+    gap: 2.8rem;
+    min-width: 0;
+    flex: 1;
+    overflow-x: auto;
+    padding: 1.2rem 1.6rem;
+    scrollbar-width: none;
+  }
+  &__filter-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin: 3.2rem 0 0 auto;
+    padding: 0.8rem 1.6rem;
+    background: transparent;
+    border: 1px solid;
+    border-radius: 3rem;
+  }
+  &__filter-toggle img {
+    width: 2.4rem;
+    height: 2.4rem;
+  }
+  &__tools + &__content {
+    padding-top: 3.2rem;
+  }
+  &__notice {
+    font-size: 1.2rem;
+    margin: 1.6rem 0 0;
+  }
+  .pm-suggestions {
+    margin: 0;
+  }
+  .pm-discovery-cards {
+    gap: 3.2rem 3.6rem;
+  }
+  .pm-explorer__locked {
+    margin-top: 3.2rem;
+  }
+  .pm-cuisine {
+    position: relative;
+    flex: 0 0 16rem;
+    height: 18.6rem;
+    border: 2px solid transparent;
+    border-radius: 0.8rem;
+    background: white;
+    box-shadow: 0 5px 18px #00000014;
+    padding: 15.2rem 0 1.2rem;
+    font:
+      600 1.6rem/1.2 "DM Sans",
+      sans-serif;
+    &[aria-pressed="true"] {
+      border-color: var(--pm-teal);
+    }
+    > span {
+      position: absolute;
+      left: 2rem;
+      top: 1.8rem;
+      width: 12.1rem;
+      height: 11.7rem;
+      overflow: hidden;
+    }
+    img {
+      position: absolute;
+      width: 186.79%;
+      height: 127.44%;
+      left: -43.84%;
+      top: -12.61%;
+      object-fit: cover;
+    }
+    &--1 img {
+      width: 15.4rem;
+      height: 15.4rem;
+      left: -1.6rem;
+      top: -1.8rem;
+    }
+    &--2 img {
+      width: 191.02%;
+      height: 132.5%;
+      left: -14.23%;
+      top: -14.61%;
+    }
+    &--3 img {
+      width: 156.66%;
+      height: 100.08%;
+      left: -26.9%;
+      top: -0.04%;
+    }
+    &--4 img {
+      width: 100%;
+      height: 100%;
+      left: 0;
+      top: 0;
+      object-fit: cover;
+    }
+    &--5 img {
+      width: 114.73%;
+      height: 113.15%;
+      left: -7.6%;
+      top: -7.03%;
+    }
+  }
+  @media (max-width: 600px) {
+    &__search {
+      border-radius: 2rem;
+      display: grid;
+      label {
+        padding-left: 0.8rem;
+      }
+    }
+    &__slider > button {
+      flex-basis: 3.6rem;
+      height: 3.6rem;
+      img {
+        width: 2.4rem;
+        height: 2.4rem;
+      }
+    }
+    &__categories h2 {
+      font-size: 2.2rem;
+    }
+    &__heading p {
+      font-size: 1.6rem;
+    }
+  }
+
   &__locked {
     position: relative;
     display: grid;

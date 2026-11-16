@@ -126,7 +126,7 @@ const backend = createServer(async (req, res) => {
   for (const route of ['', 'explorer']) {
     await go(route);
     const selector = route ? '.pm-discovery-cards' : '.pm-featured__cards';
-    const count = route ? 4 : 5;
+    const count = route ? 8 : 5;
     await until(`document.querySelectorAll('${selector} .pm-table-card').length === ${count}`);
     assert.equal(await ev('document.body.textContent.includes("Des suggestions classées")'), false);
     await ev(`[...document.querySelectorAll('${selector} img')].forEach(image => { image.loading = "eager"; })`);
@@ -152,6 +152,16 @@ const backend = createServer(async (req, res) => {
       assert.equal(await ev('document.documentElement.scrollWidth - document.documentElement.clientWidth'), 0);
     }
   }
+  await go('explorer');
+  await until('document.querySelectorAll(".pm-discovery-cards .pm-table-card").length === 8');
+  assert.equal(await ev('!!document.querySelector(".pm-explorer__search")'), true);
+  await ev('[...document.querySelectorAll(".pm-explorer__categories img")].forEach(i=>i.loading="eager")');
+  await until('[...document.querySelectorAll(".pm-explorer__categories img")].every(i=>i.complete && i.naturalWidth>0)');
+  await ev('document.querySelector(".pm-cuisine").click()');
+  await until('document.body.textContent.includes("Aucun repas ne correspond")');
+  await ev('document.querySelector(".pm-explorer__filter-toggle").click()');
+  await ev('document.querySelector("[type=reset]").click()');
+  await until('document.querySelectorAll(".pm-discovery-cards .pm-table-card").length === 8');
   emptyCatalogue = false;
   await go('mon-profil/hote'); await until('document.querySelectorAll("form").length === 4');
   await ev('document.querySelectorAll("form")[3].requestSubmit()');

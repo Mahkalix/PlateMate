@@ -7,6 +7,9 @@ export type Filters = {
   ambience?: string;
   diet?: string;
   kind?: string;
+  city?: string;
+  date?: string;
+  cuisine?: string;
 };
 export class ExplorerRepository {
   constructor(private db: pg.Pool) {}
@@ -20,7 +23,7 @@ export class ExplorerRepository {
       : null;
     if (userId && !viewer) return [];
     const { rows } = await this.db.query(
-      `SELECT c.*,p.details,p.is_verified, (SELECT count(*)::int FROM reviews WHERE subject_id=c.host_id) AS review_count,(SELECT avg(rating)::float FROM reviews WHERE subject_id=c.host_id) AS average_rating,(SELECT coalesce(sum(b.party_size),0)::int FROM bookings b JOIN context_slots s ON s.id=b.slot_id JOIN contexts ctx ON ctx.id=s.context_id WHERE ctx.host_id=c.host_id AND b.status='completed') AS guests_welcomed FROM contexts c JOIN profiles p ON p.user_id=c.host_id WHERE ($1::uuid IS NULL OR c.host_id<>$1) AND ($2::text IS NULL OR $2=ANY(c.languages)) AND ($3::text IS NULL OR c.ambience=$3) AND ($4::text IS NULL OR $4=ANY(c.supported_diets)) AND ($5::text IS NULL OR c.kind=$5) AND ($6::uuid IS NULL OR c.host_id=$6) AND ($7::uuid IS NULL OR c.id=$7) ORDER BY c.id`,
+      `SELECT c.*,p.details,p.is_verified, (SELECT count(*)::int FROM reviews WHERE subject_id=c.host_id) AS review_count,(SELECT avg(rating)::float FROM reviews WHERE subject_id=c.host_id) AS average_rating,(SELECT coalesce(sum(b.party_size),0)::int FROM bookings b JOIN context_slots s ON s.id=b.slot_id JOIN contexts ctx ON ctx.id=s.context_id WHERE ctx.host_id=c.host_id AND b.status='completed') AS guests_welcomed FROM contexts c JOIN profiles p ON p.user_id=c.host_id WHERE ($1::uuid IS NULL OR c.host_id<>$1) AND ($2::text IS NULL OR $2=ANY(c.languages)) AND ($3::text IS NULL OR c.ambience=$3) AND ($4::text IS NULL OR $4=ANY(c.supported_diets)) AND ($5::text IS NULL OR c.kind=$5) AND ($6::uuid IS NULL OR c.host_id=$6) AND ($7::uuid IS NULL OR c.id=$7) AND ($8::text IS NULL OR lower(p.details->>'city')=lower($8)) AND ($9::text IS NULL OR strpos(lower(c.kind || ' ' || c.title),lower($9))>0) AND ($10::date IS NULL OR EXISTS (SELECT 1 FROM context_slots s WHERE s.context_id=c.id AND (s.starts_at AT TIME ZONE 'Europe/Paris')::date=$10::date AND s.starts_at>now() AND s.capacity > coalesce((SELECT sum(b.party_size) FROM bookings b WHERE b.slot_id=s.id AND b.status IN ('accepted','completed')),0))) ORDER BY c.id`,
       [
         userId,
         filters.language,
@@ -29,6 +32,9 @@ export class ExplorerRepository {
         filters.kind,
         detail?.host,
         detail?.context,
+        filters.city,
+        filters.cuisine,
+        filters.date,
       ],
     );
     return rows

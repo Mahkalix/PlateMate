@@ -8,6 +8,9 @@ const query = z
     ambience: tag,
     diet: tag,
     kind: tag,
+    city: tag,
+    cuisine: tag,
+    date: z.iso.date().optional(),
     offset: z.coerce.number().int().min(0).default(0),
     limit: z.coerce.number().int().min(1).max(50).default(20),
   });

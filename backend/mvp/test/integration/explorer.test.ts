@@ -89,6 +89,13 @@ it("US06 US07 US08 US09 / Explorer : tri, filtres, pagination, confidentialité 
     { kind: "' OR 1=1 --" },
   ])
     expect((await get(q).expect(200)).body.items).toEqual([]);
+  expect((await get({ city: profile.city.toUpperCase(), cuisine: "RENCONTRE" }).expect(200)).body.total).toBe(2);
+  expect((await get({ city: "Ville inexistante" }).expect(200)).body.items).toEqual([]);
+  expect((await get({ cuisine: "' OR 1=1 --" }).expect(200)).body.items).toEqual([]);
+  await get({ date: "invalid" }).expect(422);
+  await pool.query("insert into context_slots(context_id,starts_at,capacity) values($1,'2099-06-15T18:00:00Z',4)", [page.items[0].contextId]);
+  expect((await get({ date: "2099-06-15" }).expect(200)).body.items.map((item: { contextId: string }) => item.contextId)).toEqual([page.items[0].contextId]);
+  expect((await get({ date: "2099-06-16" }).expect(200)).body.items).toEqual([]);
   const card = page.items[0];
   expect(Object.keys(card).sort()).toEqual(
     [
