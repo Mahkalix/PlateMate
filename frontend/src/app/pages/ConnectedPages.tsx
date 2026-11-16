@@ -305,7 +305,7 @@ export function ConnectedProfile({ host = false }: { host?: boolean }) {
             <ul>
               {[
                 "Prénom et initiale",
-                "Présentation et intéréts publics",
+                "Présentation et intérêts publics",
                 "Jamais : coordonnées et adresse exacte",
               ].map((label, i) => (
                 <li key={label}>
@@ -422,7 +422,7 @@ function TableForm() {
       />
       <Field
         name="instructions"
-        label="Instructions d'accés"
+        label="Instructions d'accès"
         value={t.address?.instructions}
         maxLength={500}
       />
@@ -873,7 +873,7 @@ function PublishMeal({ after }: { after: () => void }) {
           maxLength={1944}
           required
         />
-        <Field name="themes" label="Thémes (virgules)" maxLength={1944} />
+        <Field name="themes" label="Thèmes (virgules)" maxLength={1944} />
         <Field
           name="supportedDiets"
           label="Régimes proposés (virgules)"
@@ -881,7 +881,7 @@ function PublishMeal({ after }: { after: () => void }) {
         />
         <Field
           name="safeFor"
-          label="Allergénes et intolérances que vous pouvez exclure (virgules)"
+          label="Allergènes et intolérances que vous pouvez exclure (virgules)"
           maxLength={1944}
         />
         <label>
