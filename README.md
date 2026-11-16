@@ -24,6 +24,22 @@ Dans Vercel, les variables Preview ciblant `main` doivent définir `AUTH0_CALLBA
 
 Utiliser cette adresse stable pour les tests, plutôt que l’URL unique de chaque déploiement. Une erreur « Callback URL mismatch » indique que le callback exact manque dans les URL autorisées de l’application Auth0.
 
+## Convention des branches
+
+| Branche ou préfixe | Usage |
+|---|---|
+| `main` | Développement intégré et préproduction Vercel |
+| `production` | Version réservée à la production |
+| `feat/<sujet>` | Nouvelle fonctionnalité |
+| `fix/<sujet>` | Correction de bug |
+| `chore/<sujet>` | Maintenance, dépendances et configuration |
+| `docs/<sujet>` | Documentation |
+| `archive/<sujet>` | Ancien travail conservé, non destiné au développement actif |
+
+Utiliser des noms courts en minuscules avec des tirets, par exemple `feat/meal-preferences`. Créer les branches de travail depuis `main`, ouvrir les PR vers `main`, puis supprimer leur branche après fusion. Ne fusionner vers `production` que pour une livraison explicitement validée.
+
+Les cinq branches `archive/` conservent des historiques non entièrement fusionnés ; elles ne doivent pas être supprimées sans examen de leurs commits. Les anciennes branches fusionnées des PR #5, #6 et #8 et les deux sauvegardes redondantes ont été supprimées le 16 novembre 2026.
+
 ## Lancement local
 
 Pour la branche commune front et back, consulter le [guide de test local](docs/local-integration.md) : sauvegardes des PR #6 et #5, pile `compose.integration.yaml`, base de test isolee et resultats reellement obtenus. Les interfaces frontend restent en demonstration tant que leur raccordement API n'est pas effectue.
