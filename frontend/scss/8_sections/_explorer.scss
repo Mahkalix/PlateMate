@@ -104,9 +104,16 @@
   &__date {
     position: relative;
     display: block;
+    margin-top: 0.2rem;
+    margin-right: 0.8rem;
 
     input {
       color: var(--pm-ink);
+    }
+
+    input::-webkit-calendar-picker-indicator {
+      margin: 0;
+      cursor: pointer;
     }
 
     &:not(:focus-within):has(.pm-explorer__date-placeholder) input {
@@ -158,6 +165,10 @@
   &__slider > button:last-child {
     background: var(--pm-yellow);
     border-color: var(--pm-yellow);
+
+    img {
+      transform: rotate(180deg);
+    }
   }
   &__slider > button img {
     width: 2.4rem;
@@ -181,16 +192,37 @@
     justify-content: center;
     gap: 1.2rem;
     margin-top: 2.4rem;
+  }
+  &__more {
+    margin-top: 2.4rem;
+    text-align: center;
 
-    .pm-button span {
-      display: grid;
-      place-items: center;
-      width: 1.6rem;
-      height: 1.6rem;
-      border: 1px solid currentColor;
-      border-radius: 50%;
-      line-height: 1;
+    summary {
+      list-style: none;
+      cursor: pointer;
     }
+
+    summary::-webkit-details-marker {
+      display: none;
+    }
+
+    summary span::before {
+      content: "+";
+    }
+
+    &[open] summary span::before {
+      content: "−";
+    }
+  }
+  &__pagination .pm-button span,
+  &__more summary span {
+    display: grid;
+    place-items: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    line-height: 1;
   }
   &__filter-toggle {
     display: flex;

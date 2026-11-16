@@ -172,6 +172,10 @@ const backend = createServer(async (req, res) => {
   await go('explorer');
   await until('document.querySelectorAll(".pm-discovery-cards .pm-table-card").length === 8');
   assert.equal(await ev('!!document.querySelector(".pm-explorer__search")'), true);
+  assert.equal(await ev('getComputedStyle(document.querySelector(\'[aria-label="Catégories suivantes"] img\')).transform'), 'matrix(-1, 0, 0, -1, 0, 0)');
+  assert.equal(await ev('document.querySelector(".pm-explorer__more").open'), false);
+  await ev('document.querySelector(".pm-explorer__more summary").click()');
+  assert.equal(await ev('document.querySelector(".pm-explorer__more").open'), true);
   assert.equal(await ev('document.querySelector(".pm-explorer__date-placeholder").textContent.trim()'), 'jj/mm/aaaa');
   for (const width of [1440, 390]) {
     await cmd('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: false });

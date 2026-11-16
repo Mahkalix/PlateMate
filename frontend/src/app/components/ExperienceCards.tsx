@@ -97,10 +97,15 @@ function DiscoveryCards({
           <span className="pm-explorer__lock" aria-hidden="true" />
         </a>
       )}
-      <p className="pm-explorer__notice">
-        Exemples de tables, présentés à titre d’inspiration. Aucun repas
-        disponible pour le moment.
-      </p>
+      <details className="pm-explorer__more">
+        <summary className="pm-button pm-button--red">
+          Voir plus <span aria-hidden="true" />
+        </summary>
+        <p className="pm-explorer__notice">
+          Exemples de tables, présentés à titre d’inspiration. Aucun repas
+          disponible pour le moment.
+        </p>
+      </details>
     </div>
   );
 }
