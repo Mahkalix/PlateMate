@@ -86,7 +86,7 @@ const backend = createServer(async (req, res) => {
   await ev('document.querySelector("form").requestSubmit()');
   await until('document.body.textContent.includes("Préférences culinaires")');
   await ev('document.querySelector("form").requestSubmit()');
-  await until('document.body.textContent.includes("Vos centres d’intérêt")');
+  await until('document.body.textContent.includes("Vos préférences d\'expérience")');
   await choose('Rencontrer des locaux'); await choose('Randonnée'); await choose('Calme et détendue');
   failure = true;
   await ev('document.querySelector("form").requestSubmit()');
