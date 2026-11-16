@@ -30,14 +30,14 @@ export function PreferenceChoices({
     if (value.includes(normalized))
       onChange(value.filter((v) => v !== normalized));
     else if (value.length < 24) onChange([...value, normalized]);
-    else setError("Vous pouvez choisir jusqu'� 24 �l�ments.");
+    else setError("Vous pouvez choisir jusqu'à 24 éléments.");
   }
   function add() {
     const text = extra.trim().toLocaleLowerCase("fr");
     if (!text) return;
     if (!value.includes(text)) {
       if (value.length >= 24) {
-        setError("Vous pouvez choisir jusqu'� 24 �l�ments.");
+        setError("Vous pouvez choisir jusqu'à 24 éléments.");
         return;
       }
       onChange([...value, text]);
