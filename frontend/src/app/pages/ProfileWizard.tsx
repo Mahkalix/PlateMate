@@ -68,7 +68,7 @@ export function ProfileWizard() {
       !values.motivations?.length
     ) {
       setError(
-        "Choisissez au moins un centre d'intérét, une expérience et une ambiance.",
+        "Choisissez au moins un centre d'intérêt, une expérience et une ambiance.",
       );
       return;
     }
@@ -176,7 +176,7 @@ export function ProfileWizard() {
                       maxLength={1000}
                       value={values.description}
                       onChange={(e) => change("description", e.target.value)}
-                      placeholder="Vos centres d'intérét, vos passions, ce qui vous attire dans les repas chez l'habitant."
+                      placeholder="Vos centres d'intérêt, vos passions, ce qui vous attire dans les repas chez l'habitant."
                     />
                     <small>Optionnel</small>
                   </label>
@@ -204,7 +204,7 @@ export function ProfileWizard() {
               {step === 3 && (
                 <>
                   {choices("motivations", "Vos préférences d'expérience", true)}
-                  {choices("affinities", "Vos centres d'intérét", true)}
+                  {choices("affinities", "Vos centres d'intérêt", true)}
                   {choices("ambiences", "Type d'ambiance préférée", true)}
                 </>
               )}
