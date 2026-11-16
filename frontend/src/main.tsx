@@ -14,4 +14,3 @@ createRoot(document.getElementById("root")!).render(
     </SessionProvider>
   </React.StrictMode>,
 );
-
