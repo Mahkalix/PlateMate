@@ -74,32 +74,41 @@ export function HomeHeader({
           >
             <HomeNavLinks onNavigate={() => setOpen(false)} />
           </nav>
-          <a
-            className="pm-button pm-header__login"
-            href={signedIn ? `#/mon-profil/${accountRole}` : "#/connexion"}
-          >
-            <img src="/home/UserCircle.svg" alt="" />
-            {signedIn ? "Mon compte" : "Se connecter"}
-          </a>
-          {signedIn && (
-            <button
-              disabled={loggingOut}
-              onClick={async () => {
-                setLoggingOut(true);
-                setLogoutError("");
-                try {
-                  await session.logout();
-                } catch (e) {
-                  setLogoutError(errorMessage(e));
-                } finally {
-                  setLoggingOut(false);
-                }
-              }}
+          <div className="pm-header__account">
+            <a
+              className="pm-button pm-header__login"
+              href={signedIn ? `#/mon-profil/${accountRole}` : "#/connexion"}
             >
-              Se déconnecter
-            </button>
-          )}
-          {logoutError && <p role="alert">{logoutError}</p>}
+              <img src="/home/UserCircle.svg" alt="" />
+              {signedIn ? "Mon compte" : "Se connecter"}
+            </a>
+            {signedIn && (
+              <button
+                type="button"
+                className="pm-header__logout"
+                disabled={loggingOut}
+                aria-busy={loggingOut}
+                onClick={async () => {
+                  setLoggingOut(true);
+                  setLogoutError("");
+                  try {
+                    await session.logout();
+                  } catch (e) {
+                    setLogoutError(errorMessage(e));
+                  } finally {
+                    setLoggingOut(false);
+                  }
+                }}
+              >
+                {loggingOut ? "Déconnexion…" : "Se déconnecter"}
+              </button>
+            )}
+            {logoutError && (
+              <p className="pm-header__account-error" role="alert">
+                {logoutError}
+              </p>
+            )}
+          </div>
         </header>
       </div>
     </>
