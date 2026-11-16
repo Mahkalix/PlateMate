@@ -71,7 +71,7 @@
       padding-left: 2rem;
       font-size: 1.4rem;
     }
-    label span {
+    label > span:first-child {
       display: flex;
       align-items: center;
       gap: 0.4rem;
@@ -101,6 +101,31 @@
       color: var(--pm-ink);
     }
   }
+  &__date {
+    position: relative;
+    display: block;
+
+    input {
+      color: var(--pm-ink);
+    }
+
+    &:not(:focus-within):has(.pm-explorer__date-placeholder) input {
+      color: transparent;
+    }
+
+    &-placeholder {
+      position: absolute;
+      inset: 0 auto 0 0;
+      display: flex;
+      align-items: center;
+      pointer-events: none;
+      font-size: 1.6rem;
+    }
+
+    &:focus-within &-placeholder {
+      display: none;
+    }
+  }
   &__filter-panel:not([hidden]) {
     display: flex;
     flex-wrap: wrap;
@@ -119,10 +144,11 @@
     display: flex;
     align-items: center;
     min-width: 0;
+    gap: clamp(0.6rem, 1.2vw, 1.6rem);
   }
   &__slider > button {
-    flex: 0 0 6.8rem;
-    height: 6.8rem;
+    flex: 0 0 4.8rem;
+    height: 4.8rem;
     display: grid;
     place-items: center;
     border: 1px solid #93969f;
@@ -134,17 +160,37 @@
     border-color: var(--pm-yellow);
   }
   &__slider > button img {
-    width: 3.9rem;
-    height: 3.9rem;
+    width: 2.4rem;
+    height: 2.4rem;
   }
   &__cuisines {
-    display: flex;
-    gap: 2.8rem;
+    display: grid;
+    grid-template-columns: repeat(6, minmax(11rem, 1fr));
+    gap: clamp(0.8rem, 1.5vw, 2rem);
     min-width: 0;
     flex: 1;
     overflow-x: auto;
-    padding: 1.2rem 1.6rem;
+    padding: 0.8rem 0.4rem 1.2rem;
+    scroll-padding-inline: 0.4rem;
+    scroll-snap-type: x mandatory;
     scrollbar-width: none;
+  }
+  &__pagination:not(:empty) {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.2rem;
+    margin-top: 2.4rem;
+
+    .pm-button span {
+      display: grid;
+      place-items: center;
+      width: 1.6rem;
+      height: 1.6rem;
+      border: 1px solid currentColor;
+      border-radius: 50%;
+      line-height: 1;
+    }
   }
   &__filter-toggle {
     display: flex;
@@ -181,25 +227,26 @@
   }
   .pm-cuisine {
     position: relative;
-    flex: 0 0 16rem;
-    height: 18.6rem;
+    display: grid;
+    justify-items: center;
+    align-content: space-between;
+    gap: 0.8rem;
+    scroll-snap-align: start;
     border: 2px solid transparent;
     border-radius: 0.8rem;
     background: white;
     box-shadow: 0 5px 18px #00000014;
-    padding: 15.2rem 0 1.2rem;
+    padding: 1.2rem 0.6rem 0.8rem;
     font:
-      600 1.6rem/1.2 "DM Sans",
+      600 clamp(1.2rem, 1.2vw, 1.6rem)/1.2 "DM Sans",
       sans-serif;
     &[aria-pressed="true"] {
       border-color: var(--pm-teal);
     }
     > span {
-      position: absolute;
-      left: 2rem;
-      top: 1.8rem;
-      width: 12.1rem;
-      height: 11.7rem;
+      position: relative;
+      width: min(85%, 12.1rem);
+      aspect-ratio: 121 / 117;
       overflow: hidden;
     }
     img {
@@ -211,10 +258,10 @@
       object-fit: cover;
     }
     &--1 img {
-      width: 15.4rem;
-      height: 15.4rem;
-      left: -1.6rem;
-      top: -1.8rem;
+      width: 127.27%;
+      height: 131.62%;
+      left: -13.22%;
+      top: -15.38%;
     }
     &--2 img {
       width: 191.02%;
