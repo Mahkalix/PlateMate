@@ -959,35 +959,47 @@ function PublishMeal({ after }: { after: () => void }) {
 export function ConnectedLogin() {
   const { user, error, retry, loading } = useSession();
   return (
-    <Shell title="Hello !">
-      {loading ? (
-        <p role="status">Chargement…</p>
-      ) : user ? (
-        <>
-          <p>Vous êtes connecté.</p>
-          <a className="pm-button" href="#/mon-profil/invite">
-            Ouvrir mon profil
-          </a>
-        </>
-      ) : (
-        <div className="pm-form-card">
-          <p>Retrouvez vos hôtes et vos repas.</p>
-          {error && (
+    <div className="app pm-inner-page">
+      <HomeHeader />
+      <main className="pm-login">
+        <header>
+          <h1>Hello !</h1>
+          <p>Connectez-vous pour retrouver vos hôtes préférés</p>
+        </header>
+        <section className="pm-form-card" aria-label="Connexion">
+          {loading ? (
+            <p role="status">Chargement…</p>
+          ) : user ? (
+            <a className="pm-button" href="#/mon-profil/invite">
+              Ouvrir mon profil
+            </a>
+          ) : (
             <>
-              <p role="alert">{error}</p>
-              <button onClick={retry}>Réessayer</button>
+              {error && (
+                <div>
+                  <p role="alert">{error}</p>
+                  <button className="pm-button" type="button" onClick={retry}>
+                    Réessayer
+                  </button>
+                </div>
+              )}
+              <div className="pm-login__actions">
+                <a className="pm-button" href="/auth/login">
+                  Se connecter
+                </a>
+              </div>
+              <p className="pm-login__register">
+                Pas encore de compte ? <a href="/auth/register">S’inscrire</a>
+              </p>
+              <p>
+                La connexion et la réinitialisation du mot de passe se font sur
+                la page sécurisée Auth0.
+              </p>
             </>
           )}
-          <a className="pm-button" href="/auth/login">
-            Se connecter
-          </a>
-          <a href="/auth/register">Créer un compte</a>
-          <p>
-            La connexion et la réinitialisation du mot de passe se font sur la
-            page sécurisée Auth0.
-          </p>
-        </div>
-      )}
-    </Shell>
+        </section>
+      </main>
+      <HomeFooter />
+    </div>
   );
 }
