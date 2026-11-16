@@ -480,6 +480,13 @@ vite.on("error", (error) => {
       for (let i = 0; i < 100 && !(await ev(`!!document.querySelector('${selector}')`)); i++) await wait(50);
       await ev("document.fonts.ready");
       await ev("Promise.all([...document.images].map(image => image.decode()))");
+      if (width === 1440) {
+        const geometry = await ev('({lists:[...document.querySelectorAll(".pm-history__list")].map(el=>({width:el.getBoundingClientRect().width,height:el.getBoundingClientRect().height})),booking:document.querySelector(".pm-history__booking")?.getBoundingClientRect().height})');
+        measurements.push({ label: route, geometry });
+        const expected = route.endsWith("hote") ? [210, 146] : [142, 58];
+        geometry.lists.forEach((rect, index) => assert(Math.abs(rect.height - expected[index]) <= 1 && rect.width === 1320, `Figma ${route.endsWith("hote") ? "815:2783" : "793:2402"} list ${index + 1} geometry`));
+        if (geometry.booking !== undefined) assert(Math.abs(geometry.booking - 268) <= 1, "Figma 793:2402 confirmed booking height");
+      }
       assert(await ev(`document.documentElement.scrollWidth === ${width}`), `${width}/${route} fits viewport`);
       assert(await ev('getComputedStyle(document.documentElement).fontSize === "10px"'), `${width}/${route} rem base`);
       {

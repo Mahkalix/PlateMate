@@ -26,7 +26,9 @@ export function MealHistoryPage({ host = false }: { host?: boolean }) {
         accountName={host ? "Amina" : "Mikaella"}
         accountRole={host ? "hote" : "invite"}
       />
-      <main className="pm-account pm-history">
+      <main
+        className={`pm-account pm-history${host ? " pm-history--host" : ""}`}
+      >
         <AccountHeading
           name={host ? "Amina" : "Mikaella"}
           host={host}

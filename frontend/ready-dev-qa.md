@@ -81,7 +81,7 @@ Pas de frame mobile correspondante identifiée : adaptation responsive vérifié
 | Repas hôte remplis | 815:2783 | /#/mes-repas/hote |
 | Repas hôte vides | 942:5537 | /#/mes-repas/hote/vide |
 
-Après retrait de l’après-repas et corrections de géométrie : build réussi, 159 assertions réussies. Les contrôles à 1440 et 390 px, DPR 1, couvrent les états vides, les liens vers Explorer et Devenir hôte, la bascule invité/hôte, les trois sections de profil, le verrouillage des champs et leur édition, le minimum de trois intérêts, les historiques et les messages honnêtes des actions sans API. Les mesures détaillées de conformité Figma restent en cours ; ces assertions ne constituent pas un audit visuel complet.
+Après retrait de l’après-repas et corrections de géométrie : build réussi, 164 assertions réussies. Les contrôles à 1440 et 390 px, DPR 1, couvrent les états vides, les liens vers Explorer et Devenir hôte, la bascule invité/hôte, les trois sections de profil, le verrouillage des champs et leur édition, le minimum de trois intérêts, les historiques et les messages honnêtes des actions sans API. Les mesures détaillées de conformité Figma restent en cours ; ces assertions ne constituent pas un audit visuel complet.
 
 Mesures locales après chargement des polices et décodage des images (desktop 1440 px). Base html 10 px, body 16 px, pas de débordement horizontal à 1440 ou 390 px. Les hauteurs des cartes suivantes sont dans la tolérance de 1 px ; leurs positions et tous les styles descendants ne sont pas encore certifiés.
 
@@ -95,10 +95,17 @@ Mesures locales après chargement des polices et décodage des images (desktop 1
 | Préférences invité | 932 × 326 | 932 × 326.390625 |
 | Carte vide avec action | 1320 × 228 | 1320 × 228.78125 |
 | Carte vide sans action | 1320 × 174 | 1320 × 174.390625 |
+| Repas hôte à venir, liste | 1320 × 210 | 1320 × 210 |
+| Repas hôte passés, liste | 1320 × 146 | 1320 × 146 |
+| Repas invité passés, liste | 1320 × 142 | 1320 × 142 |
+| Repas invité annulés, liste | 1320 × 58 | 1320 × 57 |
+| Réservation confirmée invité | 957 × 268 | 957 × 267.578125 |
+
+Les dimensions des listes et de la réservation confirmée sont désormais protégées par cinq assertions Figma supplémentaires dans `test:browser`. Le contour intérieur et les séparateurs des listes sont dessinés sans augmenter leurs dimensions, comme les strokes intérieurs Figma.
 
 Corrections : fond des statistiques sur le token `Surface/card-secondary` #ffe1a2, colonnes de 185 px espacées de 64 px, padding vertical 20 px ; actions et mention privée sur la même ligne ; titre des historiques 36 px ; sous-titre de confidentialité au-dessus de la carte ; liens Profil et Mes repas reliés aux écrans correspondants. Les cartes utilisent un padding CSS de 23 px plus une bordure de 1 px pour retrouver l’offset intérieur Figma de 24 px.
 
-Points ouverts : le libellé de la statistique « 4 » du profil invité vaut « ??? » dans Figma (précision demandée). La mention de transmission des allergies à la réservation contredit l'ancien arbitrage de confidentialité ; aucun transfert n'est implémenté. Les interactions restent locales, sans authentification, envoi de message, avis, annulation ou versement réel. Les pages ne sont pas encore publiées dans la PR à ce stade.
+Points ouverts : le libellé de la statistique « 4 » du profil invité vaut « ??? » dans Figma (précision demandée). La mention de transmission des allergies à la réservation contredit l'ancien arbitrage de confidentialité ; aucun transfert n'est implémenté. Les interactions restent locales, sans authentification, envoi de message, avis, annulation ou versement réel. Les pages sont publiées dans la PR #6 ; le contrôle de la preview déployée reste ouvert.
 
 - La preview Vercel protégée n'a pas été mesurée : permission navigateur précédemment refusée. Une réactivation a été demandée. Les relevés sont locaux.
 - Audit exhaustif des sous-composants, des couleurs, interlignes et états interactifs encore incomplet. Aucun audit externe d'accessibilité, test de charge ou test API.
