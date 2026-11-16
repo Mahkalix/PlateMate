@@ -73,7 +73,7 @@ const backend = createServer(async (req, res) => {
   const go = hash => cmd('Page.navigate', { url: origin + '/#/' + hash });
   await go('mon-profil/invite');
   await until('document.body.textContent.includes("Connectez-vous pour continuer")');
-  await ev('document.querySelector("a[href=\"/auth/login\"]").click()');
+  await ev(`document.querySelector('a[href="/auth/login"]').click()`);
   await until('!!document.querySelector("input[name=firstName]")');
   await ev(`for (const [name,value] of Object.entries({firstName:'Alex',lastName:'Test',city:'Grenoble',languages:'français',affinities:'cuisine, musique, voyages',publicInterests:'cuisine',ambiences:'calme'})) document.querySelector('[name='+name+']').value=value; document.querySelector('form').requestSubmit();`);
   await until('document.body.textContent.includes("Profil enregistré sur le serveur")');
@@ -90,7 +90,7 @@ const backend = createServer(async (req, res) => {
   await until('document.body.textContent.includes("Repas publié")');
   assert.equal(published.title, 'Repas publié');
   await go('explorer'); await until('document.body.textContent.includes("Repas de test")');
-  await ev('document.querySelector("a[href^=\"#/experience/\"]").click()');
+  await ev(`document.querySelector('a[href^="#/experience/"]').click()`);
   await until('!!document.querySelector("[name=partySize]")');
   await ev('document.querySelector("form").requestSubmit()');
   await until('document.body.textContent.includes("Demande envoyée")');
@@ -100,7 +100,7 @@ const backend = createServer(async (req, res) => {
   await ev('const select=document.querySelector("[name=status]"); select.value="cancelled"; select.form.requestSubmit()');
   await until('!document.querySelector("[name=status]") && document.body.textContent.includes("Annulée")');
   assert.equal(booking.status, 'cancelled');
-  for (const width of [1440,390]) { await cmd('Emulation.setDeviceMetricsOverride', { width,height:900,deviceScaleFactor:1,mobile:false }); assert.equal(await ev('document.documentElement.scrollWidth'), width); }
+  for (const width of [1440,390]) { await cmd('Emulation.setDeviceMetricsOverride', { width,height:900,deviceScaleFactor:1,mobile:false }); assert.equal(await ev('document.documentElement.scrollWidth - document.documentElement.clientWidth'), 0); }
   failure = true; await go('explorer'); await until('!!document.querySelector("[role=alert]")');
   failure = false; await ev('[...document.querySelectorAll("button")].find(b=>b.textContent==="Réessayer").click()'); await until('document.body.textContent.includes("Repas de test")');
   assert.equal(await ev('document.querySelector("#account-navigation").hidden'), true);
@@ -110,7 +110,7 @@ const backend = createServer(async (req, res) => {
   assert.equal(await ev('document.querySelector("#account-navigation").hidden'), true);
   await ev('document.querySelector("[aria-controls=account-navigation]").click()');
   await ev('[...document.querySelectorAll("button")].find(b=>b.textContent==="Se déconnecter").click()');
-  await until('!!document.querySelector("a[href=\"/auth/login\"]")');
+  await until(`!!document.querySelector('a[href="/auth/login"]')`);
   await go('mes-repas/invite'); await until('document.body.textContent.includes("Connectez-vous pour continuer")');
   assert.equal(loggedIn, false);
   console.log('PASS: protected route, cookie refresh, profile persistence, explorer, booking, private consent, cancellation, responsive layout, error recovery, logout (API fixture).');

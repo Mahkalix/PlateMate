@@ -31,15 +31,15 @@ mot de passe PostgreSQL. Connexion Database Auth0 et email verifie requis.
 
 ```dotenv
 APP_ORIGIN=http://localhost:8080
-AUTH0_CALLBACK_URL=http://localhost:8080/auth/callback
+AUTH0_CALLBACK_URL=http://localhost:3001/auth/callback
 ```
 
 Enregistrer exactement ce callback dans les Allowed Callback URLs Auth0.
 Utiliser `localhost` partout pendant le parcours. En production, utiliser HTTPS.
 
 ```powershell
-docker compose -f compose.integration.yaml config --quiet
-docker compose -f compose.integration.yaml up --build -d --wait
+docker compose --env-file backend/mvp/.env -f compose.integration.yaml config --quiet
+docker compose --env-file backend/mvp/.env -f compose.integration.yaml up --build -d --wait
 ```
 
 Ouvrir http://localhost:8080. L'API migre sa base au demarrage. Le serveur front
