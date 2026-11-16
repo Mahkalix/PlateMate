@@ -126,7 +126,7 @@ function useLoad<T>(path: string) {
   return { data, error, reload: () => setVersion((n) => n + 1) };
 }
 
-function Shell({ title, children }: { title: string; children: ReactNode }) {
+function Shell({ title, children, name }: { title: string; children: ReactNode; name?: string }) {
   const route = window.location.hash;
   const accountPage =
     /^#\/(mon-profil|mes-repas|profil|candidature)(\/|$)/.test(route);
@@ -134,13 +134,15 @@ function Shell({ title, children }: { title: string; children: ReactNode }) {
     route.includes("/hote") || route === "#/candidature" ? "hote" : "invite";
   const meals = route.startsWith("#/mes-repas");
   return (
-    <div className="app pm-inner-page">
-      <HomeHeader accountRole={role} />
-      <main className="pm-live">
-        <h1>{title}</h1>
+    <div className={`app pm-inner-page${accountPage ? " pm-account-page" : ""}`}>
+      <HomeHeader accountRole={role} accountName={name} />
+      <main className={accountPage ? `pm-live pm-account ${meals ? "pm-history" : "pm-profile"}` : "pm-live"}>
+        {!accountPage && <h1>{title}</h1>}
         {accountPage && (
           <>
-            <nav className="pm-account__tabs" aria-label="Mon compte">
+            <div className="pm-account__heading">
+              <h1>{name ? `Bonjour ${name}` : "Mon compte"}</h1>
+              <nav className="pm-account__tabs" aria-label="Mon compte">
               <a
                 href={`#/mon-profil/${role}`}
                 aria-current={!meals ? "page" : undefined}
@@ -154,7 +156,8 @@ function Shell({ title, children }: { title: string; children: ReactNode }) {
                 Mes repas
               </a>
             </nav>
-            <nav className="pm-live__nav" aria-label="Choisir mon espace">
+            </div>
+            <nav className="pm-account__role" aria-label="Choisir mon espace">
               <a
                 href={`#/${meals ? "mes-repas" : "mon-profil"}/invite`}
                 aria-current={role === "invite" ? "true" : undefined}
@@ -170,6 +173,7 @@ function Shell({ title, children }: { title: string; children: ReactNode }) {
             </nav>
           </>
         )}
+        {accountPage && <h2 className={meals ? undefined : "pm-profile__title"}>{title}</h2>}
         {children}
       </main>
       <HomeFooter />
@@ -278,12 +282,21 @@ export function ConnectedProfile({ host = false }: { host?: boolean }) {
     );
   const p = profile.data.profile;
   return (
-    <Shell title={host ? "Mon profil hôte" : "Mon profil"}>
-      <p>{summary.data.email}</p>
-      <p>
-        {summary.data.hostsMet} hôtes rencontrés · {summary.data.mealsHosted}{" "}
-        repas accueillis · {summary.data.guestsMet} invités rencontrés
-      </p>
+    <Shell title={host ? "Mon profil hôte" : "Mon profil"} name={p?.firstName}>
+      <div className="pm-profile__stats">
+        <div><strong>{summary.data.hostsMet}</strong><p>Hôtes rencontrés</p></div>
+        <div><strong>{summary.data.mealsHosted}</strong><p>Repas accueillis</p></div>
+        <div><strong>{summary.data.guestsMet}</strong><p>Invités rencontrés</p></div>
+      </div>
+      <div className="pm-profile__columns">
+        <aside className="pm-profile__sidebar">
+          <section className="pm-profile__aside-card">
+            <h3>Ce que voient les hôtes</h3>
+            <p>Votre nom complet, votre numéro de téléphone et votre date de naissance restent privés.</p>
+            <p>Le partage des allergies demande votre accord pour chaque réservation.</p>
+          </section>
+        </aside>
+        <div className="pm-profile__details">
       <ActionForm
         key={JSON.stringify(p)}
         success="Profil enregistré sur le serveur."
@@ -321,6 +334,9 @@ export function ConnectedProfile({ host = false }: { host?: boolean }) {
         }}
       >
         <h2>Informations personnelles</h2>
+        <p className="pm-profile__privacy">Vos coordonnées restent privées.</p>
+        <div className="pm-profile__fields">
+        <label className="pm-field">Email<input type="email" value={summary.data.email} readOnly /></label>
         <Field name="firstName" label="Prénom" value={p?.firstName} required />
         <Field
           name="lastName"
@@ -343,15 +359,17 @@ export function ConnectedProfile({ host = false }: { host?: boolean }) {
           value={p?.birthDate}
           type="date"
         />
+        </div>
+        <h2>À propos de moi</h2>
         <label className="pm-field">
-          À propos de moi
+          Ma présentation
           <textarea
             name="description"
             defaultValue={p?.description || ""}
             maxLength={1000}
           />
         </label>
-        <h2>Préférences</h2>
+        <h2>Mes préférences</h2>
         <p>
           Séparez les valeurs par des virgules. Les centres d’intérêt publics
           doivent faire partie de vos affinités.
@@ -411,6 +429,8 @@ export function ConnectedProfile({ host = false }: { host?: boolean }) {
             </p>
           </ActionForm>
         ))}
+        </div>
+      </div>
     </Shell>
   );
 }
@@ -536,6 +556,7 @@ export function ConnectedExplorer() {
               </article>
             ))}
           </div>
+          </div>
           {offset > 0 && (
             <button onClick={() => setOffset(Math.max(0, offset - 20))}>
               Précédent
@@ -643,6 +664,13 @@ export function ConnectedMeals({ host = false }: { host?: boolean }) {
             </p>
           )}
           {host && state.data.isHost && <PublishMeal after={reload} />}
+          {offset === 0 && Object.values(state.data.sections).every((items) => !items.length) && !bookings.data.items.length && (
+            <section className="pm-form-card">
+              <h3>{host ? "Vous n’avez pas encore accueilli de repas" : "Vous n’avez pas encore réservé de repas"}</h3>
+              {!host && <a className="pm-button" href="#/explorer">Explorer les repas</a>}
+            </section>
+          )}
+          <div className="pm-meals__sections">
           {(
             [
               ["upcoming", "À venir"],
@@ -650,13 +678,15 @@ export function ConnectedMeals({ host = false }: { host?: boolean }) {
               ["cancelled", "Annulés ou refusés"],
             ] as const
           ).map(([section, title]) => (
-            <section key={section}>
+            <section className="pm-meals__section" key={section}>
               <h2>{title}</h2>
               {!state.data!.sections[section].length && (
                 <p>Aucun repas dans cette rubrique.</p>
               )}
+              <div className="pm-history__list">
               {state.data!.sections[section].map((meal) => (
-                <article className="pm-form-card" key={meal.id || meal.slotId}>
+                <article className="pm-history__row" key={meal.id || meal.slotId}>
+                  <div>
                   <h3>{meal.title}</h3>
                   <p>{date(meal.startsAt)}</p>
                   {meal.status && <p>{statusLabel[meal.status]}</p>}
@@ -714,8 +744,10 @@ export function ConnectedMeals({ host = false }: { host?: boolean }) {
                         />
                       </ActionForm>
                     ))}
+                  </div>
                 </article>
               ))}
+              </div>
             </section>
           ))}
           {offset > 0 && (
