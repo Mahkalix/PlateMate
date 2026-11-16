@@ -70,7 +70,7 @@ Pas de frame mobile correspondante identifiée : adaptation responsive vérifié
 
 ## Limites et contrôles encore ouverts
 
-### Six écrans supplémentaires (travail local en cours)
+### Six écrans supplémentaires (PR front)
 
 | Écran | Figma | Route |
 | --- | --- | --- |
@@ -81,7 +81,7 @@ Pas de frame mobile correspondante identifiée : adaptation responsive vérifié
 | Repas hôte remplis | 815:2783 | /#/mes-repas/hote |
 | Repas hôte vides | 942:5537 | /#/mes-repas/hote/vide |
 
-Après retrait de l’après-repas et corrections de géométrie : build réussi, 164 assertions réussies. Les contrôles à 1440 et 390 px, DPR 1, couvrent les états vides, les liens vers Explorer et Devenir hôte, la bascule invité/hôte, les trois sections de profil, le verrouillage des champs et leur édition, le minimum de trois intérêts, les historiques et les messages honnêtes des actions sans API. Les mesures détaillées de conformité Figma restent en cours ; ces assertions ne constituent pas un audit visuel complet.
+Après retrait de l’après-repas et corrections de géométrie : build réussi, 200 assertions réussies. Les contrôles à 1440 et 390 px, DPR 1, couvrent les états vides, les liens vers Explorer et Devenir hôte, la bascule invité/hôte, les trois sections de profil, le verrouillage des champs et leur édition, le minimum de trois intérêts, les historiques et les messages honnêtes des actions sans API. Les mesures détaillées de conformité Figma restent en cours ; ces assertions ne constituent pas un audit visuel complet.
 
 Mesures locales après chargement des polices et décodage des images (desktop 1440 px). Base html 10 px, body 16 px, pas de débordement horizontal à 1440 ou 390 px. Les hauteurs des cartes suivantes sont dans la tolérance de 1 px ; leurs positions et tous les styles descendants ne sont pas encore certifiés.
 
@@ -113,3 +113,5 @@ Points ouverts : le libellé de la statistique « 4 » du profil invité vaut «
 - La vidéo n'est pas générée ni publiée. Weave nécessite une liaison Figma ; validation du résultat requise avant intégration. Voir `video-proposal.md`.
 - FAQ proposée à la demande du propriétaire. Promesses de revenus, assurance et délais reprises de la maquette à confirmer côté produit. Les emails de contact ne sont pas vérifiés.
 - Google/Apple et mot de passe oublié expliquent la limite de preview. Auth0 sera raccordé dans le périmètre d'intégration. Le centre d'aide reste sans destination faute d'écran.
+
+Contrôle complémentaire des six routes à 1440 et 390 px : les SVG du compte conservent leurs dimensions natives ; les polices réellement utilisées, relevées dans Chrome, sont BBB ReadMe (titres) et DM Sans 9pt (onglets). Le cadenas était étiré à 24 × 24 px ; il mesure désormais 18 × 20 px dans son conteneur de 24 × 24 px. La flèche de vérification utilise le SVG Figma de 24 × 24 px. Ces contrôles ajoutent 36 assertions. Build et formatage réussis, 200 assertions passées, aucun échec.

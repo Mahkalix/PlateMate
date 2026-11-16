@@ -208,16 +208,29 @@
     display: flex;
     align-items: center;
     gap: 0.6rem;
-    align-self: flex-start;
     padding: 0.4rem 1rem;
     border-radius: 10rem;
     background: #f2f2f3;
     font-size: 1.2rem;
     color: #545868;
     img {
-      width: 2rem;
+      width: 1.8rem;
       height: 2rem;
     }
+  }
+  &__private-icon {
+    width: 2.4rem;
+    height: 2.4rem;
+    display: grid;
+    place-items: center;
+    img {
+      width: 1.8rem;
+      height: 2rem;
+    }
+  }
+  &__completion button img {
+    width: 2.4rem;
+    height: 2.4rem;
   }
   &__actions {
     display: flex;
@@ -245,7 +258,7 @@
       background: var(--pm-yellow);
       border-color: var(--pm-yellow);
     }
-    img {
+    button img {
       width: 2.4rem;
       height: 2.4rem;
     }

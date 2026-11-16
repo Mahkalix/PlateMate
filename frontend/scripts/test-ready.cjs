@@ -497,6 +497,28 @@ vite.on("error", (error) => {
       }
     }
   }
+  await cmd("DOM.enable");
+  await cmd("CSS.enable");
+  for (const width of [1440, 390]) {
+    await cmd("Emulation.setDeviceMetricsOverride", { width, height: 900, deviceScaleFactor: 1, mobile: false });
+    for (const route of ["mon-profil/hote", "mon-profil/invite", "mes-repas/hote", "mes-repas/invite", "mes-repas/hote/vide", "mes-repas/invite/vide"]) {
+      await cmd("Page.navigate", { url: `${url}/#/${route}` });
+      for (let i = 0; i < 100 && !(await ev('!!document.querySelector(".pm-account")')); i++) await wait(50);
+      await ev("document.fonts.ready");
+      await ev("Promise.all([...document.images].map(image => image.decode()))");
+      const assets = await ev('[...document.querySelectorAll("main img")].filter(img=>img.getAttribute("src").startsWith("/account/")).map(img=>({src:img.getAttribute("src"),width:img.getBoundingClientRect().width,height:img.getBoundingClientRect().height,naturalWidth:img.naturalWidth,naturalHeight:img.naturalHeight}))');
+      assert(assets.length > 0 && assets.every(asset => asset.width === asset.naturalWidth && asset.height === asset.naturalHeight && asset.width > 0), `${width}/${route} Figma SVG assets retain native dimensions`);
+      const {root} = await cmd("DOM.getDocument");
+      const fonts = {};
+      for (const selector of [".pm-account h1", ".pm-account__tabs a"]) {
+        const {nodeId} = await cmd("DOM.querySelector", {nodeId:root.nodeId, selector});
+        fonts[selector] = (await cmd("CSS.getPlatformFontsForNode", {nodeId})).fonts;
+      }
+      assert(fonts[".pm-account h1"].some(font => font.familyName === "BBB ReadMe" && font.isCustomFont && font.glyphCount > 0), `${width}/${route} heading uses loaded BBB ReadMe`);
+      assert(fonts[".pm-account__tabs a"].some(font => font.familyName.includes("DM Sans") && font.isCustomFont && font.glyphCount > 0), `${width}/${route} body uses loaded DM Sans`);
+      measurements.push({label:`${width}/${route}/assets-and-fonts`, assets, fonts});
+    }
+  }
   console.log(JSON.stringify({ passed: checks.length, measurements }));
 })()
   .catch((e) => {

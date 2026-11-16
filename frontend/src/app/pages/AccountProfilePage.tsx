@@ -58,7 +58,9 @@ function EditableCard({
         <div className="pm-profile__actions">
           {title === "Informations personnelles" && (
             <span className="pm-profile__private-label">
-              <img src="/account/ca53b.svg" alt="" />
+              <span className="pm-profile__private-icon">
+                <img src="/account/ca53b.svg" alt="" />
+              </span>
               Privé, jamais affiché
             </span>
           )}
@@ -166,7 +168,7 @@ export function AccountProfilePage({ host = false }: { host?: boolean }) {
                   Un profil complet reçoit plus de réservations. Il vous reste :
                 </p>
                 <button onClick={() => setEmailNotice(true)}>
-                  Vérifier votre email <span aria-hidden="true">→</span>
+                  Vérifier votre email <img src="/account/ac712.svg" alt="" />
                 </button>
                 {emailNotice && (
                   <p role="status">
