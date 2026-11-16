@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import { HomeHeader } from "../sections/HomeHeader";
 import { HomeFooter } from "../sections/HomeFooter";
+import { Button } from "../components/Button";
 
 const benefits = [
   [
@@ -43,10 +44,10 @@ const faq = [
 ];
 function StartLink() {
   return (
-    <a className="pm-button" href="#/candidature">
+    <Button className="pm-host__start" variant="yellow" to="#/candidature">
       <span>Commencer</span>
       <img src="/ready/eb2be.svg" alt="" />
-    </a>
+    </Button>
   );
 }
 export function HostPage() {
@@ -98,7 +99,10 @@ export function HostPage() {
               src="/ready/447f8.png"
               alt="Pourquoi devenir hôte ? La réponse en vidéo !"
             />
-            <img className="pm-host__play" src="/ready/1fed7.svg" alt="" />
+            <span className="pm-host__video-overlay" aria-hidden="true" />
+            <span className="pm-host__play" aria-hidden="true">
+              <img src="/ready/1fed7.svg" alt="" />
+            </span>
           </button>
         </section>
         <section className="pm-host__faq">
