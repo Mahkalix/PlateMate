@@ -53,11 +53,13 @@ const backend = createServer(async (req, res) => {
   }
   if (!ready) throw Error(`Local server unreachable: ${lastError?.cause?.code || lastError?.message}`);
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'pm-connected-'));
-  browser = spawn(process.env.CHROME_PATH || (process.platform === 'win32' ? 'C:/Program Files/Google/Chrome/Application/chrome.exe' : 'google-chrome'), ['--headless=new','--no-first-run','--remote-debugging-port=0',`--user-data-dir=${dir}`,origin], { windowsHide: true, stdio: 'ignore' });
+  browser = spawn(process.env.CHROME_PATH || (process.platform === 'win32' ? 'C:/Program Files/Google/Chrome/Application/chrome.exe' : 'google-chrome'), ['--headless=new',...(process.env.GITHUB_ACTIONS === 'true' ? ['--no-sandbox'] : []),'--no-first-run','--remote-debugging-port=0',`--user-data-dir=${dir}`,origin], { windowsHide: true, stdio: ['ignore', 'ignore', 'pipe'] });
+  let browserLog = '';
+  browser.stderr.on('data', chunk => { browserLog = (browserLog + chunk.toString()).slice(-4000); });
   let launchError; browser.on('error', e => { launchError = e; });
   const portFile = path.join(dir, 'DevToolsActivePort');
   for (let i = 0; !fs.existsSync(portFile) && i < 100; i++) { if (launchError) throw launchError; await wait(100); }
-  if (!fs.existsSync(portFile)) throw Error('Chrome did not start. Set CHROME_PATH.');
+  if (!fs.existsSync(portFile)) throw Error(`Chrome did not start (exit ${browser.exitCode}). Check CHROME_PATH. ${browserLog}`);
   const targets = await (await fetch(`http://127.0.0.1:${parseInt(fs.readFileSync(portFile, 'utf8'))}/json/list`)).json();
   ws = new WebSocket(targets.find(t => t.type === 'page').webSocketDebuggerUrl);
   await new Promise((resolve, reject) => { ws.onopen = resolve; ws.onerror = reject; });
