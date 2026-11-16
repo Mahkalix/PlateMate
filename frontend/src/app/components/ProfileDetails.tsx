@@ -224,9 +224,9 @@ export function ProfileDetails({
           />
         </label>
         {choices("languages", "Langues parlées", true)}
-        {choices("affinities", "Mes centres d'intérét", true)}
+        {choices("affinities", "Mes centres d'intérêt", true)}
         <PreferenceChoices
-          label="Centres d'intérét visibles sur mon profil public"
+          label="Centres d'intérêt visibles sur mon profil public"
           options={draft.affinities}
           value={draft.publicInterests.filter((v) =>
             draft.affinities.includes(v),
