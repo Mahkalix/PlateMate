@@ -536,6 +536,29 @@ vite.on("error", (error) => {
       measurements.push({label:`${width}/${route}/assets-and-fonts`, assets, fonts});
     }
   }
+  for (const width of [1440, 390]) {
+    await cmd("Emulation.setDeviceMetricsOverride", { width, height: 900, deviceScaleFactor: 1, mobile: false });
+    for (const route of ["explorer", "devenir-hote"]) {
+      await cmd("Page.navigate", { url: `${url}/#/${route}` });
+      for (let i = 0; i < 100 && !(await ev(`!!document.querySelector('${route === "explorer" ? ".pm-explorer" : ".pm-host"}')`)); i++) await wait(50);
+      await ev("document.fonts.ready");
+      if (route === "explorer") {
+        const actual = await ev('(()=>{const style=s=>getComputedStyle(document.querySelector(s));const arrow=document.querySelector(".pm-table-card__arrow img");return {title:style(".pm-table-card__title").color,banner:style(".pm-explorer__banner").color,bannerHeight:document.querySelector(".pm-explorer__banner").getBoundingClientRect().height,arrow:arrow.getAttribute("src"),arrowWidth:arrow.getBoundingClientRect().width,arrowBackground:style(".pm-table-card__arrow").backgroundColor}})()');
+        assert(actual.title === "rgb(35, 109, 119)", `${width} Figma Explorer card title turquoise`);
+        assert(actual.banner === "rgb(255, 204, 88)", `${width} Figma Explorer banner yellow text`);
+        assert(actual.arrow === "/ready/54d67.svg" && actual.arrowWidth === 24 && actual.arrowBackground === "rgba(0, 0, 0, 0)", `${width} Figma Explorer outline action uses original dark arrow`);
+        if (width === 1440) assert(actual.bannerHeight === 40, "Figma Explorer banner height 40");
+        measurements.push({label:`${width}/explorer/reported-fixes`,...actual});
+      } else {
+        const actual = await ev('(()=>{const play=document.querySelector(".pm-host__play"),s=getComputedStyle(play);return {buttons:[...document.querySelectorAll(".pm-host__start")].map(e=>({background:getComputedStyle(e).backgroundColor,color:getComputedStyle(e).color,radius:getComputedStyle(e).borderRadius,height:e.getBoundingClientRect().height})),playWidth:play.getBoundingClientRect().width,iconWidth:play.querySelector("img").getBoundingClientRect().width,playBackground:s.backgroundColor,playBorder:s.borderColor,overlay:getComputedStyle(document.querySelector(".pm-host__video-overlay")).backgroundColor}})()');
+        assert(actual.buttons.length === 2 && actual.buttons.every(b=>b.background === "rgb(255, 204, 88)" && b.color === "rgb(15, 9, 9)" && b.radius === "100px" && Math.abs(b.height-42)<=1), `${width} both Figma Commencer buttons use yellow pill variant`);
+        assert(actual.playWidth === 87 && actual.iconWidth === 67 && actual.playBorder === "rgb(255, 255, 255)" && actual.playBackground === "rgba(255, 255, 255, 0.13)", `${width} Figma video play circle and native icon geometry`);
+        assert(actual.overlay === "rgba(0, 0, 0, 0.27)", `${width} Figma video overlay opacity`);
+        measurements.push({label:`${width}/host/reported-fixes`,...actual});
+      }
+      assert(await ev(`document.documentElement.scrollWidth === ${width}`), `${width}/${route} reported fixes fit viewport`);
+    }
+  }
   console.log(JSON.stringify({ passed: checks.length, measurements }));
 })()
   .catch((e) => {
