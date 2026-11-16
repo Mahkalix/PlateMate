@@ -369,7 +369,7 @@ export function AccountProfilePage({ host = false }: { host?: boolean }) {
               subtitle={
                 host
                   ? undefined
-                  : "Visible par vous seul. Votre régime et vos allergies sont transmis à l'hôte uniquement quand vous réservez."
+                  : "Vos préférences restent privées. Vos allergies sont transmises à l'hôte de votre réservation uniquement avec votre consentement explicite."
               }
             >
               {(editing) => (

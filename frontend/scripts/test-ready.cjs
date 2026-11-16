@@ -465,6 +465,8 @@ vite.on("error", (error) => {
       assert(await ev('document.querySelectorAll(".pm-profile__card").length === 3'), `${width}/${role} three profile sections`);
       if (role === "hote") {
         assert(await ev('(()=>{const bar=document.querySelector(".pm-profile__completion progress");const label=document.getElementById(bar.getAttribute("aria-labelledby"));return bar.value===90 && bar.max===100 && bar.position===0.9 && label?.textContent==="Profil complété à 90 %"})()'), `${width}/host completion label and native progress both show 90 percent`);
+      } else {
+        assert(await ev('[...document.querySelectorAll(".pm-profile__subtitle")].some(el=>el.textContent.includes("uniquement avec votre consentement explicite"))'), `${width}/guest allergy disclosure requires explicit consent in privacy notice`);
       }
       assert(await ev('document.querySelector(".pm-profile__card input").readOnly'), `${width}/${role} personal data starts read-only`);
       await ev('document.querySelector(".pm-profile__edit").click()');
