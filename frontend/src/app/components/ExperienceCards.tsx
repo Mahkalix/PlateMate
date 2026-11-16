@@ -45,12 +45,19 @@ const discoveryTables = [
   },
 ];
 
-function DiscoveryCards({ featured }: { featured: boolean }) {
+function DiscoveryCards({
+  featured,
+  signedIn,
+}: {
+  featured: boolean;
+  signedIn: boolean;
+}) {
   return (
     <div className="pm-suggestions" id={featured ? "cartes" : undefined}>
       <p>
-        Un aperçu des moments à partager autour d’une table. Connectez-vous pour
-        découvrir les repas disponibles et vos suggestions personnalisées.
+        Un aperçu des moments à partager autour d’une table. Les repas
+        disponibles et les suggestions adaptées à votre profil apparaîtront ici
+        dès qu’il y en aura.
       </p>
       <p>Exemples de tables, présentés à titre d’inspiration.</p>
       <div className="pm-suggestions__grid">
@@ -71,8 +78,11 @@ function DiscoveryCards({ featured }: { featured: boolean }) {
               <p>
                 {table.kind} · {table.ambience}
               </p>
-              <a className="pm-button pm-button--red" href="#/connexion">
-                Découvrir PlateMate
+              <a
+                className="pm-button pm-button--red"
+                href={signedIn ? "#/devenir-hote" : "#/connexion"}
+              >
+                {signedIn ? "Proposer ma table" : "Découvrir PlateMate"}
               </a>
             </div>
           </article>
@@ -113,14 +123,21 @@ export function ExperienceCards({ featured = false }: { featured?: boolean }) {
     setOffset(0);
   }, [user?.id, profile]);
   const current = state.key === key ? state : null;
-  if (!user && !current?.data?.items.length)
-    return <DiscoveryCards featured={featured} />;
+  if (
+    (!user && !current?.data?.items.length) ||
+    current?.data?.items.length === 0
+  )
+    return <DiscoveryCards featured={featured} signedIn={!!user} />;
+  const hasSuggestions =
+    personalized && current?.data?.items.some((card) => card.score > 0);
   return (
     <div className="pm-suggestions" id={featured ? "cartes" : undefined}>
       <p>
-        {personalized
+        {hasSuggestions
           ? "Des suggestions classées selon vos langues, vos centres d’intérêt et vos préférences alimentaires."
-          : "Découvrez les tables. Connectez-vous pour obtenir des suggestions adaptées à votre profil et réserver."}
+          : user
+            ? "Découvrez les tables et les prochains repas."
+            : "Découvrez les tables. Connectez-vous pour réserver."}
       </p>
       {!personalized && <a href="#/connexion">Se connecter</a>}
       {loading || !current ? (

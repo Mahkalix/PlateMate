@@ -8,6 +8,7 @@ const assert = require('node:assert/strict');
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 const origin = 'http://127.0.0.1:4197';
 let profile = null, loggedIn = false, booking = null, shared = false, failure = false;
+let emptyCatalogue = false;
 let isHost = false, table = {}, published = null;
 let browser, web, ws;
 const hostId = '11111111-1111-4111-8111-111111111111';
@@ -33,7 +34,7 @@ const backend = createServer(async (req, res) => {
   if (route === '/me/host') { isHost = true; return send({ hostId }, 201); }
   if (route === '/me/table') { if (req.method === 'PUT') table = body; return send({ table }); }
   if (route === '/me/contexts') { published = { slotId, title: body.title, startsAt: body.slots[0].startsAt, capacity: body.slots[0].capacity, confirmedPlaces: 0, pendingRequests: 0 }; return send({ id: contextId }, 201); }
-  if (route === '/explorer') return send({ items: profile ? [card] : [], total: profile ? 1 : 0, nextOffset: null });
+  if (route === '/explorer') return send({ items: profile && !emptyCatalogue ? [card] : [], total: profile && !emptyCatalogue ? 1 : 0, nextOffset: null });
   if (route === `/profiles/${hostId}/contexts/${contextId}`) return send(card);
   if (route === '/bookings' && req.method === 'POST') { assert.equal(body.slotId, slotId); booking = { id: bookingId, slotId, status: 'pending', partySize: body.partySize, title: card.contextTitle, contextTitle: card.contextTitle, counterpartName: 'Camille', startsAt }; return send(booking, 201); }
   if (route === `/bookings/${bookingId}/status`) { booking.status = body.status; return send(booking); }
@@ -121,6 +122,14 @@ const backend = createServer(async (req, res) => {
     assert.equal(await ev('document.documentElement.scrollWidth - document.documentElement.clientWidth'), 0);
   }
   await cmd('Page.reload'); await until('document.querySelector("[name=firstName]")?.value === "Max"');
+  emptyCatalogue = true;
+  for (const route of ['', 'explorer']) {
+    await go(route);
+    await until('document.querySelectorAll(".pm-suggestion").length === 4');
+    assert.equal(await ev('document.body.textContent.includes("Des suggestions classées")'), false);
+    assert.equal(await ev('document.querySelectorAll(".pm-suggestion img").length'), 4);
+  }
+  emptyCatalogue = false;
   await go('mon-profil/hote'); await until('document.querySelectorAll("form").length === 4');
   await ev('document.querySelectorAll("form")[3].requestSubmit()');
   await until('!!document.querySelector("[name=tableLanguages]")');
