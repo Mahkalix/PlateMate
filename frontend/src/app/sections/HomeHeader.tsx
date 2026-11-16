@@ -163,7 +163,7 @@ export function HomeHeader({
                     }
                   }}
                 >
-                  {loggingOut ? "D�connexion." : "Se d�connecter"}
+                  {loggingOut ? "Déconnexion." : "Se déconnecter"}
                 </button>
                 {logoutError && (
                   <p className="pm-header__account-error" role="alert">
