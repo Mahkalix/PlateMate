@@ -35,7 +35,7 @@ export function ExplorerPage() {
           <p>Voir les expériences disponibles près de chez vous</p>
         </header>
         {!user && (
-          <a className="pm-explorer__banner" href="#/connexion">
+          <a className="pm-explorer__banner" href="/auth/login">
             Connectez-vous pour en voir plus !
           </a>
         )}

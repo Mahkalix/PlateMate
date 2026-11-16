@@ -132,7 +132,7 @@ export function HomeHeader({
                   "Mon compte"}
               </button>
             ) : (
-              <a className="pm-button pm-header__login" href="#/connexion">
+              <a className="pm-button pm-header__login" href="/auth/login">
                 <img src="/home/UserCircle.svg" alt="" />
                 Se connecter
               </a>
