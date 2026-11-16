@@ -176,6 +176,9 @@
   .pm-explorer__locked {
     margin-top: 3.2rem;
   }
+  .pm-table-card--outline .pm-table-card__arrow img {
+    transform: none;
+  }
   .pm-cuisine {
     position: relative;
     flex: 0 0 16rem;
@@ -289,6 +292,7 @@
 
   &__lock {
     position: relative;
+    display: block;
     justify-self: center;
     width: 4.5rem;
     height: 3.5rem;
@@ -321,4 +325,8 @@
       justify-content: center;
     }
   }
+}
+
+.app .pm-explorer__locked {
+  display: grid;
 }
