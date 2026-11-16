@@ -31,7 +31,7 @@ function ProfileCard({
           try {
             await save();
             setEditing(false);
-            setMessage("Modifications enregistr�es.");
+            setMessage("Modifications enregistrées.");
           } catch (e) {
             setError(errorMessage(e));
           } finally {
@@ -46,7 +46,7 @@ function ProfileCard({
           {title === "Informations personnelles" && (
             <span className="pm-profile__private-label">
               <img src="/account/ca53b.svg" alt="" />
-              Priv�, jamais affich�
+              Privé, jamais affiché
             </span>
           )}
           <button
@@ -173,15 +173,15 @@ export function ProfileDetails({
       >
         <p className="pm-profile__privacy">
           <img src="/account/fb0e2.svg" alt="" />
-          Ces informations restent priv�es. Les autres membres voient votre
-          pr�nom et l'initiale de votre nom.
+          Ces informations restent privées. Les autres membres voient votre
+          prénom et l'initiale de votre nom.
         </p>
         <div className="pm-profile__fields">
-          {field("firstName", "Pr�nom", "text", true)}
+          {field("firstName", "Prénom", "text", true)}
           {field("lastName", "Nom", "text", true)}
         </div>
         <div className="pm-profile__fields">
-          {field("phone", "T�l�phone", "tel")}
+          {field("phone", "Téléphone", "tel")}
           <label>
             Email
             <input value={email} type="email" readOnly />
@@ -194,7 +194,7 @@ export function ProfileDetails({
         </div>
       </ProfileCard>
       <ProfileCard
-        title="� propos de moi"
+        title="À propos de moi"
         save={() =>
           save(["description", "languages", "affinities", "publicInterests"])
         }
@@ -215,7 +215,7 @@ export function ProfileDetails({
           </div>
         </div>
         <label className="pm-profile__group">
-          <span className="pm-profile__subheading">Ma pr�sentation</span>
+          <span className="pm-profile__subheading">Ma présentation</span>
           <textarea
             name="description"
             value={draft.description ?? ""}
@@ -223,10 +223,10 @@ export function ProfileDetails({
             onChange={(e) => change("description", e.target.value)}
           />
         </label>
-        {choices("languages", "Langues parl�es", true)}
-        {choices("affinities", "Mes centres d'int�r�t", true)}
+        {choices("languages", "Langues parlées", true)}
+        {choices("affinities", "Mes centres d'intérét", true)}
         <PreferenceChoices
-          label="Centres d'int�r�t visibles sur mon profil public"
+          label="Centres d'intérét visibles sur mon profil public"
           options={draft.affinities}
           value={draft.publicInterests.filter((v) =>
             draft.affinities.includes(v),
@@ -236,7 +236,7 @@ export function ProfileDetails({
         />
       </ProfileCard>
       <ProfileCard
-        title="Mes pr�f�rences"
+        title="Mes préférences"
         save={() =>
           save([
             "diets",
@@ -250,19 +250,19 @@ export function ProfileDetails({
         }
       >
         <p className="pm-profile__subtitle">
-          Vos pr�f�rences alimentaires restent priv�es. Le partage de vos
-          allergies demande votre accord pour chaque r�servation.
+          Vos préférences alimentaires restent privées. Le partage de vos
+          allergies demande votre accord pour chaque réservation.
         </p>
         <div className="pm-profile__preferences">
           <div>
-            {choices("diets", "R�gime alimentaire")}
+            {choices("diets", "Régime alimentaire")}
             {choices("allergies", "Allergies")}
-            {choices("intolerances", "Intol�rances")}
-            {choices("cuisines", "Cuisines pr�f�r�es")}
+            {choices("intolerances", "Intolérances")}
+            {choices("cuisines", "Cuisines préférées")}
           </div>
           <div>
             {choices("motivations", "Ce que je recherche")}
-            {choices("ambiences", "Ambiance pr�f�r�e", true)}
+            {choices("ambiences", "Ambiance préférée", true)}
           </div>
         </div>
         <label className="pm-consent">
@@ -271,12 +271,12 @@ export function ProfileDetails({
             checked={draft.consent}
             onChange={(e) => change("consent", e.target.checked)}
           />
-          J'accepte l'enregistrement de mes pr�f�rences alimentaires pour la
-          compatibilit� des repas.
+          J'accepte l'enregistrement de mes préférences alimentaires pour la
+          compatibilité des repas.
         </label>
         <p>
-          Pour retirer cet accord, d�s�lectionnez vos r�gimes, allergies et
-          intol�rances, puis enregistrez.
+          Pour retirer cet accord, désélectionnez vos régimes, allergies et
+          intolérances, puis enregistrez.
         </p>
       </ProfileCard>
     </>
