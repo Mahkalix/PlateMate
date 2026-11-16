@@ -1,0 +1,143 @@
+.app {
+  .pm-wizard-fields,
+  .pm-profile__editable {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+    display: grid;
+    gap: 2.4rem;
+  }
+  .pm-preference-choices {
+    border: 0;
+    padding: 0;
+    margin: 0 0 1.6rem;
+    min-width: 0;
+  }
+  .pm-preference-choices legend {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 1.2rem;
+  }
+  .pm-profile__choices {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+  }
+  .pm-profile__choices button {
+    border: 1px solid var(--pm-red);
+    border-radius: 3rem;
+    background: white;
+    color: var(--pm-ink);
+    padding: 0.6rem 1.2rem;
+    font: inherit;
+    font-size: 1.4rem;
+    cursor: pointer;
+  }
+  .pm-profile__choices button[aria-pressed="true"] {
+    background: var(--pm-red);
+    color: white;
+  }
+  .pm-profile__choices button:focus-visible {
+    outline: 2px solid var(--pm-ink);
+    outline-offset: 3px;
+  }
+  .pm-preference-choices__custom {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.8rem;
+    margin-top: 1.2rem;
+    font-size: 1.3rem;
+  }
+  .pm-preference-choices__custom input {
+    min-width: 0;
+    flex: 1;
+    padding: 0.8rem;
+    border: 1px solid #cbcdd1;
+    border-radius: 0.8rem;
+    font: inherit;
+  }
+  .pm-preference-choices__custom button {
+    border: 1px solid #cbcdd1;
+    border-radius: 2rem;
+    background: white;
+    padding: 0.6rem 1rem;
+    cursor: pointer;
+  }
+  .pm-profile__editable:disabled .pm-preference-choices__custom {
+    display: none;
+  }
+  .pm-profile__editable:disabled
+    .pm-profile__choices
+    button:not([aria-pressed="true"]) {
+    display: none;
+  }
+  .pm-profile__editable:disabled .pm-profile__choices button {
+    cursor: default;
+    opacity: 1;
+    background: #ccecf0;
+    border-color: #ccecf0;
+    color: #174a50;
+  }
+  .pm-profile__editable input:disabled,
+  .pm-profile__editable textarea:disabled {
+    color: var(--pm-ink);
+    -webkit-text-fill-color: var(--pm-ink);
+    opacity: 1;
+    background: white;
+  }
+  .pm-profile__editable textarea {
+    width: 100%;
+    min-height: 9rem;
+  }
+  .pm-profile__private-label > img {
+    width: 2rem;
+    height: 2rem;
+  }
+  .pm-consent {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    font-size: 1.4rem;
+    line-height: 1.5;
+  }
+  .pm-consent input {
+    flex: 0 0 auto;
+    width: 1.6rem;
+    height: 1.6rem;
+    accent-color: var(--pm-red);
+  }
+  .pm-connected-wizard .pm-field {
+    font-size: 1.4rem;
+    font-weight: 600;
+  }
+  .pm-profile__preferences > div {
+    min-width: 0;
+  }
+  .pm-profile__card > .pm-form-error {
+    color: #a01626;
+  }
+  @media (max-width: 600px) {
+    .pm-connected-wizard {
+      padding: 3.2rem 1.6rem;
+    }
+    .pm-connected-wizard h1 {
+      font-size: 3.2rem;
+    }
+    .pm-connected-wizard .pm-form-card {
+      padding: 2rem;
+    }
+    .pm-connected-wizard .pm-field-row {
+      grid-template-columns: 1fr;
+    }
+    .pm-connected-wizard .pm-stepper span {
+      width: 4rem;
+      height: 4rem;
+      font-size: 1.8rem;
+    }
+    .pm-connected-wizard .pm-stepper li + li::before {
+      width: 2.4rem;
+    }
+  }
+}

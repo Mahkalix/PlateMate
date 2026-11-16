@@ -1,0 +1,241 @@
+.pm-inner-page .pm-sticky-nav {
+  height: auto;
+}
+.pm-inner-page .pm-header {
+  .pm-nav a {
+    color: var(--pm-ink);
+    font-weight: 600;
+  }
+  .pm-header__login {
+    background: var(--pm-red);
+    color: white;
+  }
+}
+@media (min-width: 981px) {
+  .pm-inner-page .pm-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    .pm-logo {
+      justify-self: start;
+    }
+    .pm-header__login {
+      justify-self: end;
+    }
+  }
+  .pm-inner-page .pm-footer__bottom {
+    gap: 0;
+  }
+}
+.app .pm-about {
+  h1,
+  h2 {
+    font-family: "BBB ReadMe", serif;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+  h2 {
+    font-size: 4.8rem;
+    line-height: 1.2;
+    letter-spacing: -0.12rem;
+    text-align: center;
+    margin: 0;
+  }
+  p,
+  h3 {
+    margin: 0;
+  }
+  &__hero {
+    height: 27.6rem;
+    overflow: hidden;
+    position: relative;
+    background: #620009;
+  }
+  &__hero-photo {
+    position: absolute;
+    width: 100%;
+    height: auto;
+    top: -23.3rem;
+  }
+  &__hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgb(15 9 9 / 40%);
+  }
+  &__hero-logo {
+    width: 31.4246rem;
+    height: 17.7325rem;
+    object-fit: contain;
+    position: absolute;
+    z-index: 1;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  &__mission {
+    padding: 11.2rem 8.3rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    h1 {
+      font-size: 11.0939rem;
+      line-height: 1.2;
+      margin: 0;
+    }
+    p {
+      font-size: 2rem;
+      line-height: 2.72rem;
+      font-variation-settings: "opsz" 9;
+    }
+    p + p {
+      margin-top: 2.4rem;
+    }
+  }
+  &__team {
+    padding: 7.2rem 8rem;
+    background: var(--pm-red);
+    color: var(--pm-cream);
+  }
+  &__people {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5.6rem 6.4rem;
+    margin-top: 6.4rem;
+    article {
+      flex: 0 0 22.775rem;
+      text-align: center;
+    }
+    h3 {
+      color: white;
+      white-space: nowrap;
+      font-size: 2rem;
+      line-height: 2.25rem;
+      margin-top: 1.6rem;
+    }
+    p {
+      font-size: 1.6rem;
+      line-height: 1.95rem;
+      white-space: nowrap;
+      color: #ded6d6;
+      margin-top: 0.4rem;
+    }
+  }
+  &__portrait {
+    width: 12.8rem;
+    height: 12.8rem;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-inline: auto;
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+  &__people article:first-child .pm-about__portrait img {
+    height: 150%;
+    transform: translate(-0.54%, -25.5667%);
+  }
+  &__values {
+    padding: 8.8rem 11.2rem 9.6rem;
+    > div {
+      display: flex;
+      justify-content: center;
+      gap: 4.8rem;
+      margin-top: 4.8rem;
+    }
+    article {
+      width: 30.3664rem;
+    }
+    h3 {
+      color: var(--pm-red);
+      font-size: 2rem;
+      line-height: 3rem;
+      margin-bottom: 1.6rem;
+    }
+    p {
+      font-size: 1.4rem;
+      line-height: 2.24rem;
+      font-variation-settings: "opsz" 9;
+    }
+  }
+  &__join {
+    padding: 8rem;
+    background: rgb(131 190 162 / 16%);
+    text-align: center;
+    > p {
+      font-size: 2rem;
+      line-height: 1.2;
+      margin-top: 2.4rem;
+    }
+  }
+  &__contacts {
+    display: flex;
+    justify-content: center;
+    gap: 3.2rem;
+    margin-top: 5.6rem;
+    text-align: left;
+    article {
+      width: 35.2rem;
+      min-height: 18rem;
+      padding: 3.3rem;
+      border-radius: 1.6rem;
+      background: rgb(131 190 162 / 64%);
+    }
+    h3 {
+      font-size: 2rem;
+      line-height: 1.2;
+    }
+    p {
+      margin-top: 0.8rem;
+      font-size: 1.6rem;
+      line-height: 1.2;
+    }
+    a {
+      display: inline-block;
+      line-height: 2.1rem;
+      margin-top: 2.2rem;
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: inherit;
+    }
+  }
+}
+@media (max-width: 980px) {
+  .app .pm-about {
+    h2 {
+      font-size: 3.6rem;
+    }
+    &__hero-photo {
+      height: 100%;
+      object-fit: cover;
+      top: 0;
+    }
+    &__mission {
+      padding: 5.6rem 2.4rem;
+      grid-template-columns: 1fr;
+      gap: 3.2rem;
+      h1 {
+        font-size: 7rem;
+      }
+    }
+    &__team,
+    &__values,
+    &__join {
+      padding: 5.6rem 2.4rem;
+    }
+    &__people {
+      gap: 3.2rem;
+    }
+    &__values > div,
+    &__contacts {
+      flex-wrap: wrap;
+    }
+    &__values article,
+    &__contacts article {
+      width: 100%;
+      max-width: 40rem;
+    }
+  }
+}

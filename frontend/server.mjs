@@ -3,6 +3,7 @@ import { createReadStream } from 'node:fs';
 import { stat } from 'node:fs/promises';
 import { extname, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { proxy } from './proxy.mjs';
 
 const root = resolve(fileURLToPath(new URL('./dist/', import.meta.url)));
 const types = {
@@ -13,10 +14,12 @@ const types = {
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg',
+  '.webp': 'image/webp',
   '.woff2': 'font/woff2',
 };
 
 createServer(async (req, res) => {
+  if (proxy(req, res)) return;
   if (req.method !== 'GET' && req.method !== 'HEAD') {
     res.writeHead(405, { Allow: 'GET, HEAD' }).end();
     return;
@@ -24,19 +27,8 @@ createServer(async (req, res) => {
   let filename;
   try {
     const pathname = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
-    filename = resolve(root, `.${pathname}`);
+    filename = pathname === '/' ? resolve(root, 'index.html') : resolve(root, `.${pathname}`);
     if (filename !== root && !filename.startsWith(root + sep)) throw new Error('Invalid path');
-    let info;
-    try { info = await stat(filename); } catch {
-      if (!pathname.includes('.') || pathname.endsWith('.html')) filename = resolve(root, 'index.html');
-      else throw new Error('Invalid file');
-      info = await stat(filename);
-    }
-    if (info.isDirectory()) {
-      const directoryIndex = resolve(filename, 'index.html');
-      try { await stat(directoryIndex); filename = directoryIndex; }
-      catch { filename = resolve(root, 'index.html'); }
-    }
     const file = await stat(filename);
     if (!file.isFile()) throw new Error('Invalid file');
     res.writeHead(200, {
