@@ -280,19 +280,24 @@ export function ProfileDetails({
             {choices("ambiences", "Ambiance préférée", true)}
           </div>
         </div>
-        <label className="pm-consent">
-          <input
-            type="checkbox"
-            checked={draft.consent}
-            onChange={(e) => change("consent", e.target.checked)}
-          />
-          J'accepte l'enregistrement de mes préférences alimentaires pour la
-          compatibilité des repas.
-        </label>
-        <p>
-          Pour retirer cet accord, désélectionnez vos régimes, allergies et
-          intolérances, puis enregistrez.
-        </p>
+        <div className="pm-consent-group">
+          <label className="pm-consent">
+            <input
+              type="checkbox"
+              aria-describedby="profile-consent-help"
+              checked={draft.consent}
+              onChange={(e) => change("consent", e.target.checked)}
+            />
+            <span>
+              J'accepte l'enregistrement de mes préférences alimentaires pour la
+              compatibilité des repas.
+            </span>
+          </label>
+          <p className="pm-consent-help" id="profile-consent-help">
+            Pour retirer cet accord, désélectionnez vos régimes, allergies et
+            intolérances, puis enregistrez.
+          </p>
+        </div>
       </ProfileCard>
     </>
   );

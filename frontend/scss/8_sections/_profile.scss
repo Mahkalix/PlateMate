@@ -182,7 +182,7 @@
       letter-spacing: -0.028rem;
     }
   }
-  input,
+  input:not([type="checkbox"]),
   textarea {
     width: 100%;
     min-width: 0;
@@ -195,7 +195,7 @@
       500 1.4rem/1 "DM Sans Variable",
       sans-serif;
   }
-  input {
+  input:not([type="checkbox"]) {
     min-height: 5.2rem;
   }
   textarea {

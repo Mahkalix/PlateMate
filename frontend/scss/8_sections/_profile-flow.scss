@@ -102,11 +102,25 @@
     font-size: 1.4rem;
     line-height: 1.5;
   }
-  .pm-consent input {
+  .pm-consent input[type="checkbox"] {
     flex: 0 0 auto;
     width: 1.6rem;
     height: 1.6rem;
+    min-height: 1.6rem;
+    padding: 0;
+    margin: 0.25rem 0 0;
     accent-color: var(--pm-red);
+  }
+  .pm-consent-group {
+    display: grid;
+    gap: 0.8rem;
+  }
+  .pm-consent-help {
+    margin: 0;
+    padding-left: 2.6rem;
+    font-size: 1.2rem;
+    line-height: 1.5;
+    color: #545868;
   }
   .pm-connected-wizard .pm-field {
     font-size: 1.4rem;

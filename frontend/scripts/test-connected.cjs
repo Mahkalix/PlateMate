@@ -113,6 +113,13 @@ const backend = createServer(async (req, res) => {
   await ev('document.querySelector("[name=firstName]").form.requestSubmit()');
   await until('document.body.textContent.includes("Modifications enregistrées.")');
   assert.equal(profile.firstName, 'Max');
+  for (const width of [1440, 390]) {
+    await cmd('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: false });
+    assert.equal(await ev('document.querySelector(".pm-consent input").getBoundingClientRect().height'), 16);
+    assert.equal(await ev('document.querySelector(".pm-consent input").getBoundingClientRect().width'), 16);
+    assert.equal(await ev('document.querySelector("[aria-controls=account-navigation]").getBoundingClientRect().width < 165'), true);
+    assert.equal(await ev('document.documentElement.scrollWidth - document.documentElement.clientWidth'), 0);
+  }
   await cmd('Page.reload'); await until('document.querySelector("[name=firstName]")?.value === "Max"');
   await go('mon-profil/hote'); await until('document.querySelectorAll("form").length === 4');
   await ev('document.querySelectorAll("form")[3].requestSubmit()');
