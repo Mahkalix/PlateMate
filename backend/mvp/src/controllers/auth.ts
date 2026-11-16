@@ -41,7 +41,17 @@ export function authController(service: AuthService, provider: Auth0Login) {
     next();
   };
   function start(signup: boolean): RequestHandler {
-    return async (_req, res) => {
+    return async (req, res) => {
+      // Preview aliases must start and finish OAuth on the same cookie host.
+      if (process.env.VERCEL === "1") {
+        const callback = new URL(process.env.AUTH0_CALLBACK_URL!);
+        if (req.get("host") !== callback.host) {
+          res
+            .set("Cache-Control", "no-store")
+            .redirect(303, new URL(signup ? "/auth/register" : "/auth/login", callback.origin).href);
+          return;
+        }
+      }
       const { url, attempt } = await provider.start(signup);
       res
         .set("Cache-Control", "no-store")
