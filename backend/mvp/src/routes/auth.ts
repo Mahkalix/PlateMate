@@ -10,7 +10,7 @@ import { explorerController } from "../controllers/explorer.js";
 import { ExplorerRepository } from "../repositories/explorer.js";
 import { profileController } from "../controllers/profile.js";
 import { ProfileRepository } from "../repositories/profile.js";
-import { rateLimit } from "express-rate-limit";
+import { rateLimit, ipKeyGenerator } from "express-rate-limit";
 import type pg from "pg";
 import { AuthRepository } from "../repositories/auth.js";
 import { Auth0Login } from "../services/auth0.js";
@@ -23,6 +23,13 @@ export function authRoutes(db: pg.Pool) {
     new Auth0Login(process.env),
   );
   const limit = rateLimit({
+    // Vercel overwrites this header; do not trust it on direct/local servers.
+    ...(process.env.VERCEL === "1" ? {
+      keyGenerator: (req) => ipKeyGenerator(
+        req.get("x-vercel-forwarded-for")?.split(",")[0].trim()
+          || req.ip || req.socket.remoteAddress || "unknown",
+      ),
+    } : {}),
     windowMs: 60000,
     limit: 10,
     standardHeaders: "draft-7",
