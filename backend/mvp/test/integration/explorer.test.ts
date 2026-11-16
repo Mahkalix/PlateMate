@@ -56,6 +56,7 @@ it("US06 US07 US08 US09 / Explorer : tri, filtres, pagination, confidentialité 
   expect((await api.get("/public/explorer?limit=1&offset=1").expect(200)).body.items).toHaveLength(1);
   expect((await api.get("/public/explorer?language=inconnue").expect(200)).body.items).toEqual([]);
   await api.get("/public/explorer?limit=0").expect(422);
+  await api.get("/public/explorer?limit=1&preview=1").expect(200);
   const get = (q: object) =>
     api.get("/explorer").set("Authorization", auth).query(q);
   const secondMeal = await pool.query(
