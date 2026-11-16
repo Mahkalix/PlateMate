@@ -506,6 +506,11 @@ vite.on("error", (error) => {
       for (let i = 0; i < 100 && !(await ev('!!document.querySelector(".pm-account")')); i++) await wait(50);
       await ev("document.fonts.ready");
       await ev("Promise.all([...document.images].map(image => image.decode()))");
+      if (width === 1440 && route === "mes-repas/invite/vide") {
+        const top = await ev('document.querySelector(".pm-meals__sections").getBoundingClientRect().top');
+        measurements.push({ label: "Figma 942:5367 section position", top });
+        assert(Math.abs(top - 401) <= 1, "Figma 942:5367 empty guest sections start at y=401");
+      }
       const assets = await ev('[...document.querySelectorAll("main img")].filter(img=>img.getAttribute("src").startsWith("/account/")).map(img=>({src:img.getAttribute("src"),width:img.getBoundingClientRect().width,height:img.getBoundingClientRect().height,naturalWidth:img.naturalWidth,naturalHeight:img.naturalHeight}))');
       assert(assets.length > 0 && assets.every(asset => asset.width === asset.naturalWidth && asset.height === asset.naturalHeight && asset.width > 0), `${width}/${route} Figma SVG assets retain native dimensions`);
       const {root} = await cmd("DOM.getDocument");

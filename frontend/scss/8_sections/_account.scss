@@ -28,7 +28,7 @@
   &__tabs {
     display: flex;
     gap: 2rem;
-    border-bottom: 0.1rem solid #e0e0e0;
+    box-shadow: inset 0 -0.1rem #e0e0e0;
     a,
     button {
       border: 0;
@@ -46,7 +46,7 @@
   }
   &__toolbar {
     padding-bottom: 2.4rem;
-    border-bottom: 0.1rem solid #cbcdd1;
+    box-shadow: inset 0 -0.1rem #cbcdd1;
   }
   &__role {
     min-height: 5.2rem;
