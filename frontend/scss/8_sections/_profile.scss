@@ -264,6 +264,7 @@
     }
   }
   &__identity {
+    line-height: normal;
     display: flex;
     align-items: center;
     gap: 1.2rem;
@@ -296,6 +297,7 @@
     background: #e1e2e5;
     font-size: 2.2rem;
     font-weight: 800;
+    line-height: normal;
     flex-shrink: 0;
   }
   &__group {
