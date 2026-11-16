@@ -463,6 +463,9 @@ vite.on("error", (error) => {
       await ev("Promise.all([...document.images].map(image => image.decode()))");
       assert(await ev(`document.documentElement.scrollWidth === ${width}`), `${width}/${role} account profile fits viewport`);
       assert(await ev('document.querySelectorAll(".pm-profile__card").length === 3'), `${width}/${role} three profile sections`);
+      if (role === "hote") {
+        assert(await ev('(()=>{const bar=document.querySelector(".pm-profile__completion progress");const label=document.getElementById(bar.getAttribute("aria-labelledby"));return bar.value===90 && bar.max===100 && bar.position===0.9 && label?.textContent==="Profil complété à 90 %"})()'), `${width}/host completion label and native progress both show 90 percent`);
+      }
       assert(await ev('document.querySelector(".pm-profile__card input").readOnly'), `${width}/${role} personal data starts read-only`);
       await ev('document.querySelector(".pm-profile__edit").click()');
       await wait(50);

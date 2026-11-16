@@ -160,8 +160,12 @@ export function AccountProfilePage({ host = false }: { host?: boolean }) {
           <aside className="pm-profile__sidebar">
             {host && (
               <section className="pm-profile__aside-card pm-profile__completion">
-                <h3>Profil complété à 90 %</h3>
-                <progress value="90" max="100">
+                <h3 id="profile-completion-label">Profil complété à 90 %</h3>
+                <progress
+                  value="90"
+                  max="100"
+                  aria-labelledby="profile-completion-label"
+                >
                   90 %
                 </progress>
                 <p>
