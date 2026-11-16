@@ -125,9 +125,22 @@ const backend = createServer(async (req, res) => {
   emptyCatalogue = true;
   for (const route of ['', 'explorer']) {
     await go(route);
-    await until('document.querySelectorAll(".pm-suggestion").length === 4');
+    await until('document.querySelectorAll(".pm-discovery-cards .pm-table-card").length === 4');
     assert.equal(await ev('document.body.textContent.includes("Des suggestions classées")'), false);
-    assert.equal(await ev('document.querySelectorAll(".pm-suggestion img").length'), 4);
+    assert.equal(await ev('document.querySelectorAll(".pm-discovery-cards .pm-table-card__meal").length'), 4);
+    await until('[...document.querySelectorAll(".pm-discovery-cards img")].every(image => image.complete && image.naturalWidth > 0)');
+    assert.equal(await ev('[...document.querySelectorAll(".pm-discovery-cards .pm-table-card")].every(card => Math.abs(card.getBoundingClientRect().height / card.getBoundingClientRect().width - 427 / 296) < 0.01)'), true);
+  }
+  for (const route of ['', 'explorer', 'mon-profil/invite']) {
+    await go(route);
+    await until('!!document.querySelector(".pm-header")');
+    for (const width of [1440, 390]) {
+      await cmd('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: false });
+      if (width === 1440) {
+        assert.equal(await ev('Math.abs((document.querySelector("#home-nav").getBoundingClientRect().left + document.querySelector("#home-nav").getBoundingClientRect().right) / 2 - document.documentElement.clientWidth / 2) < 1'), true);
+      }
+      assert.equal(await ev('document.documentElement.scrollWidth - document.documentElement.clientWidth'), 0);
+    }
   }
   emptyCatalogue = false;
   await go('mon-profil/hote'); await until('document.querySelectorAll("form").length === 4');

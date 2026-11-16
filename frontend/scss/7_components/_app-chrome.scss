@@ -248,3 +248,19 @@
     text-underline-offset: 6px;
   }
 }
+
+@media (min-width: 981px) {
+  .app .pm-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  }
+  .app .pm-header .pm-logo {
+    justify-self: start;
+  }
+  .app .pm-header .pm-nav {
+    justify-self: center;
+  }
+  .app .pm-header__account {
+    justify-self: end;
+  }
+}

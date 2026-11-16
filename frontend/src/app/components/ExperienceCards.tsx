@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, publicApi, errorMessage } from "../api";
 import { useSession } from "../Session";
+import { TableCard } from "./TableCard";
 
 type Card = {
   hostId: string;
@@ -16,32 +17,36 @@ type Page = { items: Card[]; total: number; nextOffset: number | null };
 
 const discoveryTables = [
   {
-    title: "Une soirée libanaise",
+    title: "Nuit libanaise",
     host: "Amina",
     kind: "Cuisine libanaise",
     ambience: "Conviviale",
     photo: "BackgroundImage",
+    portrait: "Image25",
   },
   {
-    title: "Le bistrot à la maison",
+    title: "La French Touch",
     host: "Jean-Marc",
     kind: "Cuisine française",
     ambience: "Calme et détendue",
     photo: "BackgroundImage4",
+    portrait: "Image28",
   },
   {
-    title: "Burgers et jeux de société",
+    title: "American Night",
     host: "Troy",
     kind: "Cuisine américaine",
     ambience: "Animée",
     photo: "BackgroundImage3",
+    portrait: "Image27",
   },
   {
-    title: "Un dimanche à partager",
+    title: "La French Touch",
     host: "Usain",
     kind: "Cuisine familiale",
     ambience: "Grande tablée",
     photo: "BackgroundImage2",
+    portrait: "Image26",
   },
 ];
 
@@ -60,32 +65,17 @@ function DiscoveryCards({
         dès qu’il y en aura.
       </p>
       <p>Exemples de tables, présentés à titre d’inspiration.</p>
-      <div className="pm-suggestions__grid">
+      <div className="pm-discovery-cards">
         {discoveryTables.map((table) => (
-          <article className="pm-suggestion" key={table.title}>
-            <img
-              src={`/home/${table.photo}.webp`}
-              alt=""
-              loading="lazy"
-              width="400"
-              height="240"
-              style={{ width: "100%", height: "20rem", objectFit: "cover" }}
-            />
-            <div className="pm-suggestion__body">
-              <p className="pm-eyebrow">Table découverte · Exemple</p>
-              <h3>{table.title}</h3>
-              <p>Chez {table.host}</p>
-              <p>
-                {table.kind} · {table.ambience}
-              </p>
-              <a
-                className="pm-button pm-button--red"
-                href={signedIn ? "#/devenir-hote" : "#/connexion"}
-              >
-                {signedIn ? "Proposer ma table" : "Découvrir PlateMate"}
-              </a>
-            </div>
-          </article>
+          <TableCard
+            key={table.host}
+            host={table.host}
+            title={table.title}
+            photo={table.photo}
+            portrait={table.portrait}
+            variant={featured ? "filled" : "outline"}
+            href={signedIn ? "#/devenir-hote" : "#/connexion"}
+          />
         ))}
       </div>
     </div>

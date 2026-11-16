@@ -160,3 +160,27 @@
   color: #766862;
   text-transform: uppercase;
 }
+
+.pm-discovery-cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 3.2rem;
+  width: 100%;
+  .pm-table-card {
+    display: block;
+    width: 100%;
+    min-width: 0;
+  }
+}
+@media (max-width: 980px) {
+  .pm-discovery-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2.4rem;
+  }
+}
+@media (max-width: 600px) {
+  .pm-discovery-cards {
+    grid-template-columns: minmax(0, 29.6rem);
+    justify-content: center;
+  }
+}
