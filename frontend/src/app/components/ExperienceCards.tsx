@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { api, publicApi, errorMessage } from "../api";
 import { useSession } from "../Session";
 import { TableCard } from "./TableCard";
+import { Featured } from "./Featured";
 
 type Card = {
   hostId: string;
@@ -57,6 +58,7 @@ function DiscoveryCards({
   featured: boolean;
   signedIn: boolean;
 }) {
+  if (featured) return <Featured />;
   return (
     <div className="pm-suggestions" id={featured ? "cartes" : undefined}>
       <p>

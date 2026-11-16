@@ -125,12 +125,21 @@ const backend = createServer(async (req, res) => {
   emptyCatalogue = true;
   for (const route of ['', 'explorer']) {
     await go(route);
-    await until('document.querySelectorAll(".pm-discovery-cards .pm-table-card").length === 4');
+    const selector = route ? '.pm-discovery-cards' : '.pm-featured__cards';
+    const count = route ? 4 : 5;
+    await until(`document.querySelectorAll('${selector} .pm-table-card').length === ${count}`);
     assert.equal(await ev('document.body.textContent.includes("Des suggestions classées")'), false);
-    assert.equal(await ev('document.querySelectorAll(".pm-discovery-cards .pm-table-card__meal").length'), 4);
-    await ev('[...document.querySelectorAll(".pm-discovery-cards img")].forEach(image => { image.loading = "eager"; })');
-    await until('[...document.querySelectorAll(".pm-discovery-cards img")].every(image => image.complete && image.naturalWidth > 0)');
-    assert.equal(await ev('[...document.querySelectorAll(".pm-discovery-cards .pm-table-card")].every(card => Math.abs(card.getBoundingClientRect().height / card.getBoundingClientRect().width - 427 / 296) < 0.01)'), true);
+    await ev(`[...document.querySelectorAll('${selector} img')].forEach(image => { image.loading = "eager"; })`);
+    await until(`[...document.querySelectorAll('${selector} img')].every(image => image.complete && image.naturalWidth > 0)`);
+    assert.equal(await ev(`[...document.querySelectorAll('${selector} .pm-table-card')].every(card => Math.abs(card.getBoundingClientRect().height / card.getBoundingClientRect().width - 427 / 296) < 0.01)`), true);
+    if (!route) {
+      await cmd('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
+      assert.equal(await ev(`(() => {
+        const cards = [...document.querySelectorAll('.pm-featured__cards .pm-table-card')];
+        const boxes = cards.map(card => card.getBoundingClientRect());
+        return cards[2].textContent.includes('Amina') && boxes[2].top < boxes[1].top && boxes[2].top < boxes[3].top && boxes[0].right > boxes[1].left && boxes[1].right > boxes[2].left;
+      })()`), true);
+    }
   }
   for (const route of ['', 'explorer', 'mon-profil/invite']) {
     await go(route);
