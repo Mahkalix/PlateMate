@@ -1,5 +1,7 @@
 # Corrections des captures (16 novembre 2026)
 
+> Archive des vérifications de la PR #6, avant raccordement à l’API. Les mesures et résultats ci-dessous ne décrivent pas la version connectée actuelle. Les anciennes pages de démonstration et leur script de test ont été retirés ; le test actif est `scripts/test-connected.cjs`.
+
 Références Figma : Explorer `371:725`, Devenir hôte `448:984`, lecteur `651:1376`. Comparaison depuis les composants et styles Figma, puis mesures DOM. Base html 10 px et body 16 px inchangée.
 
 | Élément | Écart observé | Référence et correction | Gravité |

@@ -6,7 +6,6 @@
     "start": "tsx --env-file-if-exists=.env src/server.ts",
     "migrate": "tsx --env-file-if-exists=.env src/db.ts migrate",
     "seed": "tsx --env-file-if-exists=.env src/db.ts seed",
-    "seed": "tsx --env-file-if-exists=.env src/db.ts seed",
     "test": "vitest run",
     "test:unit": "vitest run test/unit",
     "test:integration": "vitest run test/integration",

@@ -1,5 +1,7 @@
 # Ready for dev : audit front
 
+> Archive des vérifications de la PR #6, avant raccordement à l’API. Les mesures et résultats ci-dessous ne décrivent pas la version connectée actuelle. Les anciennes pages de démonstration et leur script de test ont été retirés ; le test actif est `scripts/test-connected.cjs`.
+
 PR #6, branche `feat/homepage-ready`. Aucun merge ni changement backend. Référence Figma : `qtiIzlBfRLB3xK20yCRfuj`, page Wireframe `174:10`.
 
 ## Périmètre

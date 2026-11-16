@@ -4,12 +4,11 @@ React, TypeScript, Vite et SCSS. Le frontend communique avec le backend MVP dans
 
 ## Démarrer avec Docker (recommandé)
 
-Toutes les commandes Docker ci-dessous se lancent depuis la racine du dépôt, **integration-local**, pas depuis frontend.
+Toutes les commandes Docker ci-dessous se lancent depuis la racine du dépôt, pas depuis frontend.
 
 Prérequis : Docker Desktop démarré avec les conteneurs Linux et backend/mvp/.env configuré selon le README backend. Ne pas remplacer un fichier .env déjà renseigné.
 
 ~~~powershell
-cd C:\Users\maxen\Documents\ChatGPT\PLATEMATE\integration-local
 docker compose --env-file backend/mvp/.env -f compose.integration.yaml config --quiet
 docker compose --env-file backend/mvp/.env -f compose.integration.yaml up --build -d --wait
 ~~~
@@ -36,7 +35,7 @@ Ctrl+C quitte les logs. La commande down conserve les données PostgreSQL. Ne pa
 
 ## Développement avec rechargement automatique
 
-Node.js 22 ou 24 et npm requis sur le PC. Depuis integration-local, arrêter le conteneur frontend pour libérer le port 8080, garder l'API et la base dans Docker, puis lancer Vite :
+Node.js 22 ou 24 et npm requis sur le PC. depuis la racine du dépôt, arrêter le conteneur frontend pour libérer le port 8080, garder l'API et la base dans Docker, puis lancer Vite :
 
 ~~~powershell
 docker compose --env-file backend/mvp/.env -f compose.integration.yaml stop frontend
@@ -47,7 +46,7 @@ npm start --prefix frontend
 
 Vite transmet /api/* vers localhost:3001 en retirant /api et transmet /auth/* sans changer le chemin. Utiliser localhost dans le navigateur pour conserver une origine cohérente avec Auth0.
 
-## Vérifications (depuis integration-local)
+## Vérifications (depuis la racine du dépôt)
 
 ~~~powershell
 npm ci --prefix frontend
@@ -68,7 +67,7 @@ Connexion via Auth0 → Mon compte → Mon profil → Explorer → demande de r�
 
 Les jetons restent en mémoire ; le renouvellement utilise un cookie HttpOnly. Aucun secret Auth0 ne doit être ajouté au frontend.
 
-Le serveur Docker transmet les requêtes à http://api:3001 via API_UPSTREAM. Publier dist seul sans ces proxies ne suffit pas. Les anciennes pages de démonstration sont conservées comme références ; toutes les pages connectées ne sont pas encore validées visuellement contre Figma.
+Le serveur Docker transmet les requêtes à http://api:3001 via API_UPSTREAM. Publier dist seul sans ces proxies ne suffit pas. Les anciennes pages de démonstration non routées ont été retirées. Les pages connectées restent à valider visuellement contre Figma.
 
 ## Dockerfile et dépannage
 

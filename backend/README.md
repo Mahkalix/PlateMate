@@ -4,10 +4,9 @@ Le frontend actuel utilise **backend/mvp**, une API Express/TypeScript avec Auth
 
 ## Configuration initiale
 
-Toutes les commandes suivantes se lancent depuis **integration-local**. Docker Desktop doit être démarré en mode conteneurs Linux.
+Toutes les commandes suivantes se lancent depuis **la racine du dépôt**. Docker Desktop doit être démarré en mode conteneurs Linux.
 
 ~~~powershell
-cd C:\Users\maxen\Documents\ChatGPT\PLATEMATE\integration-local
 if (!(Test-Path backend/mvp/.env)) {
     Copy-Item backend/mvp/.env.example backend/mvp/.env
 }
@@ -68,7 +67,7 @@ Ctrl+C quitte les logs. Ne pas ajouter --volumes : cela supprimerait les donnée
 
 Node.js 24 et npm sur le PC, Docker pour une **base de test isolée**. Le Dockerfile applicatif n'inclut pas Vitest ni les dépendances de développement ; ne pas lancer npm test dans le conteneur api.
 
-Depuis integration-local :
+depuis la racine du dépôt :
 
 ~~~powershell
 docker compose -f compose.test.yaml up -d --wait
