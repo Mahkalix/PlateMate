@@ -55,18 +55,24 @@ vite.on("error", (error) => {
       "--user-data-dir=" + dir,
       url,
     ],
-    { stdio: "ignore", windowsHide: true },
+    { stdio: ["ignore", "ignore", "pipe"], windowsHide: true },
   );
+  let chromeError = "";
+  c.stderr.on("data", (chunk) => {
+    chromeError = (chromeError + chunk.toString()).slice(-8000);
+  });
   c.on("error", (error) => {
     startupError = error;
   });
   const file = path.join(dir, "DevToolsActivePort");
   for (let i = 0; i < 100 && !fs.existsSync(file); i++) {
     if (startupError) throw startupError;
+    if (c.exitCode !== null || c.signalCode !== null)
+      throw Error(`Chrome exited (${c.exitCode ?? c.signalCode}): ${chromeError}`);
     await wait(100);
   }
   if (!fs.existsSync(file))
-    throw Error("Chrome did not start. Set CHROME_PATH to its executable.");
+    throw Error(`Chrome did not start. Set CHROME_PATH to its executable. ${chromeError}`);
   const targets = await (
     await fetch(
       "http://127.0.0.1:" +
