@@ -5,6 +5,8 @@ include:
 services:
   frontend:
     build: ./frontend
+    environment:
+      API_UPSTREAM: http://api:3001
     ports:
       - "127.0.0.1:8080:8080"
     healthcheck:

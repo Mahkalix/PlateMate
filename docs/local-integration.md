@@ -1,5 +1,9 @@
 # Integration front et back du 16 novembre 2026
 
+> Archive de la fusion initiale. Le raccordement fonctionnel est maintenant
+> decrit dans [connected-local.md](connected-local.md). La branche s'appelle
+> desormais `integration/front-back`.
+
 ## Sauvegardes
 
 - Frontend : `backup/frontend-2026-11-16-dc6e54a`, commit `dc6e54a41bce1d415eed3b0648956e95a2c16e20`.

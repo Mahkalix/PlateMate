@@ -3,6 +3,7 @@ import { createReadStream } from 'node:fs';
 import { stat } from 'node:fs/promises';
 import { extname, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { proxy } from './proxy.mjs';
 
 const root = resolve(fileURLToPath(new URL('./dist/', import.meta.url)));
 const types = {
@@ -18,6 +19,7 @@ const types = {
 };
 
 createServer(async (req, res) => {
+  if (proxy(req, res)) return;
   if (req.method !== 'GET' && req.method !== 'HEAD') {
     res.writeHead(405, { Allow: 'GET, HEAD' }).end();
     return;

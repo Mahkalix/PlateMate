@@ -1,0 +1,72 @@
+.app .pm-live {
+  max-width: 120rem;
+  margin: auto;
+  padding: 4rem 2rem;
+  min-height: 60vh;
+  h1 {
+    font-size: clamp(3rem, 5vw, 4.8rem);
+  }
+  h2 {
+    margin: 2.4rem 0 1.6rem;
+  }
+  p {
+    line-height: 1.6;
+  }
+  .pm-live__nav {
+    display: flex;
+    gap: 1.6rem;
+    flex-wrap: wrap;
+    margin: 2rem 0 3rem;
+  }
+  .pm-live__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 30rem), 1fr));
+    gap: 2rem;
+  }
+  .pm-form-card {
+    width: 100%;
+    margin: 2rem 0;
+  }
+  fieldset {
+    border: 0;
+    padding: 0;
+    min-width: 0;
+    display: grid;
+    gap: 1.6rem;
+  }
+  label {
+    display: grid;
+    gap: 0.8rem;
+  }
+  label:has(input[type="checkbox"]) {
+    display: block;
+  }
+  input:not([type="checkbox"]),
+  textarea,
+  select {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid #6d717f;
+    border-radius: 0.8rem;
+    font: inherit;
+  }
+  textarea {
+    min-height: 12rem;
+  }
+  [role="alert"] {
+    color: #a01626;
+  }
+  button,
+  summary,
+  a {
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: wait;
+    opacity: 0.65;
+  }
+}
+.pm-live:not(.app *) {
+  padding: 4rem;
+}

@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { HomeNavLinks } from "../components/HomeNavLinks";
+import { useSession } from "../Session";
+import { errorMessage } from "../api";
 
 export function HomeHeader({
   accountName,
@@ -9,6 +11,10 @@ export function HomeHeader({
   accountRole?: "hote" | "invite";
 }) {
   const innerPage = window.location.hash.startsWith("#/");
+  const session = useSession();
+  const [logoutError, setLogoutError] = useState("");
+  const [loggingOut, setLoggingOut] = useState(false);
+  const signedIn = Boolean(session.user);
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const header = useRef<HTMLElement>(null);
@@ -70,11 +76,30 @@ export function HomeHeader({
           </nav>
           <a
             className="pm-button pm-header__login"
-            href={accountName ? `#/mon-profil/${accountRole}` : "#/connexion"}
+            href={signedIn ? `#/mon-profil/${accountRole}` : "#/connexion"}
           >
             <img src="/home/UserCircle.svg" alt="" />
-            {accountName || "Se connecter"}
+            {signedIn ? "Mon compte" : "Se connecter"}
           </a>
+          {signedIn && (
+            <button
+              disabled={loggingOut}
+              onClick={async () => {
+                setLoggingOut(true);
+                setLogoutError("");
+                try {
+                  await session.logout();
+                } catch (e) {
+                  setLogoutError(errorMessage(e));
+                } finally {
+                  setLoggingOut(false);
+                }
+              }}
+            >
+              Se déconnecter
+            </button>
+          )}
+          {logoutError && <p role="alert">{logoutError}</p>}
         </header>
       </div>
     </>

@@ -1,5 +1,10 @@
 # Frontend PlateMate
 
+> La branche d'integration utilise maintenant les routes connectees a l'API.
+> Voir [le guide actuel](../docs/connected-local.md) pour Auth0, le proxy, les tests
+> et les limites connues. Les descriptions de maquette ci-dessous concernent
+> l'etat historique de la PR frontend avant raccordement.
+
 React, TypeScript et Vite servent la page d’accueil. Les styles SCSS suivent les couches inspirées de Socle-SCSS. Les photos, les polices de titre et le logo se trouvent dans `public/home/`.
 
 ## Écrans Ready for dev
