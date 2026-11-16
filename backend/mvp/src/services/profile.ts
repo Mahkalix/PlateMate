@@ -10,6 +10,16 @@ export const profileInput = z
     lastName: label,
     city: label,
     neighborhood: label.optional(),
+    phone: z
+      .string()
+      .trim()
+      .regex(/^\+?[0-9 ()-]{6,25}$/)
+      .optional(),
+    birthDate: z.iso
+      .date()
+      .refine((v) => v < new Date().toISOString().slice(0, 10))
+      .optional(),
+    motivations: tags.optional(),
     description: z.string().trim().max(1000).optional(),
     languages: tags.refine((v) => v.length > 0),
     affinities: tags.refine((v) => v.length > 0),

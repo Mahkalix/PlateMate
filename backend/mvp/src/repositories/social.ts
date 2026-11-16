@@ -47,12 +47,27 @@ export class SocialRepository {
     return { rating, comment };
   }
   async personal(me: string) {
-    return (
+    const personal = (
       await this.db.query(
         `SELECT u.id,u.email,u.created_at AS "createdAt",p.details AS profile,p.consented_at AS "consentedAt",p.is_verified AS "isVerified",EXISTS(SELECT 1 FROM host_profiles WHERE user_id=u.id) AS "isHost",ARRAY(SELECT to_jsonb(c) || jsonb_build_object('slots',ARRAY(SELECT to_jsonb(s) FROM context_slots s WHERE s.context_id=c.id)) FROM contexts c WHERE c.host_id=u.id) AS contexts,ARRAY(SELECT to_jsonb(b) FROM bookings b WHERE b.guest_id=u.id) AS bookings,ARRAY(SELECT to_jsonb(e) FROM booking_status_events e WHERE e.actor_id=u.id) AS events,ARRAY(SELECT to_jsonb(m) FROM messages m WHERE m.sender_id=u.id) AS messages,ARRAY(SELECT to_jsonb(r) FROM reviews r WHERE r.author_id=u.id) AS reviews FROM users u LEFT JOIN profiles p ON p.user_id=u.id WHERE u.id=$1`,
         [me],
       )
     ).rows[0];
+    if (!personal) return personal;
+    personal.table =
+      (
+        await this.db.query(
+          "SELECT details FROM host_profiles WHERE user_id=$1",
+          [me],
+        )
+      ).rows[0]?.details ?? null;
+    personal.allergyConsents = (
+      await this.db.query(
+        'SELECT a.booking_id AS "bookingId",a.allergies,a.granted_at AS "grantedAt" FROM booking_allergy_consents a JOIN bookings b ON b.id=a.booking_id WHERE b.guest_id=$1 ORDER BY a.booking_id',
+        [me],
+      )
+    ).rows;
+    return personal;
   }
   async erase(me: string) {
     const result = await this.db.query(

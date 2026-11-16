@@ -1,4 +1,5 @@
 import { walletRoutes } from "./wallet.js";
+import { accountRoutes } from "./account.js";
 import { Router } from "express";
 import { socialController } from "../controllers/social.js";
 import { SocialRepository } from "../repositories/social.js";
@@ -40,6 +41,7 @@ export function authRoutes(db: pg.Pool) {
     .route("/me/profile")
     .all(c.authenticated)
     .get(profile.read)
+    .patch(profile.patch)
     .put(profile.save);
   const explorer = explorerController(new ExplorerRepository(db));
   router.get("/explorer", c.authenticated, explorer.list);
@@ -73,5 +75,6 @@ export function authRoutes(db: pg.Pool) {
   router.get("/me/export", c.authenticated, social.personal);
   router.delete("/me/account", c.authenticated, social.erase);
   router.use(walletRoutes(db, c.authenticated));
+  router.use(accountRoutes(db, c.authenticated));
   return router;
 }
