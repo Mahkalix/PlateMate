@@ -103,6 +103,7 @@ export class Auth0Login {
       redirect_uri: this.callback.href,
       connection: this.connection,
       prompt: "login",
+      ui_locales: "fr",
       state,
       nonce,
       code_challenge_method: "S256",
