@@ -8,7 +8,7 @@
     "migrate": "node --env-file=.env src/server.js --migrate",
     "worker": "node --env-file=.env src/worker.js",
     "worker:dev": "node --env-file=.env src/worker.js --loop",
-    "test": "node --test",
+    "test": "node --test test/*.test.js",
     "test:integration": "node --env-file=.env.test --test test/integration.test.js",
     "demo": "node scripts/demo.mjs",
     "demo:stripe": "node scripts/demo.mjs --checkout"
