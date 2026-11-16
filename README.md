@@ -2,6 +2,28 @@
 
 Le nouveau backend TypeScript se trouve dans `backend/mvp`. Il utilise son propre schéma PostgreSQL. Le frontend et le service historique conservent leur fonctionnement pendant la migration. Les instructions historiques figurent en deuxième partie.
 
+## Préproduction et production
+
+- **Préproduction (branche `main`)** : [ouvrir PlateMate](https://plate-mate-git-main-mahkalixs-projects.vercel.app/).
+- **Santé de l’API** : [`/api/health`](https://plate-mate-git-main-mahkalixs-projects.vercel.app/api/health).
+- **Production (branche `production`)** : [weareplatemate.com](https://weareplatemate.com/). Cette branche conserve l’ancien `main` au commit `3153109`, avant la PR #8.
+
+Les push sur `main` créent des previews Vercel. Ils ne publient pas sur le domaine public. L’attribution automatique des domaines de production est désactivée ; une publication publique nécessite une promotion explicite dans Vercel.
+
+### Auth0 pour la préproduction
+
+Dans l’application Auth0 **PlateMate** (`rwmckSUTScqswy4vZoSxp88Ru0aJ47Hk`), conserver les URL locales utiles et ajouter :
+
+| Paramètre | Valeur |
+|---|---|
+| Allowed Callback URLs | `https://plate-mate-git-main-mahkalixs-projects.vercel.app/auth/callback` |
+| Allowed Logout URLs | `https://plate-mate-git-main-mahkalixs-projects.vercel.app` |
+| Allowed Web Origins | `https://plate-mate-git-main-mahkalixs-projects.vercel.app` |
+
+Dans Vercel, les variables Preview ciblant `main` doivent définir `AUTH0_CALLBACK_URL` sur le callback ci-dessus et `APP_ORIGIN` sur l’origine ci-dessus. Les secrets restent côté serveur.
+
+Utiliser cette adresse stable pour les tests, plutôt que l’URL unique de chaque déploiement. Une erreur « Callback URL mismatch » indique que le callback exact manque dans les URL autorisées de l’application Auth0.
+
 ## Lancement local
 
 Pour la branche commune front et back, consulter le [guide de test local](docs/local-integration.md) : sauvegardes des PR #6 et #5, pile `compose.integration.yaml`, base de test isolee et resultats reellement obtenus. Les interfaces frontend restent en demonstration tant que leur raccordement API n'est pas effectue.
