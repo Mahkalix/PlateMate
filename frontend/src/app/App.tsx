@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { HomePage } from "./pages/HomePage";
 import { AboutPage } from "./pages/AboutPage";
 import { HostPage } from "./pages/HostPage";
-import { RequireSession } from "./Session";
+import { RequireSession, useSession } from "./Session";
+import { ProfileWizard } from "./pages/ProfileWizard";
 import {
   ConnectedProfile,
   ConnectedExplorer,
@@ -12,7 +13,18 @@ import {
 } from "./pages/ConnectedPages";
 
 export function App() {
+  const session = useSession();
   const [route, setRoute] = useState(window.location.hash);
+  useEffect(() => {
+    if (
+      session.user &&
+      !session.loading &&
+      !session.error &&
+      !session.profile &&
+      route !== "#/profil"
+    )
+      window.location.hash = "#/profil";
+  }, [session.user, session.loading, session.error, session.profile, route]);
   useEffect(() => {
     const navigate = () => {
       setRoute(window.location.hash);
@@ -27,6 +39,20 @@ export function App() {
       document.getElementById(route.slice(1) || "accueil")?.scrollIntoView();
     }
   }, [route]);
+  if (
+    session.user &&
+    !session.loading &&
+    !session.profile &&
+    !session.error &&
+    route !== "#/profil"
+  )
+    return null;
+  if (route === "#/profil")
+    return (
+      <RequireSession>
+        <ProfileWizard />
+      </RequireSession>
+    );
   if (route === "#/explorer")
     return (
       <RequireSession>
@@ -58,12 +84,6 @@ export function App() {
     );
   if (route === "#/a-propos") return <AboutPage />;
   if (route === "#/devenir-hote") return <HostPage />;
-  if (route === "#/profil")
-    return (
-      <RequireSession>
-        <ConnectedProfile />
-      </RequireSession>
-    );
   if (route === "#/candidature")
     return (
       <RequireSession>
@@ -73,3 +93,4 @@ export function App() {
   if (route === "#/connexion") return <ConnectedLogin />;
   return <HomePage />;
 }
+
